@@ -14,12 +14,12 @@ export interface FAQItem {
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
-    question: 'What is MeetVault?',
+    question: 'What is MeetingVault?',
     answer:
-      'MeetVault is booking and payments software for salons and barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders you control—no spam. Includes client history and notes. Built for solo barbers and salons.',
+      'MeetingVault is booking and payments software for salons and barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders you control—no spam. Includes client history and notes. Built for solo barbers and salons.',
     link: '/',
     linkLabel: 'Learn more',
-    keywords: ['what', 'meetvault', 'salon', 'barber', 'booking', 'scheduling'],
+    keywords: ['what', 'meetingvault', 'salon', 'barber', 'booking', 'scheduling'],
   },
   {
     question: 'How do I book an appointment?',
@@ -36,7 +36,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     keywords: ['start', 'get started', 'host', 'sign up'],
   },
   {
-    question: 'What makes MeetVault different?',
+    question: 'What makes MeetingVault different?',
     answer:
       'We focus on: payments confirm before the appointment (no “booked but payment failed”), and reminders are appointment-only—no spam or marketing blasts you can’t turn off. Booking, deposits, no-show protection, and client history. Built for solo barbers and salons, with optional self-hosting.',
     keywords: ['different', 'vs', 'compare', 'why'],
@@ -44,7 +44,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'Pricing',
     answer:
-      'MeetVault is free to start with no credit card required. We offer simple, transparent pricing for solo barbers and salons. Check our pricing page for current plans.',
+      'MeetingVault is free to start with no credit card required. We offer simple, transparent pricing for solo barbers and salons. Check our pricing page for current plans.',
     link: '/pricing',
     linkLabel: 'View pricing',
     keywords: ['pricing', 'price', 'cost', 'plan', 'free', 'paid'],
@@ -52,7 +52,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'Book a demo',
     answer:
-      'Want to see MeetVault in action or discuss a Teams or custom plan? Get in touch and we\'ll schedule a demo.',
+      'Want to see MeetingVault in action or discuss a Teams or custom plan? Get in touch and we\'ll schedule a demo.',
     link: '/contact',
     linkLabel: 'Schedule a demo',
     keywords: ['demo', 'contact', 'sales', 'team', 'enterprise'],

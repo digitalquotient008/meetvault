@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { APP_URL } from '@/lib/constants';
 
 export default function Footer() {
 
@@ -8,7 +7,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
-            <h3 className="text-white font-bold text-lg mb-4">MeetVault</h3>
+            <h3 className="text-white font-bold text-lg mb-4">MeetingVault</h3>
             <p className="text-sm text-slate-400">Booking & payments for salons and barbers.</p>
           </div>
           <div>
@@ -42,12 +41,12 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Get Started</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors font-medium text-blue-400 hover:text-blue-300">
+                <Link href="/contact" className="hover:text-white transition-colors font-medium text-amber-400 hover:text-amber-300">
                   Schedule a demo
                 </Link>
               </li>
               <li>
-                <Link href={`${APP_URL}/auth/signup`} className="hover:text-white transition-colors">
+                <Link href="/sign-up" className="hover:text-white transition-colors">
                   Sign Up
                 </Link>
               </li>
@@ -60,7 +59,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>&copy; {new Date().getFullYear()} MeetVault. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} MeetingVault. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

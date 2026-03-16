@@ -1,24 +1,22 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import ChatWidget from '@/components/ChatWidget';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://meetvault.app'),
-  title: 'MeetVault – Booking & Payments for Salons and Barbers',
-  description: 'Online booking, deposits, no-show protection, and client history for salons and solo barbers.',
-  keywords: 'salon booking, barbershop app, barber scheduling, salon software, appointment booking, no-show protection, MeetVault',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://meetingvault.app'),
+  title: { default: 'MeetingVault – The operating system for modern barbershops', template: '%s | MeetingVault' },
+  description: 'Bookings, payments, customer relationships, staff payouts, and growth workflows in one clean platform that the shop actually controls.',
+  keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetingVault, Squire alternative',
   openGraph: {
-    title: 'MeetVault – Booking & Payments for Salons and Barbers',
-    description: 'Online booking, deposits, no-show protection, and client history for salons and solo barbers.',
+    title: 'MeetingVault – The operating system for modern barbershops',
+    description: 'Bookings, payments, customers, and payouts — finally in one clean system.',
     type: 'website',
   },
 };
@@ -28,26 +26,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'MeetVault',
-    url: 'https://meetvault.app',
-    description: 'Booking and payments for salons and barbers. Reliable payments, reminders you control, no spam.',
-  };
-
   return (
-    <html lang="en">
-      <body className={`${inter.className} ${inter.variable} bg-slate-950 text-slate-200`}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <ChatWidget />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${inter.className} ${inter.variable} bg-slate-950 text-slate-200 antialiased`}>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

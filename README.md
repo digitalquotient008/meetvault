@@ -1,82 +1,85 @@
-# MeetVault Marketing Website
+# MeetingVault
 
-Modern, SEO-optimized marketing website for MeetVault built with Next.js, TypeScript, and TailwindCSS.
+**The operating system for modern barbershops.**  
+Bookings, payments, customer relationships, staff payouts, and growth workflows in one clean platform that the shop actually controls.
 
-## Features
+## Stack
 
-- SEO-optimized with meta tags and structured data
-- Responsive design (mobile-first)
-- Fast performance with Next.js static generation
-- MVP-focused content highlighting core features
-- FAQ section
-- Roadmap for future features
+- **Next.js 15** (App Router), TypeScript, Tailwind CSS
+- **Clerk** for auth
+- **Prisma** + PostgreSQL
+- Stripe-ready (Phase 2)
 
-## Getting Started
+## Getting started
 
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### Development
+### 2. Environment variables
+
+Copy `.env.example` to `.env.local` and set:
+
+- `DATABASE_URL` — PostgreSQL connection string (e.g. Neon, Supabase)
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` — from [Clerk](https://clerk.com)
+- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_APP_URL` — e.g. `http://localhost:3000`
+
+### 3. Database
+
+```bash
+npm run db:generate
+npm run db:push
+npm run db:seed
+```
+
+### 4. Run dev server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **Marketing:** http://localhost:3000  
+- **Sign up / Sign in:** http://localhost:3000/sign-up, /sign-in  
+- **Dashboard:** http://localhost:3000/app (after sign-in)  
+- **Public booking:** http://localhost:3000/book/demo-shop (after seed)
 
-### Build
+## Phase 0 & 1 (current)
 
-```bash
-npm run build
-npm start
-```
+- [x] App skeleton, auth (Clerk), Prisma schema, tenant structure
+- [x] Marketing site (MeetingVault branding), pricing, FAQ
+- [x] Protected app shell (sidebar, dashboard)
+- [x] Owner onboarding (shop → services → staff → hours → booking link)
+- [x] Services & staff (list views; full CRUD in Phase 2)
+- [x] Scheduling engine (slots, conflict check, transactional booking)
+- [x] Public booking flow: service → barber → date/time → details → confirm
+- [x] Confirmation page
+- [x] Seed (demo shop, barber, service, customer)
 
-## Environment Variables
+## Phase 2 (next)
 
-Create a `.env.local` file:
+- Customer CRM (detail, notes, visit history)
+- Stripe deposits & checkout, tips, receipts, refunds
+- Appointment completion flow, dashboard metrics
 
-```env
-NEXT_PUBLIC_APP_URL=https://meetvault.app
-NEXT_PUBLIC_MARKETING_URL=https://meetvault.app
-GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
-```
+## Commands
 
-## Deployment
+| Command        | Description              |
+|----------------|--------------------------|
+| `npm run dev`  | Start dev server         |
+| `npm run build`| Build for production     |
+| `npm run db:push` | Push schema to DB     |
+| `npm run db:seed` | Run seed              |
+| `npm run db:studio` | Open Prisma Studio  |
 
-### Vercel (Recommended)
+## Project structure
 
-1. Push to GitHub
-2. Import project in Vercel
-3. Set environment variables
-4. Deploy
-
-### Other Options
-
-- Netlify
-- Railway
-- GitHub Pages (with static export)
-
-## Project Structure
-
-```
-meetvault-marketing/
-├── public/          # Static assets
-├── src/
-│   ├── app/         # Next.js pages
-│   ├── components/  # React components
-│   ├── lib/         # Constants and utilities
-│   └── styles/      # Global styles
-└── package.json
-```
-
-## License
-
-MIT
+- `src/app/(marketing)/` — Landing, features, pricing, etc.
+- `src/app/(auth)/` — Sign-in, sign-up (Clerk)
+- `src/app/app/` — Dashboard (onboarding, calendar, customers, services, staff, settings)
+- `src/app/book/[shopSlug]/` — Public booking flow & confirmation
+- `src/lib/services/` — Shop, service, barber, availability, appointment, customer
+- `src/lib/auth.ts` — Clerk + membership, requireShopAccess
+- `prisma/schema.prisma` — Full multi-tenant schema

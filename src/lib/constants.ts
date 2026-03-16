@@ -1,6 +1,6 @@
 // App URL: where the Spring Boot backend (auth, dashboard, subscribe) is hosted.
-// Marketing site is typically at meetvault.app; app is usually at app.meetvault.app or your Railway URL.
-const raw = process.env.NEXT_PUBLIC_APP_URL || 'https://app.meetvault.app';
+// App URL for redirects and links (e.g. https://meetingvault.app or http://localhost:3000).
+const raw = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 export const APP_URL = raw.replace(/\/$/, '');
 
 export const MVP_FEATURES = [

@@ -1,0 +1,423 @@
+// MeetingVault — multi-tenant barbershop SaaS
+// All tenant-owned tables include shopId, createdAt, updatedAt
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  OWNER
+  MANAGER
+  BARBER
+  RECEPTIONIST
+}
+
+enum CommissionType {
+  PERCENT
+  FIXED
+  CHAIR_RENTAL
+  HYBRID
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED
+  NO_SHOW
+  IN_PROGRESS
+}
+
+enum AppointmentChannel {
+  ONLINE
+  STAFF
+  WALK_IN
+}
+
+enum DepositType {
+  FIXED
+  PERCENT
+}
+
+enum PaymentType {
+  DEPOSIT
+  FULL
+  BALANCE
+  TIP
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIAL_REFUNDED
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+enum WaitlistStatus {
+  ACTIVE
+  MATCHED
+  EXPIRED
+  CANCELED
+}
+
+enum WalkInStatus {
+  WAITING
+  ASSIGNED
+  IN_SERVICE
+  DONE
+  LEFT
+}
+
+model Shop {
+  id                   String    @id @default(cuid())
+  name                 String
+  slug                 String    @unique
+  logoUrl              String?
+  phone                String?
+  email                String?
+  addressLine1         String?
+  addressLine2         String?
+  city                 String?
+  state                String?
+  postalCode           String?
+  country              String?   @default("US")
+  timezone             String    @default("America/New_York")
+  brandPrimaryColor    String?
+  brandSecondaryColor  String?
+  cancellationPolicy   String?
+  depositRequired      Boolean   @default(false)
+  depositType          DepositType?
+  depositValue         Decimal?  @db.Decimal(10, 2)
+  tippingEnabled       Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  memberships          Membership[]
+  barberProfiles       BarberProfile[]
+  services             Service[]
+  availabilityRules    AvailabilityRule[]
+  timeOffs             TimeOff[]
+  customers            Customer[]
+  appointments         Appointment[]
+  payments             Payment[]
+  refunds              Refund[]
+  notificationLogs     NotificationLog[]
+  waitlistEntries      WaitlistEntry[]
+  walkInQueueEntries   WalkInQueueEntry[]
+  auditLogs            AuditLog[]
+}
+
+model User {
+  id              String   @id @default(cuid())
+  authProviderId  String   @unique
+  email           String
+  firstName       String?
+  lastName        String?
+  phone           String?
+  avatarUrl       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  memberships     Membership[]
+  barberProfiles  BarberProfile[]
+}
+
+model Membership {
+  id        String         @id @default(cuid())
+  shopId    String
+  userId    String
+  role      MembershipRole
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, userId])
+  @@index([shopId])
+  @@index([userId])
+}
+
+model BarberProfile {
+  id                    String          @id @default(cuid())
+  shopId                String
+  userId                String
+  displayName           String
+  bio                   String?
+  photoUrl              String?
+  isBookable            Boolean         @default(true)
+  commissionType        CommissionType? @default(PERCENT)
+  commissionValue       Decimal?        @db.Decimal(10, 2)
+  chairRentalAmount     Decimal?        @db.Decimal(10, 2)
+  serviceBufferBeforeMin Int             @default(0)
+  serviceBufferAfterMin Int             @default(0)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  shop              Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  availabilityRules AvailabilityRule[]
+  timeOffs          TimeOff[]
+  appointments      Appointment[]
+  customersFavorite Customer[]
+
+  @@unique([shopId, userId])
+  @@index([shopId])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  shopId         String
+  name           String
+  description    String?
+  durationMin    Int
+  price          Decimal  @db.Decimal(10, 2)
+  depositEligible Boolean  @default(false)
+  category       String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  shop               Shop                @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  appointmentServices AppointmentService[]
+
+  @@index([shopId])
+}
+
+model AvailabilityRule {
+  id               String   @id @default(cuid())
+  shopId           String
+  barberProfileId  String
+  dayOfWeek        Int      // 0 = Sunday, 6 = Saturday
+  startTime        String   // "09:00"
+  endTime          String   // "17:00"
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  shop          Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  barberProfile BarberProfile @relation(fields: [barberProfileId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([barberProfileId])
+}
+
+model TimeOff {
+  id               String   @id @default(cuid())
+  shopId           String
+  barberProfileId  String
+  startDateTime    DateTime
+  endDateTime      DateTime
+  reason           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  shop          Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  barberProfile BarberProfile @relation(fields: [barberProfileId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([barberProfileId])
+}
+
+model Customer {
+  id                      String   @id @default(cuid())
+  shopId                  String
+  firstName               String
+  lastName                String
+  email                   String?
+  phone                   String?
+  notes                   String?
+  favoriteBarberProfileId String?
+  totalSpend              Decimal  @default(0) @db.Decimal(12, 2)
+  totalVisits             Int      @default(0)
+  lastVisitAt             DateTime?
+  noShowCount             Int      @default(0)
+  marketingOptInSms       Boolean  @default(false)
+  marketingOptInEmail     Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  shop                    Shop                @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  favoriteBarber          BarberProfile?     @relation(fields: [favoriteBarberProfileId], references: [id], onDelete: SetNull)
+  appointments            Appointment[]
+  waitlistEntries         WaitlistEntry[]
+  walkInQueueEntries      WalkInQueueEntry[]
+
+  @@index([shopId])
+  @@index([shopId, email])
+}
+
+model Appointment {
+  id               String             @id @default(cuid())
+  shopId           String
+  customerId       String
+  barberProfileId  String
+  startDateTime   DateTime
+  endDateTime     DateTime
+  status          AppointmentStatus  @default(PENDING)
+  channel         AppointmentChannel @default(ONLINE)
+  subtotal        Decimal?           @db.Decimal(10, 2)
+  taxAmount       Decimal?           @db.Decimal(10, 2)
+  tipAmount       Decimal?           @db.Decimal(10, 2)
+  totalAmount     Decimal?           @db.Decimal(10, 2)
+  depositAmount   Decimal?           @db.Decimal(10, 2)
+  balanceDue      Decimal?           @db.Decimal(10, 2)
+  notes           String?
+  confirmationCode String?           @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  shop              Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer          Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  barberProfile     BarberProfile      @relation(fields: [barberProfileId], references: [id], onDelete: Cascade)
+  appointmentServices AppointmentService[]
+  payments          Payment[]
+
+  @@index([shopId])
+  @@index([barberProfileId])
+  @@index([customerId])
+  @@index([shopId, startDateTime])
+}
+
+model AppointmentService {
+  id                  String   @id @default(cuid())
+  appointmentId       String
+  serviceId           String
+  serviceNameSnapshot String
+  durationMinSnapshot Int
+  priceSnapshot       Decimal  @db.Decimal(10, 2)
+  createdAt           DateTime @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId])
+}
+
+model Payment {
+  id                   String        @id @default(cuid())
+  shopId               String
+  appointmentId        String?
+  customerId           String?
+  stripePaymentIntentId String?
+  amount               Decimal       @db.Decimal(10, 2)
+  currency             String        @default("usd")
+  type                 PaymentType
+  status               PaymentStatus @default(PENDING)
+  methodBrand          String?
+  receiptUrl           String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  refunds     Refund[]
+
+  @@index([shopId])
+  @@index([appointmentId])
+}
+
+model Refund {
+  id        String   @id @default(cuid())
+  shopId    String
+  paymentId String
+  amount    Decimal  @db.Decimal(10, 2)
+  reason    String?
+  status    String
+  createdAt DateTime @default(now())
+
+  shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model NotificationLog {
+  id                String             @id @default(cuid())
+  shopId            String
+  appointmentId     String?
+  customerId        String?
+  channel           NotificationChannel
+  templateKey       String
+  status            NotificationStatus  @default(QUEUED)
+  providerMessageId String?
+  errorMessage      String?
+  sentAt            DateTime?
+  createdAt         DateTime           @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model WaitlistEntry {
+  id                     String        @id @default(cuid())
+  shopId                 String
+  customerId             String
+  preferredBarberProfileId String?
+  preferredServiceId     String?
+  preferredDate          DateTime?
+  preferredTimeWindow    String?
+  notes                  String?
+  status                 WaitlistStatus @default(ACTIVE)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  shop   Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+}
+
+model WalkInQueueEntry {
+  id                      String       @id @default(cuid())
+  shopId                  String
+  customerId              String?
+  guestName               String
+  requestedServiceId      String?
+  requestedBarberProfileId String?
+  status                  WalkInStatus @default(WAITING)
+  estimatedWaitMin        Int?
+  arrivedAt               DateTime     @default(now())
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+
+  shop   Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([shopId])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  shopId      String
+  actorUserId String?
+  entityType  String
+  entityId    String
+  action      String
+  beforeJson  String?
+  afterJson   String?
+  createdAt   DateTime @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([shopId, entityType, entityId])
+}

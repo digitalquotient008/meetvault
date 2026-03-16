@@ -8,13 +8,13 @@ type Need = 'scheduling' | 'crm' | 'full' | '';
 
 const RECOMMENDATIONS: Record<string, { plan: string; blurb: string; planValue: string }> = {
   'solo-scheduling': { plan: 'Free / Solo', planValue: 'solo', blurb: 'Start with the free tier. Perfect for solo barbers and stylists who need simple booking.' },
-  'solo-crm': { plan: 'Solo', planValue: 'solo', blurb: 'MeetVault includes client history on all plans. The free tier gives you contacts and booking history.' },
+  'solo-crm': { plan: 'Solo', planValue: 'solo', blurb: 'MeetingVault includes client history on all plans. The free tier gives you contacts and booking history.' },
   'solo-full': { plan: 'Solo', planValue: 'solo', blurb: 'The free tier includes booking, client history, and reminders. Upgrade when you need multiple chairs.' },
   'team-scheduling': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan gives you multiple barbers or stylists, each with a booking link. Ideal for shops.' },
   'team-crm': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan includes booking and client history for the whole shop. Book on behalf of others.' },
   'team-full': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan is the best fit for barbershops and salons with multiple chairs.' },
   'enterprise-scheduling': { plan: 'Custom', planValue: 'custom', blurb: 'For multi-location or large shops we recommend a custom solution. Contact us.' },
-  'enterprise-crm': { plan: 'Custom', planValue: 'custom', blurb: 'Custom deployments for multi-location or enterprise. We can tailor MeetVault to your shop.' },
+  'enterprise-crm': { plan: 'Custom', planValue: 'custom', blurb: 'Custom deployments for multi-location or enterprise. We can tailor MeetingVault to your shop.' },
   'enterprise-full': { plan: 'Custom', planValue: 'custom', blurb: 'Custom solutions for multi-location salons or barbershop chains. Schedule a demo.' },
 };
 
