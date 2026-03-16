@@ -47,21 +47,30 @@ export default async function PaymentsPage({
 
   // Verify live with Stripe if DB says not onboarded
   if (!onboarded && shop?.stripeConnectAccountId) {
-    const { chargesEnabled } = await getConnectAccountStatus(shop.stripeConnectAccountId);
-    if (chargesEnabled) {
-      await markShopOnboarded(shopId);
-      onboarded = true;
+    try {
+      const { chargesEnabled } = await getConnectAccountStatus(shop.stripeConnectAccountId);
+      if (chargesEnabled) {
+        await markShopOnboarded(shopId);
+        onboarded = true;
+      }
+    } catch {
+      // Stripe unreachable or key misconfigured — show page without crashing
     }
   }
 
   let balance: { available: number; pending: number; currency: string } | null = null;
   let payouts: Stripe.Payout[] = [];
+  let stripeError: string | null = null;
 
   if (onboarded && shop?.stripeConnectAccountId) {
-    [balance, payouts] = await Promise.all([
-      getAccountBalance(shop.stripeConnectAccountId),
-      getPayoutHistory(shop.stripeConnectAccountId),
-    ]);
+    try {
+      [balance, payouts] = await Promise.all([
+        getAccountBalance(shop.stripeConnectAccountId),
+        getPayoutHistory(shop.stripeConnectAccountId),
+      ]);
+    } catch {
+      stripeError = 'Unable to load balance from Stripe. Please try again shortly.';
+    }
   }
 
   const notConnected = !shop?.stripeConnectAccountId;
@@ -107,6 +116,12 @@ export default async function PaymentsPage({
 
         {(notConnected || notOnboarded) && <ConnectButton />}
       </div>
+
+      {stripeError && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+          {stripeError}
+        </div>
+      )}
 
       {/* Balance Cards */}
       {onboarded && balance && (
