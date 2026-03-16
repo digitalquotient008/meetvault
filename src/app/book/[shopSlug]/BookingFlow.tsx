@@ -6,6 +6,8 @@ import type { ShopForBooking } from '@/lib/services/shop';
 import { bookAppointmentAction, joinWaitlistAction } from './actions';
 
 type Step = 'service' | 'barber' | 'datetime' | 'details' | 'confirm';
+type Service = ShopForBooking['services'][number];
+type BarberProfile = ShopForBooking['barberProfiles'][number];
 
 export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   const router = useRouter();
