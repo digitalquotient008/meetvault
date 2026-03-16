@@ -3,7 +3,7 @@ import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'Features - MeetVault',
-  description: 'Core, Revenue, Workflow, and Automation layers for legal consultations: booking, payments, intake, and client history.',
+  description: 'Booking, deposits, no-show protection, and client history for salons and barbers. Like Squire, without the headaches.',
 };
 
 export default function FeaturesPage() {
@@ -13,10 +13,10 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Four layers for client consultations
+              Booking & payments for salons and barbers
             </h1>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              From booking and payments to intake, client history, and automation — one platform for lawyers.
+              Core booking, revenue, workflow, and automation—built for the chair. Reliable payments, no spam.
             </p>
           </div>
         </div>
@@ -56,21 +56,21 @@ export default function FeaturesPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
-              <h3 className="text-xl font-semibold text-white mb-3">Lawyers & law firms</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Solo barbers</h3>
               <p className="text-slate-400">
-                Book consultations, collect retainers and fees, run intake and document uploads, and keep client history and notes in one place.
+                One link, deposits to cut no-shows, client history and notes. Free to start. Reminders you control—no spam.
               </p>
             </div>
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
-              <h3 className="text-xl font-semibold text-white mb-3">Consultants</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Barbershops & salons</h3>
               <p className="text-slate-400">
-                Manage client consultations, track booking history, and maintain professional relationships all in one platform.
+                Multiple barbers or stylists, each with a booking link. Deposits, cancellation fees, reliable payment confirmation.
               </p>
             </div>
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
-              <h3 className="text-xl font-semibold text-white mb-3">Coaches & advisors</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Nail techs & stylists</h3>
               <p className="text-slate-400">
-                Schedule sessions, collect payments, and focus on delivery with built-in CRM and reminders.
+                Set services and hours, share your link. Get paid upfront or in-shop. Client notes and booking history in one place.
               </p>
             </div>
           </div>

@@ -10,7 +10,7 @@ interface CTAProps {
 
 export default function CTA({ 
   title = 'Ready to get started?',
-  description = 'Join lawyers and firms who run consultations on MeetVault.',
+  description = 'Join salons and barbers who run their book with MeetVault.',
   buttonText = 'Sign up for free',
   variant = 'primary'
 }: CTAProps) {

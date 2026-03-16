@@ -2,7 +2,7 @@ import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'About - MeetVault',
-  description: 'MeetVault is the client consultation platform for lawyers. One place for booking, payments, intake, and client workflow.',
+  description: 'MeetVault is booking and payments for salons and barbers. Like Squire—reliable payments, reminders you control, no spam.',
 };
 
 export default function AboutPage() {
@@ -15,7 +15,7 @@ export default function AboutPage() {
               About MeetVault
             </h1>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Client consultation platform for lawyers
+              Booking & payments for salons and barbers
             </p>
           </div>
         </div>
@@ -26,28 +26,26 @@ export default function AboutPage() {
           <div className="prose prose-lg max-w-none">
             <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              MeetVault was built so lawyers can run client consultations from one platform: book consultations, 
-              collect payments and deposits, run intake and document uploads, and keep client history and notes 
-              in one place—without juggling multiple tools or expensive subscriptions.
+              MeetVault was built for salons and barbers who want Squire-style booking and payments without the headaches: 
+              reliable payment confirmation (no “booked but payment failed”), reminders you control with no spam or 
+              marketing blasts, and client history in one place. Free to start.
             </p>
             
             <h2 className="text-3xl font-bold text-white mb-6 mt-12">What Makes Us Different</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              We combine core booking (calendar, time zones, video links, reminders), revenue (payments, deposits, 
-              cancellation fees), workflow (intake, document uploads, client history, notes), and automation 
-              (follow-ups, rescheduling, waitlists) in one product. Built for solo and small-firm practice.
+              We focus on what the chair needs: online booking, deposits and no-show protection, appointment reminders 
+              only (no unsolicited promos), and client notes. Payments confirm before the appointment so you don’t get 
+              “booked but not paid.” Built for solo barbers and salons. Self-hostable—you own your data.
             </p>
             
             <h2 className="text-3xl font-bold text-white mb-6 mt-12">Our Approach</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              We focus on the layers that matter for legal consultations. As we grow, we add features based on 
-              feedback from lawyers and firms. Your practice drives our roadmap.
+              We add features based on feedback from barbers and salon owners. Your book drives our roadmap.
             </p>
             
             <h2 className="text-3xl font-bold text-white mb-6 mt-12">Your Data, Your Control</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              MeetVault can be self-hosted. You own your data and have full control over your deployment. 
-              We believe in transparency and giving you the freedom to choose how you run your practice.
+              MeetVault can be self-hosted. You own your data and have full control over your deployment.
             </p>
           </div>
         </div>

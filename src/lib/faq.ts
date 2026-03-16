@@ -16,29 +16,35 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'What is MeetVault?',
     answer:
-      'MeetVault is a client consultation platform for lawyers. Book consultations, collect payments and deposits, run intake and document uploads, and keep client history and notes in one place. It includes built-in CRM and works for solo and small-firm practice.',
+      'MeetVault is booking and payments software for salons and barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders you control—no spam. Includes client history and notes. Built for solo barbers and salons.',
     link: '/',
     linkLabel: 'Learn more',
-    keywords: ['what', 'meetvault', 'scheduling', 'platform', 'lawyers', 'legal'],
+    keywords: ['what', 'meetvault', 'salon', 'barber', 'booking', 'scheduling'],
   },
   {
-    question: 'How do I book a meeting?',
+    question: 'How do I book an appointment?',
     answer:
-      'Visit the host\'s booking page (they share a link with you), choose an event type, pick a date and time, and confirm. You\'ll get a confirmation email with the details.',
-    keywords: ['book', 'booking', 'schedule', 'meeting', 'how'],
+      'Visit the barber or salon\'s booking page (they share a link), choose a service, pick a date and time, and confirm. You\'ll get a confirmation email. Pay online or in-person depending on how they set it up.',
+    keywords: ['book', 'booking', 'schedule', 'appointment', 'how'],
   },
   {
-    question: 'How do I get started as a host?',
+    question: 'How do I get started as a barber or salon?',
     answer:
-      'Sign up with your email and password—no credit card required. Then create your event types, set your weekly availability, and share your booking link. You can start receiving bookings in minutes.',
+      'Sign up with your email and password—no credit card required. Create your services, set your availability, and share your booking link. Start taking bookings in minutes.',
     link: '/',
     linkLabel: 'Sign up for free',
     keywords: ['start', 'get started', 'host', 'sign up'],
   },
   {
+    question: 'Why MeetVault instead of Squire?',
+    answer:
+      'MeetVault fixes issues Squire users report: payments confirm before the appointment (no “booked but payment failed”), and reminders are appointment-only—no spam or marketing blasts you can’t turn off. Same idea: booking, deposits, no-show protection. We’re built for solo barbers and salons, with optional self-hosting.',
+    keywords: ['squire', 'alternative', 'vs', 'compare', 'why'],
+  },
+  {
     question: 'Pricing',
     answer:
-      'MeetVault is free to start with no credit card required. We offer simple, transparent pricing for individuals and teams. Check our pricing page for current plans.',
+      'MeetVault is free to start with no credit card required. We offer simple, transparent pricing for solo barbers and salons. Check our pricing page for current plans.',
     link: '/pricing',
     linkLabel: 'View pricing',
     keywords: ['pricing', 'price', 'cost', 'plan', 'free', 'paid'],

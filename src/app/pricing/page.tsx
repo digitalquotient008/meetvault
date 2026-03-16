@@ -4,7 +4,7 @@ import PricingCards from '@/components/PricingCards';
 
 export const metadata = {
   title: 'Pricing - MeetVault',
-  description: 'Simple, transparent pricing for MeetVault — client consultation platform for lawyers.',
+  description: 'Simple, transparent pricing for MeetVault — booking & payments for salons and barbers.',
 };
 
 export default function PricingPage() {

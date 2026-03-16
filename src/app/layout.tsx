@@ -13,12 +13,12 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://meetvault.app'),
-  title: 'MeetVault – Client Consultation Platform for Lawyers',
-  description: 'Booking, payments, intake, and client history for legal consultations. One platform for lawyers.',
-  keywords: 'scheduling, calendar, booking, lawyers, law firm, legal consultation, client intake, appointment scheduling, CRM, MeetVault',
+  title: 'MeetVault – Booking & Payments for Salons and Barbers',
+  description: 'Online booking, deposits, no-show protection, and client history for salons and solo barbers. Like Squire—without the headaches.',
+  keywords: 'salon booking, barbershop app, barber scheduling, salon software, appointment booking, no-show protection, MeetVault',
   openGraph: {
-    title: 'MeetVault – Client Consultation Platform for Lawyers',
-    description: 'Booking, payments, intake, and client history for legal consultations. One platform for lawyers.',
+    title: 'MeetVault – Booking & Payments for Salons and Barbers',
+    description: 'Online booking, deposits, no-show protection, and client history for salons and solo barbers.',
     type: 'website',
   },
 };
@@ -33,7 +33,7 @@ export default function RootLayout({
     '@type': 'Organization',
     name: 'MeetVault',
     url: 'https://meetvault.app',
-    description: 'Client consultation platform for lawyers. Booking, payments, intake, and workflow in one place.',
+    description: 'Booking and payments for salons and barbers. Reliable payments, reminders you control, no spam.',
   };
 
   return (

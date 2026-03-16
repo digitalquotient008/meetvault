@@ -4,7 +4,7 @@ import { FAQ_ITEMS } from '@/lib/faq';
 
 export const metadata = {
   title: 'FAQ - MeetVault',
-  description: 'Frequently asked questions about MeetVault — client consultation platform for lawyers. Booking, pricing, and support.',
+  description: 'Frequently asked questions about MeetVault — booking & payments for salons and barbers. Pricing, support, and why we’re different from Squire.',
 };
 
 export default function FAQPage() {

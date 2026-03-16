@@ -7,15 +7,15 @@ type Size = 'solo' | 'team' | 'enterprise' | '';
 type Need = 'scheduling' | 'crm' | 'full' | '';
 
 const RECOMMENDATIONS: Record<string, { plan: string; blurb: string; planValue: string }> = {
-  'solo-scheduling': { plan: 'Free / Solo', planValue: 'solo', blurb: 'Start with the free tier. Perfect for individual professionals who need simple scheduling.' },
-  'solo-crm': { plan: 'Solo with CRM', planValue: 'solo', blurb: 'MeetVault includes built-in CRM on all plans. The free tier gives you contacts and activity tracking.' },
-  'solo-full': { plan: 'Solo', planValue: 'solo', blurb: 'The free tier includes scheduling, CRM, and reminders. Upgrade to Teams when you need more seats.' },
-  'team-scheduling': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan gives you multiple users and shared scheduling. Ideal for small teams.' },
-  'team-crm': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan includes scheduling and CRM for the whole team. Book on behalf of others and share contacts.' },
-  'team-full': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan is the best fit for small teams that need full scheduling, CRM, and collaboration.' },
-  'enterprise-scheduling': { plan: 'Custom', planValue: 'custom', blurb: 'For larger organizations we recommend a custom solution. Contact us to discuss your needs.' },
-  'enterprise-crm': { plan: 'Custom', planValue: 'custom', blurb: 'Enterprise needs often require a custom deployment. We can tailor MeetVault to your organization.' },
-  'enterprise-full': { plan: 'Custom', planValue: 'custom', blurb: 'Custom solutions include SSO, dedicated support, and tailored features. Schedule a demo to learn more.' },
+  'solo-scheduling': { plan: 'Free / Solo', planValue: 'solo', blurb: 'Start with the free tier. Perfect for solo barbers and stylists who need simple booking.' },
+  'solo-crm': { plan: 'Solo', planValue: 'solo', blurb: 'MeetVault includes client history on all plans. The free tier gives you contacts and booking history.' },
+  'solo-full': { plan: 'Solo', planValue: 'solo', blurb: 'The free tier includes booking, client history, and reminders. Upgrade when you need multiple chairs.' },
+  'team-scheduling': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan gives you multiple barbers or stylists, each with a booking link. Ideal for shops.' },
+  'team-crm': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan includes booking and client history for the whole shop. Book on behalf of others.' },
+  'team-full': { plan: 'Teams', planValue: 'teams', blurb: 'Teams plan is the best fit for barbershops and salons with multiple chairs.' },
+  'enterprise-scheduling': { plan: 'Custom', planValue: 'custom', blurb: 'For multi-location or large shops we recommend a custom solution. Contact us.' },
+  'enterprise-crm': { plan: 'Custom', planValue: 'custom', blurb: 'Custom deployments for multi-location or enterprise. We can tailor MeetVault to your shop.' },
+  'enterprise-full': { plan: 'Custom', planValue: 'custom', blurb: 'Custom solutions for multi-location salons or barbershop chains. Schedule a demo.' },
 };
 
 function getRecommendation(size: Size, need: Need) {
@@ -56,7 +56,7 @@ export default function PlanRecommendation() {
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
-                {s === 'solo' ? 'Solo' : s === 'team' ? 'Small team' : 'Enterprise'}
+                {s === 'solo' ? 'Solo barber / stylist' : s === 'team' ? 'Shop (multiple chairs)' : 'Multi-location'}
               </button>
             ))}
           </div>
@@ -75,7 +75,7 @@ export default function PlanRecommendation() {
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
-                {n === 'scheduling' ? 'Scheduling only' : n === 'crm' ? 'Scheduling + CRM' : 'Full suite'}
+                {n === 'scheduling' ? 'Booking only' : n === 'crm' ? 'Booking + client history' : 'Full (payments, etc.)'}
               </button>
             ))}
           </div>

@@ -8,10 +8,10 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-5 sm:mb-6 leading-[1.1] tracking-tight">
-            MeetVault – client consultation platform for lawyers
+            MeetVault – booking & payments for salons and barbers
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-slate-400 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed font-normal">
-            Booking calendar, payments, intake, and client history in one place. Built for solo and small-firm practice.
+            Online booking, deposits, no-show protection, and client history. Built for solo barbers and salons—reliable payments, reminders you control, no spam.
           </p>
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center items-center">
             <Link

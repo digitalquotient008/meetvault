@@ -1,27 +1,27 @@
 export default function Testimonials() {
   const outcomes = [
     {
-      title: 'Reach more customers',
+      title: 'Reliable payments',
       description:
-        'Share a booking link anywhere and let clients book instantly—without back-and-forth emails.',
-      icon: '📈',
-    },
-    {
-      title: 'Better ROI on time',
-      description:
-        'Automate scheduling, reminders, and follow-ups so your team can focus on delivering value.',
-      icon: '⏱️',
-    },
-    {
-      title: 'Fewer scheduling mistakes',
-      description:
-        'Availability rules, buffers, and conflict checks help prevent double-bookings and no-shows.',
+        'Payment confirms before the appointment. No “booked but payment failed” surprises like with other apps.',
       icon: '✅',
     },
     {
-      title: 'Stronger client relationships',
+      title: 'Reminders you control',
       description:
-        'Keep context in one place with contact profiles and booking history, so every interaction feels personalized.',
+        'Appointment reminders only—no spam or marketing blasts. Your clients get 24h and 1h reminders, nothing else.',
+      icon: '🔔',
+    },
+    {
+      title: 'Fewer no-shows',
+      description:
+        'Deposits and cancellation fees protect your time. Buffers and availability rules prevent double-books.',
+      icon: '💰',
+    },
+    {
+      title: 'Client history in one place',
+      description:
+        'See who’s coming in, past visits, and notes. No spreadsheets.',
       icon: '👥',
     },
   ];
@@ -31,10 +31,10 @@ export default function Testimonials() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">
-            Why lawyers and firms use MeetVault
+            Why salons and barbers use MeetVault
           </h2>
           <p className="text-lg text-slate-400 max-w-3xl mx-auto">
-            Book consultations, get paid, run intake and client workflow, and cut coordination overhead in one place.
+            Reliable payments, reminders you control, no spam. Like Squire—without the headaches.
           </p>
         </div>
         

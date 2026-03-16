@@ -5,45 +5,39 @@ export const APP_URL = raw.replace(/\/$/, '');
 
 export const MVP_FEATURES = [
   {
-    title: 'Google Calendar Sync',
+    title: 'Your Booking Link',
     description:
-      'Connect Google Calendar to block busy times automatically and create events when bookings are confirmed.',
-    icon: '📅',
-  },
-  {
-    title: 'Customize Your Booking Link',
-    description: 'Create a personalized booking URL that matches your brand. Share your unique link anywhere.',
+      'One link per barber or service. Share on Instagram, your site, or in the shop. Clients book 24/7.',
     icon: '🔗',
   },
   {
-    title: 'Meeting Polls',
-    description: 'Send a poll, let invitees vote on times, and lock in the best slot—no back-and-forth.',
-    icon: '🗳️',
+    title: 'Deposits & No-Show Protection',
+    description: 'Collect deposits or full payment upfront. Cancellation fees reduce no-shows and protect your time.',
+    icon: '💰',
   },
   {
-    title: 'View Contact Profiles & Activity',
-    description: 'Track all interactions with your contacts. See booking history, notes, and scheduling activity in one place.',
+    title: 'Client History & Notes',
+    description: 'See who’s coming in, past visits, and notes in one place. No spreadsheets.',
     icon: '👥',
   },
   {
-    title: 'Control Your Availability',
-    description: 'Only get booked when you want to be. Set meeting limits, buffers, and advanced scheduling rules.',
+    title: 'Reminders You Control',
+    description: 'Appointment reminders only—no spam or marketing blasts. 24h and 1h before, customizable.',
+    icon: '🔔',
+  },
+  {
+    title: 'Availability & Buffers',
+    description: 'Set your hours and buffer between appointments. No double-books.',
     icon: '⏰',
   },
   {
-    title: 'Book on Behalf of Others',
-    description: 'Schedule meetings for team members or colleagues. Perfect for assistants managing multiple calendars.',
-    icon: '📋',
-  },
-  {
-    title: 'Automate Meeting Reminders',
-    description: 'Never miss a meeting with customizable email reminders. Set reminders for 48h, 24h, 2h, or 1h before.',
-    icon: '🔔',
+    title: 'Reliable Payment Confirmation',
+    description: 'Payments confirm before the appointment. No “booked but payment failed” surprises.',
+    icon: '✅',
   },
 ];
 
-
-/** Four-layer feature structure for lawyers: Core → Revenue → Workflow → Automation */
+/** Four-layer feature structure for salons/barbers (Squire-style): Core → Revenue → Workflow → Automation */
 export const FEATURE_LAYERS = [
   {
     id: 'core',
@@ -52,16 +46,16 @@ export const FEATURE_LAYERS = [
     items: [
       'Booking calendar',
       'Time zone detection',
-      'Zoom / Google Meet links',
-      'Reminders',
+      'Individual booking links',
+      'Appointment reminders',
     ],
   },
   {
     id: 'revenue',
     name: 'Revenue Layer',
-    description: 'Get paid for consultations and protect your time.',
+    description: 'Get paid and protect your time with no-show protection.',
     items: [
-      'Consultation payments',
+      'Service payments',
       'Deposits',
       'Cancellation fees',
     ],
@@ -69,20 +63,19 @@ export const FEATURE_LAYERS = [
   {
     id: 'workflow',
     name: 'Workflow Layer',
-    description: 'Run matters with context in one place.',
+    description: 'Client context in one place.',
     items: [
-      'Intake questionnaires',
-      'Document uploads',
       'Client history',
-      'Notes',
+      'Notes & preferences',
+      'Booking history',
     ],
   },
   {
     id: 'automation',
     name: 'Automation Layer',
-    description: 'Follow up and fill the calendar automatically.',
+    description: 'Fill the book and cut no-shows.',
     items: [
-      'Follow-up emails',
+      'Reminder emails',
       'Rescheduling',
       'Waitlists',
     ],
@@ -90,11 +83,10 @@ export const FEATURE_LAYERS = [
 ];
 
 export const FUTURE_FEATURES = [
-  'Follow-up email sequences',
   'Waitlist management',
-  'Advanced intake templates',
-  'Outlook & Apple calendar sync',
-  'Website embedding widgets',
+  'Instagram / website embed',
+  'Calendar sync (Google, Outlook)',
+  'Tap to Pay (in-shop)',
 ];
 
 export const VALUE_PROPOSITIONS = [
@@ -115,8 +107,8 @@ export const VALUE_PROPOSITIONS = [
     description: 'No credit card required',
   },
   {
-    title: 'Professional',
-    description: 'Built for lawyers and small-firm practice',
+    title: 'Built for the chair',
+    description: 'Solo barbers and salons',
   },
 ];
 
@@ -124,17 +116,17 @@ export const HOW_IT_WORKS = [
   {
     step: 1,
     title: 'Sign Up',
-    description: 'Create your account in seconds with email and password',
+    description: 'Create your account in seconds—no credit card required',
   },
   {
     step: 2,
-    title: 'Set Availability',
-    description: 'Define your event types and weekly schedule',
+    title: 'Set Services & Hours',
+    description: 'Add your services (e.g. cut, fade, beard), set your hours and buffers',
   },
   {
     step: 3,
     title: 'Share Your Link',
-    description: 'Send your booking page link to clients and let them book automatically',
+    description: 'Clients book online. You get reminders you control—no spam',
   },
 ];
 

@@ -9,18 +9,17 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-white font-bold text-lg mb-4">MeetVault</h3>
-            <p className="text-sm text-slate-400">Client consultation platform for lawyers.</p>
+            <p className="text-sm text-slate-400">Booking & payments for salons and barbers.</p>
           </div>
           <div>
             <h4 className="text-white font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/features" className="hover:text-white transition-colors">Features</Link></li>
-              <li><Link href="/#use-cases" className="hover:text-white transition-colors">Built for how you work</Link></li>
-              <li><Link href="/polls" className="hover:text-white transition-colors">Meeting Polls</Link></li>
+              <li><Link href="/#use-cases" className="hover:text-white transition-colors">Built for the chair</Link></li>
               <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               <li><Link href="/integrations" className="hover:text-white transition-colors">Integrations</Link></li>
-              <li><Link href="/features" className="hover:text-white transition-colors">Scheduling</Link></li>
-              <li><Link href="/features" className="hover:text-white transition-colors">CRM</Link></li>
+              <li><Link href="/features" className="hover:text-white transition-colors">Booking</Link></li>
+              <li><Link href="/features" className="hover:text-white transition-colors">Client history</Link></li>
             </ul>
           </div>
           <div>

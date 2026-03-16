@@ -2,52 +2,28 @@ import Link from 'next/link';
 
 const useCases = [
   {
-    title: 'Lawyers & law firms',
-    subtitle: 'Solo and small-firm practice',
+    title: 'Solo barbers',
+    subtitle: 'Your chair, your book',
     description:
-      'Book consultations, collect retainers and fees, run intake and document uploads, and keep client history and notes in one place.',
+      'One booking link, deposits to cut no-shows, and client history in one place. No monthly lock-in—free to start.',
   },
   {
-    title: 'Consultants',
-    subtitle: 'Strategy, operations, HR advisory',
+    title: 'Barbershops',
+    subtitle: 'Multiple chairs, one system',
     description:
-      'Run discovery calls, onboarding, and retainer check-ins with dedicated booking links and availability that fits your calendar.',
+      'Each barber gets a link. Clients book and pay deposits. Reminders you control—no spam. Built for the shop.',
   },
   {
-    title: 'Coaches',
-    subtitle: 'Life, career, wellness',
+    title: 'Salons',
+    subtitle: 'Hair, nails, styling',
     description:
-      'Let clients book sessions, keep context in one place with contact history, and cut no-shows with reminders.',
+      'Online booking, deposits, and no-show protection. Client notes and history. Reliable payment confirmation.',
   },
   {
-    title: 'Therapists & counselors',
-    subtitle: 'CBT, couples, wellness',
+    title: 'Nail techs & stylists',
+    subtitle: 'Independent or in-salon',
     description:
-      'Offer recurring slots, buffers between sessions, and a calm booking experience—without double-books.',
-  },
-  {
-    title: 'Freelancers',
-    subtitle: 'Design, dev, consulting',
-    description:
-      'One link for kickoffs, reviews, and follow-ups. Spend less time scheduling and more time delivering.',
-  },
-  {
-    title: 'Tutors & educators',
-    subtitle: 'Private, remote, test prep',
-    description:
-      'Set lesson types and availability; students book quickly. Track progress and notes in your built-in CRM.',
-  },
-  {
-    title: 'Photographers & creatives',
-    subtitle: 'Portraits, events, brands',
-    description:
-      'Book by shoot type and duration, share a link with clients, and keep location and prep in one place.',
-  },
-  {
-    title: 'Agents & advisors',
-    subtitle: 'Real estate, financial, legal',
-    description:
-      'Schedule viewings, consultations, and follow-ups. Share your link with clients and keep your pipeline moving.',
+      'Set your services and hours. Share your link. Get paid upfront or in-shop. Reminders only—no marketing blasts.',
   },
 ];
 
@@ -57,10 +33,10 @@ export default function UseCases() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">
-            Built for how you work
+            Built for the chair
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            From lawyers and law firms to consultants and coaches—one platform for client consultations.
+            Solo barbers, barbershops, salons, and stylists—one platform for booking and payments.
           </p>
         </div>
 
