@@ -95,8 +95,13 @@ export async function markPaymentAsSucceeded(stripePaymentIntentId: string) {
   const methodBrand =
     latestCharge &&
     latestCharge.payment_method_details &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (latestCharge.payment_method_details as any).card?.brand;
+    typeof latestCharge.payment_method_details === 'object' &&
+    'card' in latestCharge.payment_method_details &&
+    latestCharge.payment_method_details.card &&
+    typeof latestCharge.payment_method_details.card === 'object' &&
+    'brand' in latestCharge.payment_method_details.card
+      ? (latestCharge.payment_method_details.card as { brand?: string }).brand
+      : undefined;
 
   const updated = await prisma.payment.update({
     where: { id: payment.id },

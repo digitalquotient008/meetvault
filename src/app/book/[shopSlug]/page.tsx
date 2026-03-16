@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import { getShopBySlug } from '@/lib/services/shop';
 import BookingFlow from './BookingFlow';
 
@@ -21,7 +22,7 @@ export default async function BookPage({ params }: Props) {
       <div className="max-w-lg mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           {shop.logoUrl && (
-            <img src={shop.logoUrl} alt={shop.name} className="h-16 mx-auto mb-4 rounded-lg object-contain" />
+            <Image src={shop.logoUrl} alt={shop.name} width={64} height={64} className="h-16 w-16 mx-auto mb-4 rounded-lg object-contain" unoptimized />
           )}
           <h1 className="text-2xl font-bold text-white">{shop.name}</h1>
           <p className="text-slate-400 text-sm mt-1">Book an appointment</p>
