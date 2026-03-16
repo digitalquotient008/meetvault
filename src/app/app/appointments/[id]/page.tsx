@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import type { Payment } from '@prisma/client';
 import RefundButton from './RefundButton';
 
 type Props = { params: Promise<{ id: string }> };
@@ -39,7 +38,7 @@ export default async function AppointmentDetailPage({ params }: Props) {
         {appointment.payments.length === 0 ? (
           <p className="text-slate-500 text-sm">No payments recorded.</p>
         ) : (
-          appointment.payments.map((p: Payment) => (
+          appointment.payments.map((p: typeof appointment.payments[number]) => (
             <div
               key={p.id}
               className="flex items-center justify-between bg-slate-800 rounded-lg px-4 py-3 border border-slate-700"
