@@ -14,6 +14,7 @@ import {
   List,
   ClipboardList,
   TrendingUp,
+  Megaphone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +28,7 @@ const navItems = [
   { href: '/app/queue', label: 'Queue', icon: List },
   { href: '/app/waitlist', label: 'Waitlist', icon: ClipboardList },
   { href: '/app/growth', label: 'Growth', icon: TrendingUp },
+  { href: '/app/broadcast', label: 'Broadcast', icon: Megaphone },
   { href: '/app/reports', label: 'Reports', icon: FileText },
   { href: '/app/settings/shop', label: 'Settings', icon: Settings },
 ];

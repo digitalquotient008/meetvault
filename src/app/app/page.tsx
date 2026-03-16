@@ -17,6 +17,7 @@ import {
   UserPlus,
   ClipboardList,
   DollarSign,
+  Megaphone,
 } from 'lucide-react';
 import CopyBookingLink from '@/components/dashboard/CopyBookingLink';
 
@@ -259,11 +260,11 @@ export default async function AppDashboardPage() {
                 <span className="text-xs font-medium text-slate-300">Growth</span>
               </Link>
               <Link
-                href="/app/reports"
+                href="/app/broadcast"
                 className="flex flex-col items-center gap-2 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-center group"
               >
-                <DollarSign className="w-5 h-5 text-slate-400 group-hover:text-amber-400 transition-colors" />
-                <span className="text-xs font-medium text-slate-300">Reports</span>
+                <Megaphone className="w-5 h-5 text-slate-400 group-hover:text-amber-400 transition-colors" />
+                <span className="text-xs font-medium text-slate-300">Broadcast</span>
               </Link>
             </div>
           </div>
