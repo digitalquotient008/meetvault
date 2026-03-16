@@ -135,6 +135,13 @@ export async function markShopOnboarded(shopId: string): Promise<void> {
   });
 }
 
+export async function clearShopConnectAccount(shopId: string): Promise<void> {
+  await prisma.shop.update({
+    where: { id: shopId },
+    data: { stripeConnectAccountId: null, stripeConnectOnboarded: false },
+  });
+}
+
 export async function getConnectAccountStatus(
   stripeConnectAccountId: string,
 ): Promise<{ chargesEnabled: boolean; detailsSubmitted: boolean }> {

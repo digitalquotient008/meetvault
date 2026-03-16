@@ -1,17 +1,19 @@
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import Stripe from 'stripe';
 import {
   getAccountBalance,
   getPayoutHistory,
   getConnectAccountStatus,
   markShopOnboarded,
+  clearShopConnectAccount,
 } from '@/lib/services/stripe-connect';
 import {
   ConnectButton,
   StripeDashboardButton,
   RequestPayoutButton,
 } from './PaymentsClient';
-import type Stripe from 'stripe';
+import type { Payout } from 'stripe';
 
 function payoutStatusBadge(status: string) {
   if (status === 'paid') return 'text-emerald-400 bg-emerald-500/10';
@@ -19,7 +21,7 @@ function payoutStatusBadge(status: string) {
   return 'text-red-400 bg-red-500/10';
 }
 
-function bankLabel(destination: Stripe.Payout['destination']): string {
+function bankLabel(destination: Payout['destination']): string {
   if (!destination || typeof destination === 'string') return '—';
   const ba = destination as Stripe.BankAccount;
   if (ba.last4) return `••••${ba.last4}`;
@@ -34,7 +36,7 @@ export default async function PaymentsPage({
   const { shopId } = await requireShopAccess();
   const { setup } = await searchParams;
 
-  const shop = await prisma.shop.findUnique({
+  let shop = await prisma.shop.findUnique({
     where: { id: shopId },
     select: {
       stripeConnectAccountId: true,
@@ -53,13 +55,22 @@ export default async function PaymentsPage({
         await markShopOnboarded(shopId);
         onboarded = true;
       }
-    } catch {
-      // Stripe unreachable or key misconfigured — show page without crashing
+    } catch (err) {
+      // If Stripe returns Forbidden, the stored account ID belongs to a different
+      // Stripe platform key — clear it so the shop can reconnect with the correct key.
+      if (
+        err instanceof Stripe.errors.StripePermissionError ||
+        (err instanceof Stripe.errors.StripeError && (err as { statusCode?: number }).statusCode === 403)
+      ) {
+        await clearShopConnectAccount(shopId);
+        shop = { ...shop!, stripeConnectAccountId: null, stripeConnectOnboarded: false };
+      }
+      // For all other errors (network, auth), just degrade silently
     }
   }
 
   let balance: { available: number; pending: number; currency: string } | null = null;
-  let payouts: Stripe.Payout[] = [];
+  let payouts: Payout[] = [];
   let stripeError: string | null = null;
 
   if (onboarded && shop?.stripeConnectAccountId) {
