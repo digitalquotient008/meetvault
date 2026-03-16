@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { getAccountBalance, getPayoutHistory } from '@/lib/services/stripe-connect';
@@ -26,7 +27,12 @@ export default async function PaymentsPage({
 }: {
   searchParams: Promise<{ setup?: string; connect_error?: string }>;
 }) {
-  const { shopId } = await requireShopAccess();
+  let shopId: string;
+  try {
+    ({ shopId } = await requireShopAccess());
+  } catch {
+    redirect('/app/onboarding');
+  }
   const { setup, connect_error } = await searchParams;
 
   // Only read DB — no Stripe API calls in the page render.
