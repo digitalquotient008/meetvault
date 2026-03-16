@@ -12,17 +12,16 @@ export async function getOrCreateUser(
   clerkUserId: string,
   data: { email?: string; firstName?: string; lastName?: string }
 ) {
-  let user = await prisma.user.findUnique({ where: { authProviderId: clerkUserId } });
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        authProviderId: clerkUserId,
-        email: data.email ?? '',
-        firstName: data.firstName ?? null,
-        lastName: data.lastName ?? null,
-      },
-    });
-  }
+  const user = await prisma.user.upsert({
+    where: { authProviderId: clerkUserId },
+    create: {
+      authProviderId: clerkUserId,
+      email: data.email ?? '',
+      firstName: data.firstName ?? null,
+      lastName: data.lastName ?? null,
+    },
+    update: {},
+  });
   return user;
 }
 
