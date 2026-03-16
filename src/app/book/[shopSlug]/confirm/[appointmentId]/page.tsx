@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
+import { fmtDateTime } from '@/lib/format-date';
 
 type Props = {
   params: Promise<{ shopSlug: string; appointmentId: string }>;
@@ -44,7 +45,7 @@ export default async function ConfirmPage({ params }: Props) {
         </p>
         <div className="bg-slate-800 rounded-lg p-4 text-left space-y-2 text-sm mb-4">
           <p><span className="text-slate-500">Confirmation:</span> <span className="text-amber-400 font-mono">{appointment.confirmationCode}</span></p>
-          <p><span className="text-slate-500">When:</span> {new Date(appointment.startDateTime).toLocaleString()}</p>
+          <p><span className="text-slate-500">When:</span> {fmtDateTime(appointment.startDateTime, shop.timezone)}</p>
           <p><span className="text-slate-500">With:</span> {appointment.barberProfile.displayName}</p>
           <p><span className="text-slate-500">Service:</span> {appointment.appointmentServices[0]?.serviceNameSnapshot ?? '—'}</p>
         </div>

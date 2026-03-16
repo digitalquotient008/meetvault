@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { fmtDateTime } from '@/lib/format-date';
 import RefundButton from './RefundButton';
 
 type Props = { params: Promise<{ id: string }> };
@@ -20,6 +21,9 @@ export default async function AppointmentDetailPage({ params }: Props) {
   });
   if (!appointment) notFound();
 
+  const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { timezone: true } });
+  const tz = shop?.timezone ?? 'America/New_York';
+
   return (
     <div className="p-6 lg:p-8">
       <Link href="/app/appointments" className="text-sm text-slate-400 hover:text-white mb-4 inline-block">
@@ -27,7 +31,7 @@ export default async function AppointmentDetailPage({ params }: Props) {
       </Link>
       <h1 className="text-2xl font-bold text-white mb-6">Appointment</h1>
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 mb-6">
-        <p><span className="text-slate-400">When:</span> {new Date(appointment.startDateTime).toLocaleString()}</p>
+        <p><span className="text-slate-400">When:</span> {fmtDateTime(appointment.startDateTime, tz)}</p>
         <p><span className="text-slate-400">Customer:</span> {appointment.customer.firstName} {appointment.customer.lastName}</p>
         <p><span className="text-slate-400">Barber:</span> {appointment.barberProfile.displayName}</p>
         <p><span className="text-slate-400">Status:</span> <span className="text-amber-400">{appointment.status}</span></p>

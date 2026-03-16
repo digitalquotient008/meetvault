@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getOrCreateUser, getMembershipForUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { startOfDayInTz, endOfDayInTz } from '@/lib/format-date';
 import Link from 'next/link';
 import { Calendar, Scissors, Users } from 'lucide-react';
 
@@ -31,15 +32,14 @@ export default async function AppDashboardPage() {
   });
   if (!shop) redirect('/app/onboarding');
 
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
+  const tz = shop.timezone ?? 'America/New_York';
+  const todayStart = startOfDayInTz(tz);
+  const todayEnd = endOfDayInTz(tz);
 
   const todayAppointments = await prisma.appointment.count({
     where: {
       shopId: shop.id,
-      startDateTime: { gte: todayStart, lt: todayEnd },
+      startDateTime: { gte: todayStart, lte: todayEnd },
       status: { not: 'CANCELED' },
     },
   });

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { AppointmentActions } from '@/components/dashboard/AppointmentActions';
+import { fmtDateTime } from '@/lib/format-date';
 
 function paymentBadge(apt: { payments: { status: string; amount: unknown; type: string }[]; totalAmount: unknown }) {
   const total = Number(apt.totalAmount ?? 0);
@@ -15,6 +16,9 @@ function paymentBadge(apt: { payments: { status: string; amount: unknown; type: 
 
 export default async function AppointmentsPage() {
   const { shopId } = await requireShopAccess();
+  const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { timezone: true } });
+  const tz = shop?.timezone ?? 'America/New_York';
+
   const appointments = await prisma.appointment.findMany({
     where: { shopId },
     take: 50,
@@ -43,7 +47,7 @@ export default async function AppointmentsPage() {
               const badge = paymentBadge(apt);
               return (
                 <tr key={apt.id} className="border-t border-slate-800">
-                  <td className="p-3 text-white">{new Date(apt.startDateTime).toLocaleString()}</td>
+                  <td className="p-3 text-white">{fmtDateTime(apt.startDateTime, tz)}</td>
                   <td className="p-3 text-slate-300">{apt.customer.firstName} {apt.customer.lastName}</td>
                   <td className="p-3 text-slate-300">{apt.barberProfile.displayName}</td>
                   <td className="p-3"><span className="text-amber-400">{apt.status}</span></td>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { requireShopAccess } from '@/lib/auth';
 import { getDueForRebooking, getDormantCustomers } from '@/lib/services/growth';
 import { getShopById } from '@/lib/services/shop';
+import { fmtDate } from '@/lib/format-date';
 import SendReminderButton from './SendReminderButton';
 
 export default async function GrowthPage() {
@@ -12,6 +13,7 @@ export default async function GrowthPage() {
     getDormantCustomers(shopId, 60),
   ]);
   const shopSlug = shop?.slug ?? '';
+  const tz = shop?.timezone ?? 'America/New_York';
 
   return (
     <div className="p-6 lg:p-8">
@@ -41,10 +43,10 @@ export default async function GrowthPage() {
                     </Link>
                   </td>
                   <td className="p-3 text-slate-300">
-                    {c.nextSuggestedAt ? new Date(c.nextSuggestedAt).toLocaleDateString() : '—'}
+                    {c.nextSuggestedAt ? fmtDate(c.nextSuggestedAt, tz) : '—'}
                   </td>
                   <td className="p-3 text-slate-400">
-                    {c.lastVisitAt ? new Date(c.lastVisitAt).toLocaleDateString() : '—'}
+                    {c.lastVisitAt ? fmtDate(c.lastVisitAt, tz) : '—'}
                   </td>
                   <td className="p-3">
                     {shopSlug && (
@@ -88,7 +90,7 @@ export default async function GrowthPage() {
                   </td>
                   <td className="p-3 text-slate-400">{c.email ?? c.phone ?? '—'}</td>
                   <td className="p-3 text-slate-400">
-                    {c.lastVisitAt ? new Date(c.lastVisitAt).toLocaleDateString() : '—'}
+                    {c.lastVisitAt ? fmtDate(c.lastVisitAt, tz) : '—'}
                   </td>
                   <td className="p-3">
                     <SendReminderButton customerId={c.id} hasEmail={!!c.email} />

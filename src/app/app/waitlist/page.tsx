@@ -1,9 +1,15 @@
 import { requireShopAccess } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 import { listWaitlistEntries } from '@/lib/services/waitlist';
+import { fmtDateTime } from '@/lib/format-date';
 
 export default async function WaitlistPage() {
   const { shopId } = await requireShopAccess();
-  const entries = await listWaitlistEntries(shopId);
+  const [entries, shop] = await Promise.all([
+    listWaitlistEntries(shopId),
+    prisma.shop.findUnique({ where: { id: shopId }, select: { timezone: true } }),
+  ]);
+  const tz = shop?.timezone ?? 'America/New_York';
 
   return (
     <div className="p-6 lg:p-8">
@@ -32,7 +38,7 @@ export default async function WaitlistPage() {
                   {entry.preferredServiceId ? 'Service' : '—'} {entry.preferredBarberProfileId ? '· Barber' : ''}
                 </td>
                 <td className="p-3 text-amber-400">{entry.status}</td>
-                <td className="p-3 text-slate-500">{new Date(entry.createdAt).toLocaleString()}</td>
+                <td className="p-3 text-slate-500">{fmtDateTime(entry.createdAt, tz)}</td>
               </tr>
             ))}
           </tbody>

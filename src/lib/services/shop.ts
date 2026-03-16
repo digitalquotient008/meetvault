@@ -7,6 +7,7 @@ export type ShopForBooking = {
   name: string;
   slug: string;
   logoUrl: string | null;
+  timezone: string;
   depositRequired: boolean;
   depositType?: string | null;
   depositValue?: number | null;
@@ -75,6 +76,7 @@ export async function getShopBySlug(slug: string): Promise<ShopForBooking | null
     name: row.name,
     slug: row.slug,
     logoUrl: row.logoUrl ?? null,
+    timezone: row.timezone,
     depositRequired: row.depositRequired ?? false,
     depositType: row.depositType ?? null,
     depositValue: row.depositValue != null ? Number(row.depositValue) : null,

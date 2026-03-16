@@ -1,11 +1,16 @@
 import { requireShopAccess } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 import { listQueueEntries } from '@/lib/services/queue';
 import AddWalkInForm from './AddWalkInForm';
 import QueueEntryRow from './QueueEntryRow';
 
 export default async function QueuePage() {
   const { shopId } = await requireShopAccess();
-  const entries = await listQueueEntries(shopId);
+  const [entries, shop] = await Promise.all([
+    listQueueEntries(shopId),
+    prisma.shop.findUnique({ where: { id: shopId }, select: { timezone: true } }),
+  ]);
+  const tz = shop?.timezone ?? 'America/New_York';
 
   return (
     <div className="p-6 lg:p-8">
@@ -23,7 +28,7 @@ export default async function QueuePage() {
           </thead>
           <tbody>
             {entries.map((entry) => (
-              <QueueEntryRow key={entry.id} entry={entry} />
+              <QueueEntryRow key={entry.id} entry={entry} timezone={tz} />
             ))}
           </tbody>
         </table>

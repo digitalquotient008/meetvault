@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import type { ShopForBooking } from '@/lib/services/shop';
 import { bookAppointmentAction, joinWaitlistAction } from './actions';
 
@@ -11,13 +12,14 @@ type BarberProfile = ShopForBooking['barberProfiles'][number];
 
 export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   const router = useRouter();
+  const tz = shop.timezone;
   const [step, setStep] = useState<Step>('service');
-  const [selectedService, setSelectedService] = useState<ShopForBooking['services'][number] | null>(null);
-  const [selectedBarber, setSelectedBarber] = useState<ShopForBooking['barberProfiles'][number] | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<{ start: Date; barberProfileId: string } | null>(null);
-  const [slots, setSlots] = useState<Array<{ start: Date; barberProfileId: string }>>([]);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [selectedBarber, setSelectedBarber] = useState<BarberProfile | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ start: string; barberProfileId: string } | null>(null);
+  const [slots, setSlots] = useState<Array<{ start: string; barberProfileId: string }>>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [loadingBook, setLoadingBook] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,15 +28,13 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   const [waitlistLoading, setWaitlistLoading] = useState(false);
   const [waitlistSuccess, setWaitlistSuccess] = useState(false);
 
-  const fetchSlots = async (date: Date) => {
+  const fetchSlots = async (dateStr: string) => {
     if (!selectedService) return;
     setLoadingSlots(true);
     setError(null);
     try {
-      const dateStart = new Date(date);
-      dateStart.setHours(0, 0, 0, 0);
-      const dateEnd = new Date(dateStart);
-      dateEnd.setDate(dateEnd.getDate() + 1);
+      const dateStart = fromZonedTime(`${dateStr}T00:00:00`, tz);
+      const dateEnd = fromZonedTime(`${dateStr}T23:59:59.999`, tz);
       const result = await fetch(
         `/api/book/slots?shopId=${shop.id}&serviceId=${selectedService.id}&barberProfileId=${selectedBarber?.id ?? ''}&dateFrom=${dateStart.toISOString()}&dateTo=${dateEnd.toISOString()}`
       );
@@ -61,12 +61,12 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
     setSlots([]);
   };
 
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    fetchSlots(date);
+  const handleDateSelect = (dateStr: string) => {
+    setSelectedDate(dateStr);
+    fetchSlots(dateStr);
   };
 
-  const handleSlotSelect = (slot: { start: Date; barberProfileId: string }) => {
+  const handleSlotSelect = (slot: { start: string; barberProfileId: string }) => {
     setSelectedSlot(slot);
     setStep('details');
   };
@@ -107,7 +107,7 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
         shopId: shop.id,
         barberProfileId: selectedSlot.barberProfileId,
         serviceId: selectedService.id,
-        startDateTime: typeof selectedSlot.start === 'string' ? new Date(selectedSlot.start) : selectedSlot.start,
+        startDateTime: selectedSlot.start,
         customer: {
           firstName: details.firstName,
           lastName: details.lastName,
@@ -186,12 +186,13 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   }
 
   if (step === 'datetime') {
-    const today = new Date();
+    const nowInTz = formatInTimeZone(new Date(), tz, 'yyyy-MM-dd');
     const nextDays = Array.from({ length: 14 }, (_, i) => {
-      const d = new Date(today);
+      const d = new Date(nowInTz);
       d.setDate(d.getDate() + i);
-      return d;
+      return d.toISOString().slice(0, 10);
     });
+
     return (
       <div className="space-y-4">
         <button type="button" onClick={() => setStep('barber')} className="text-sm text-slate-400 hover:text-white">
@@ -199,16 +200,23 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
         </button>
         <h2 className="text-lg font-semibold text-white">Select date</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {nextDays.map((d) => (
-            <button
-              key={d.toISOString()}
-              type="button"
-              onClick={() => handleDateSelect(d)}
-              className="py-2 px-3 rounded-lg border border-slate-700 bg-slate-800 text-slate-200 hover:border-amber-500/50 text-sm"
-            >
-              {d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-            </button>
-          ))}
+          {nextDays.map((dateStr) => {
+            const display = new Date(dateStr + 'T12:00:00');
+            return (
+              <button
+                key={dateStr}
+                type="button"
+                onClick={() => handleDateSelect(dateStr)}
+                className={`py-2 px-3 rounded-lg border text-sm transition-colors ${
+                  selectedDate === dateStr
+                    ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                    : 'border-slate-700 bg-slate-800 text-slate-200 hover:border-amber-500/50'
+                }`}
+              >
+                {display.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+              </button>
+            );
+          })}
         </div>
         {loadingSlots && <p className="text-slate-400 text-sm">Loading times...</p>}
         {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -218,12 +226,12 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
             <div className="grid grid-cols-3 gap-2">
               {slots.map((slot) => (
                 <button
-                  key={typeof slot.start === 'string' ? slot.start : slot.start.toISOString()}
+                  key={slot.start}
                   type="button"
                   onClick={() => handleSlotSelect(slot)}
                   className="py-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-200 hover:border-amber-500/50 text-sm"
                 >
-                  {new Date(slot.start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                  {formatInTimeZone(new Date(slot.start), tz, 'h:mm a')}
                 </button>
               ))}
             </div>
@@ -307,7 +315,7 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
         <div className="bg-slate-800 rounded-lg p-4 space-y-2 text-sm">
           <p><span className="text-slate-400">Service:</span> {selectedService?.name} · ${selectedService && Number(selectedService.price)}</p>
           <p><span className="text-slate-400">With:</span> {barberName}</p>
-          <p><span className="text-slate-400">When:</span> {selectedSlot && new Date(selectedSlot.start).toLocaleString()}</p>
+          <p><span className="text-slate-400">When:</span> {selectedSlot && formatInTimeZone(new Date(selectedSlot.start), tz, 'MMM d, yyyy h:mm a')}</p>
           <p><span className="text-slate-400">Name:</span> {details.firstName} {details.lastName}</p>
         </div>
         {error && <p className="text-red-400 text-sm">{error}</p>}

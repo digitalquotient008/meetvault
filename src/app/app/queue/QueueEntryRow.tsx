@@ -1,12 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { formatInTimeZone } from 'date-fns-tz';
 import { updateQueueStatusAction } from './actions';
 import type { WalkInQueueEntry } from '@prisma/client';
 
-type Props = { entry: WalkInQueueEntry & { customer: { firstName: string; lastName: string } | null } };
+type Props = {
+  entry: WalkInQueueEntry & { customer: { firstName: string; lastName: string } | null };
+  timezone: string;
+};
 
-export default function QueueEntryRow({ entry }: Props) {
+export default function QueueEntryRow({ entry, timezone }: Props) {
   const router = useRouter();
   const name = entry.customer
     ? `${entry.customer.firstName} ${entry.customer.lastName}`
@@ -24,7 +28,7 @@ export default function QueueEntryRow({ entry }: Props) {
   return (
     <tr className="border-t border-slate-800">
       <td className="p-3 text-white">{name}</td>
-      <td className="p-3 text-slate-400">{new Date(entry.arrivedAt).toLocaleTimeString()}</td>
+      <td className="p-3 text-slate-400">{formatInTimeZone(new Date(entry.arrivedAt), timezone, 'h:mm a')}</td>
       <td className="p-3 text-amber-400">{entry.status}</td>
       <td className="p-3">
         <div className="flex flex-wrap gap-1">
