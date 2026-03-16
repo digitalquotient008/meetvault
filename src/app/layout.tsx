@@ -14,7 +14,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://meetvault.app'),
   title: 'MeetVault – Booking & Payments for Salons and Barbers',
-  description: 'Online booking, deposits, no-show protection, and client history for salons and solo barbers. Like Squire—without the headaches.',
+  description: 'Online booking, deposits, no-show protection, and client history for salons and solo barbers.',
   keywords: 'salon booking, barbershop app, barber scheduling, salon software, appointment booking, no-show protection, MeetVault',
   openGraph: {
     title: 'MeetVault – Booking & Payments for Salons and Barbers',

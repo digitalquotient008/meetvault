@@ -2,7 +2,7 @@ import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'About - MeetVault',
-  description: 'MeetVault is booking and payments for salons and barbers. Like Squire—reliable payments, reminders you control, no spam.',
+  description: 'MeetVault is booking and payments for salons and barbers. Reliable payments, reminders you control, no spam.',
 };
 
 export default function AboutPage() {
@@ -26,7 +26,7 @@ export default function AboutPage() {
           <div className="prose prose-lg max-w-none">
             <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              MeetVault was built for salons and barbers who want Squire-style booking and payments without the headaches: 
+              MeetVault was built for salons and barbers who want booking and payments that work: 
               reliable payment confirmation (no “booked but payment failed”), reminders you control with no spam or 
               marketing blasts, and client history in one place. Free to start.
             </p>

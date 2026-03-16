@@ -36,10 +36,10 @@ export const FAQ_ITEMS: FAQItem[] = [
     keywords: ['start', 'get started', 'host', 'sign up'],
   },
   {
-    question: 'Why MeetVault instead of Squire?',
+    question: 'What makes MeetVault different?',
     answer:
-      'MeetVault fixes issues Squire users report: payments confirm before the appointment (no “booked but payment failed”), and reminders are appointment-only—no spam or marketing blasts you can’t turn off. Same idea: booking, deposits, no-show protection. We’re built for solo barbers and salons, with optional self-hosting.',
-    keywords: ['squire', 'alternative', 'vs', 'compare', 'why'],
+      'We focus on: payments confirm before the appointment (no “booked but payment failed”), and reminders are appointment-only—no spam or marketing blasts you can’t turn off. Booking, deposits, no-show protection, and client history. Built for solo barbers and salons, with optional self-hosting.',
+    keywords: ['different', 'vs', 'compare', 'why'],
   },
   {
     question: 'Pricing',

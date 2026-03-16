@@ -8,7 +8,7 @@ export default function Features() {
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">Booking & payments for salons and barbers</h2>
           <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Like Squire—reliable payments, reminders you control, no spam
+            Reliable payments, reminders you control, no spam
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

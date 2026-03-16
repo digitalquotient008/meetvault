@@ -37,7 +37,7 @@ export const MVP_FEATURES = [
   },
 ];
 
-/** Four-layer feature structure for salons/barbers (Squire-style): Core → Revenue → Workflow → Automation */
+/** Four-layer feature structure for salons/barbers: Core → Revenue → Workflow → Automation */
 export const FEATURE_LAYERS = [
   {
     id: 'core',

@@ -34,7 +34,7 @@ export default function Testimonials() {
             Why salons and barbers use MeetVault
           </h2>
           <p className="text-lg text-slate-400 max-w-3xl mx-auto">
-            Reliable payments, reminders you control, no spam. Like Squire—without the headaches.
+            Reliable payments, reminders you control, no spam.
           </p>
         </div>
         

@@ -3,7 +3,7 @@ import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'Features - MeetVault',
-  description: 'Booking, deposits, no-show protection, and client history for salons and barbers. Like Squire, without the headaches.',
+  description: 'Booking, deposits, no-show protection, and client history for salons and barbers.',
 };
 
 export default function FeaturesPage() {
