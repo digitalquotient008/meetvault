@@ -10,7 +10,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://meetingvault.app'),
+  metadataBase: new URL(
+    (() => {
+      const u = process.env.NEXT_PUBLIC_APP_URL || 'https://meetingvault.app';
+      return u.startsWith('http') ? u : `https://${u}`;
+    })()
+  ),
   title: { default: 'MeetingVault – The operating system for modern barbershops', template: '%s | MeetingVault' },
   description: 'Bookings, payments, customer relationships, staff payouts, and growth workflows in one clean platform that the shop actually controls.',
   keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetingVault, Squire alternative',
