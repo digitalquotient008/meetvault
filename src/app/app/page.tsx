@@ -1,18 +1,20 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { getOrCreateUser, getMembershipForUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import Link from 'next/link';
 import { Calendar, Scissors, Users } from 'lucide-react';
 
 export default async function AppDashboardPage() {
-  const { userId, sessionClaims } = await auth();
+  const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
+  const clerkUser = await currentUser();
   const user = await getOrCreateUser(userId, {
-    email: (sessionClaims?.email as string) ?? '',
-  }).catch(() => null);
-  if (!user) redirect('/sign-in');
+    email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? '',
+    firstName: clerkUser?.firstName ?? undefined,
+    lastName: clerkUser?.lastName ?? undefined,
+  });
 
   const membership = await getMembershipForUser(user.id);
   if (!membership) {

@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/db';
 
 export type TenantRole = 'OWNER' | 'MANAGER' | 'BARBER' | 'RECEPTIONIST';
@@ -46,10 +46,11 @@ export async function requireShopAccess(allowedRoles?: TenantRole[]) {
   const clerkUserId = clerkAuth.userId;
   if (!clerkUserId) throw new Error('Unauthorized');
 
+  const clerkUser = await currentUser();
   const user = await getOrCreateUser(clerkUserId, {
-    email: clerkAuth.sessionClaims?.email as string ?? '',
-    firstName: clerkAuth.sessionClaims?.firstName as string,
-    lastName: clerkAuth.sessionClaims?.lastName as string,
+    email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? '',
+    firstName: clerkUser?.firstName ?? undefined,
+    lastName: clerkUser?.lastName ?? undefined,
   });
 
   const membership = await getMembershipForUser(user.id);

@@ -1,18 +1,18 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { getOrCreateUser, getMembershipForUser } from '@/lib/auth';
 import OnboardingClient from './OnboardingClient';
 
 export default async function OnboardingPage() {
-  const { userId, sessionClaims } = await auth();
+  const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
+  const clerkUser = await currentUser();
   const user = await getOrCreateUser(userId, {
-    email: (sessionClaims?.email as string) ?? '',
-    firstName: sessionClaims?.firstName as string | undefined,
-    lastName: sessionClaims?.lastName as string | undefined,
-  }).catch(() => null);
-  if (!user) redirect('/sign-in');
+    email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? '',
+    firstName: clerkUser?.firstName ?? undefined,
+    lastName: clerkUser?.lastName ?? undefined,
+  });
 
   const membership = await getMembershipForUser(user.id);
   if (membership) redirect('/app');
