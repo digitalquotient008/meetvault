@@ -43,10 +43,57 @@ export const MVP_FEATURES = [
 ];
 
 
+/** Four-layer feature structure for lawyers: Core → Revenue → Workflow → Automation */
+export const FEATURE_LAYERS = [
+  {
+    id: 'core',
+    name: 'Core Layer',
+    description: 'Get booked without the back-and-forth.',
+    items: [
+      'Booking calendar',
+      'Time zone detection',
+      'Zoom / Google Meet links',
+      'Reminders',
+    ],
+  },
+  {
+    id: 'revenue',
+    name: 'Revenue Layer',
+    description: 'Get paid for consultations and protect your time.',
+    items: [
+      'Consultation payments',
+      'Deposits',
+      'Cancellation fees',
+    ],
+  },
+  {
+    id: 'workflow',
+    name: 'Workflow Layer',
+    description: 'Run matters with context in one place.',
+    items: [
+      'Intake questionnaires',
+      'Document uploads',
+      'Client history',
+      'Notes',
+    ],
+  },
+  {
+    id: 'automation',
+    name: 'Automation Layer',
+    description: 'Follow up and fill the calendar automatically.',
+    items: [
+      'Follow-up emails',
+      'Rescheduling',
+      'Waitlists',
+    ],
+  },
+];
+
 export const FUTURE_FEATURES = [
-  'Built-in video conferencing',
+  'Follow-up email sequences',
+  'Waitlist management',
+  'Advanced intake templates',
   'Outlook & Apple calendar sync',
-  'Invoicing',
   'Website embedding widgets',
 ];
 
@@ -69,7 +116,7 @@ export const VALUE_PROPOSITIONS = [
   },
   {
     title: 'Professional',
-    description: 'Trusted by consultants, coaches, and service providers',
+    description: 'Built for lawyers and small-firm practice',
   },
 ];
 

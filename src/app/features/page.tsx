@@ -1,9 +1,9 @@
-import { MVP_FEATURES, FUTURE_FEATURES } from '@/lib/constants';
+import { FEATURE_LAYERS, FUTURE_FEATURES } from '@/lib/constants';
 import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'Features - MeetVault',
-  description: 'Discover all the features MeetVault offers for scheduling and managing appointments.',
+  description: 'Core, Revenue, Workflow, and Automation layers for legal consultations: booking, payments, intake, and client history.',
 };
 
 export default function FeaturesPage() {
@@ -13,31 +13,41 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Powerful features, simple setup
+              Four layers for client consultations
             </h1>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Everything you need to manage your schedule and bookings in one place — including Meeting Polls.
+              From booking and payments to intake, client history, and automation — one platform for lawyers.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">
-            Features
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {MVP_FEATURES.map((feature, index) => (
-              <div key={index} className="bg-slate-800/80 border border-slate-700 rounded-xl p-8 hover:border-slate-600 transition-colors">
-                <div className="text-5xl mb-4">{feature.icon}</div>
-                <h3 className="text-2xl font-semibold text-white mb-3">{feature.title}</h3>
-                <p className="text-slate-400 text-lg">{feature.description}</p>
-              </div>
-            ))}
+      {FEATURE_LAYERS.map((layer) => (
+        <section
+          key={layer.id}
+          className={layer.id === 'revenue' || layer.id === 'automation' ? 'py-20 bg-slate-900' : 'py-20'}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{layer.name}</h2>
+            {layer.description && (
+              <p className="text-slate-400 text-lg mb-8">{layer.description}</p>
+            )}
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {layer.items.map((item, index) => (
+                <li
+                  key={index}
+                  className="bg-slate-800/80 border border-slate-700 rounded-lg p-4 flex items-center"
+                >
+                  <svg className="w-5 h-5 text-blue-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-slate-200">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </section>
+        </section>
+      ))}
 
       <section className="py-20 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,21 +56,21 @@ export default function FeaturesPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
+              <h3 className="text-xl font-semibold text-white mb-3">Lawyers & law firms</h3>
+              <p className="text-slate-400">
+                Book consultations, collect retainers and fees, run intake and document uploads, and keep client history and notes in one place.
+              </p>
+            </div>
+            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
               <h3 className="text-xl font-semibold text-white mb-3">Consultants</h3>
               <p className="text-slate-400">
                 Manage client consultations, track booking history, and maintain professional relationships all in one platform.
               </p>
             </div>
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
-              <h3 className="text-xl font-semibold text-white mb-3">Coaches</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Coaches & advisors</h3>
               <p className="text-slate-400">
-                Schedule coaching sessions, build your client base with built-in CRM, and focus on what you do best.
-              </p>
-            </div>
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
-              <h3 className="text-xl font-semibold text-white mb-3">Service Providers</h3>
-              <p className="text-slate-400">
-                Streamline appointment booking, reduce no-shows with automatic confirmations, and grow your business.
+                Schedule sessions, collect payments, and focus on delivery with built-in CRM and reminders.
               </p>
             </div>
           </div>

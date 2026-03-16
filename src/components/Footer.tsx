@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
             <h3 className="text-white font-bold text-lg mb-4">MeetVault</h3>
-            <p className="text-sm text-slate-400">The simple scheduling platform for professionals.</p>
+            <p className="text-sm text-slate-400">Client consultation platform for lawyers.</p>
           </div>
           <div>
             <h4 className="text-white font-semibold mb-4">Product</h4>

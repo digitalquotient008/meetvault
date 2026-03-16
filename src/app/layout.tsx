@@ -13,12 +13,12 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://meetvault.app'),
-  title: 'MeetVault - Schedule Meetings Without the Back-and-Forth',
-  description: 'Simple scheduling platform with built-in CRM and booking management. Create event types, set availability, and let clients book automatically.',
-  keywords: 'scheduling, calendar, booking, appointment scheduling, CRM, meeting scheduler, MeetVault',
+  title: 'MeetVault – Client Consultation Platform for Lawyers',
+  description: 'Booking, payments, intake, and client history for legal consultations. One platform for lawyers.',
+  keywords: 'scheduling, calendar, booking, lawyers, law firm, legal consultation, client intake, appointment scheduling, CRM, MeetVault',
   openGraph: {
-    title: 'MeetVault - Schedule Meetings Without the Back-and-Forth',
-    description: 'Simple scheduling platform with built-in CRM and booking management.',
+    title: 'MeetVault – Client Consultation Platform for Lawyers',
+    description: 'Booking, payments, intake, and client history for legal consultations. One platform for lawyers.',
     type: 'website',
   },
 };
@@ -33,7 +33,7 @@ export default function RootLayout({
     '@type': 'Organization',
     name: 'MeetVault',
     url: 'https://meetvault.app',
-    description: 'Schedule meetings without the back-and-forth. Built-in CRM and self-hosted options.',
+    description: 'Client consultation platform for lawyers. Booking, payments, intake, and workflow in one place.',
   };
 
   return (

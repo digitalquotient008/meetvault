@@ -2,6 +2,12 @@ import Link from 'next/link';
 
 const useCases = [
   {
+    title: 'Lawyers & law firms',
+    subtitle: 'Solo and small-firm practice',
+    description:
+      'Book consultations, collect retainers and fees, run intake and document uploads, and keep client history and notes in one place.',
+  },
+  {
     title: 'Consultants',
     subtitle: 'Strategy, operations, HR advisory',
     description:
@@ -38,12 +44,6 @@ const useCases = [
       'Book by shoot type and duration, share a link with clients, and keep location and prep in one place.',
   },
   {
-    title: 'Salons & grooming',
-    subtitle: 'Hair, barbers, spas',
-    description:
-      'Appointments, reminders, and a simple book-now flow. Reduce no-shows and back-and-forth.',
-  },
-  {
     title: 'Agents & advisors',
     subtitle: 'Real estate, financial, legal',
     description:
@@ -60,7 +60,7 @@ export default function UseCases() {
             Built for how you work
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Scheduling that fits your practice—whether you run discovery calls, sessions, or client check-ins.
+            From lawyers and law firms to consultants and coaches—one platform for client consultations.
           </p>
         </div>
 

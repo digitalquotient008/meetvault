@@ -4,7 +4,7 @@ import PlanRecommendation from '@/components/PlanRecommendation';
 
 export const metadata = {
   title: 'Contact Us - MeetVault',
-  description: 'Get in touch to discuss Teams plans, custom solutions, or any questions.',
+  description: 'Get in touch about MeetVault — client consultation platform for lawyers. Teams plans, custom solutions, or questions.',
 };
 
 export default function ContactPage() {
@@ -17,7 +17,7 @@ export default function ContactPage() {
               Contact Us
             </h1>
             <p className="text-xl text-slate-400">
-              Interested in Teams plans or need a custom solution? Let&apos;s discuss how MeetVault can help your organization.
+              Interested in Teams plans or a custom solution? Let&apos;s discuss how MeetVault can help your firm or practice.
             </p>
           </div>
 

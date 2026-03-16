@@ -2,7 +2,7 @@ import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'About - MeetVault',
-  description: 'Learn about MeetVault and our mission to simplify scheduling.',
+  description: 'MeetVault is the client consultation platform for lawyers. One place for booking, payments, intake, and client workflow.',
 };
 
 export default function AboutPage() {
@@ -15,7 +15,7 @@ export default function AboutPage() {
               About MeetVault
             </h1>
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              Making scheduling simple for everyone
+              Client consultation platform for lawyers
             </p>
           </div>
         </div>
@@ -26,29 +26,28 @@ export default function AboutPage() {
           <div className="prose prose-lg max-w-none">
             <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              MeetVault was born from a simple idea: scheduling meetings shouldn&apos;t require multiple tools, 
-              complex integrations, or expensive subscriptions. We believe that professionals should have access 
-              to powerful scheduling tools that are easy to use and affordable.
+              MeetVault was built so lawyers can run client consultations from one platform: book consultations, 
+              collect payments and deposits, run intake and document uploads, and keep client history and notes 
+              in one place—without juggling multiple tools or expensive subscriptions.
             </p>
             
             <h2 className="text-3xl font-bold text-white mb-6 mt-12">What Makes Us Different</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              Unlike other scheduling platforms, MeetVault includes essential features like contact management 
-              (CRM) built right in. No need to connect external tools or pay for multiple subscriptions. 
-              Everything you need is in one place.
+              We combine core booking (calendar, time zones, video links, reminders), revenue (payments, deposits, 
+              cancellation fees), workflow (intake, document uploads, client history, notes), and automation 
+              (follow-ups, rescheduling, waitlists) in one product. Built for solo and small-firm practice.
             </p>
             
             <h2 className="text-3xl font-bold text-white mb-6 mt-12">Our Approach</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              We&apos;re starting with a focused MVP that covers the core scheduling needs. As we grow, 
-              we&apos;ll add advanced features based on real user feedback. Your needs drive our roadmap.
+              We focus on the layers that matter for legal consultations. As we grow, we add features based on 
+              feedback from lawyers and firms. Your practice drives our roadmap.
             </p>
             
             <h2 className="text-3xl font-bold text-white mb-6 mt-12">Your Data, Your Control</h2>
             <p className="text-slate-400 mb-6 text-lg">
-              MeetVault can be self-hosted. You own your data and have full control 
-              over your scheduling platform. We believe in transparency and giving you the freedom to 
-              choose how you use our tools.
+              MeetVault can be self-hosted. You own your data and have full control over your deployment. 
+              We believe in transparency and giving you the freedom to choose how you run your practice.
             </p>
           </div>
         </div>

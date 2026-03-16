@@ -16,10 +16,10 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'What is MeetVault?',
     answer:
-      'MeetVault is a scheduling platform that makes booking meetings simple. Create event types, set your availability, and let clients book time with you automatically. It includes built-in CRM and works for consultants, coaches, and service providers.',
+      'MeetVault is a client consultation platform for lawyers. Book consultations, collect payments and deposits, run intake and document uploads, and keep client history and notes in one place. It includes built-in CRM and works for solo and small-firm practice.',
     link: '/',
     linkLabel: 'Learn more',
-    keywords: ['what', 'meetvault', 'scheduling', 'platform'],
+    keywords: ['what', 'meetvault', 'scheduling', 'platform', 'lawyers', 'legal'],
   },
   {
     question: 'How do I book a meeting?',
