@@ -2,47 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ExternalLink, DollarSign, AlertCircle } from 'lucide-react';
-import { createConnectAccountAction, createInstantPayoutAction } from '../connect/actions';
+import { ExternalLink, DollarSign } from 'lucide-react';
+import { createInstantPayoutAction } from '../connect/actions';
 import { createStripeDashboardLinkAction } from './actions';
 
 export function ConnectButton() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleConnect = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await createConnectAccountAction();
-      if (result.error) {
-        setError(result.error);
-        setLoading(false);
-      } else if (result.onboardingUrl) {
-        window.location.href = result.onboardingUrl;
-      }
-    } catch {
-      setError('Failed to start onboarding. Please try again.');
-      setLoading(false);
-    }
-  };
-
+  // Simple link — all logic handled server-side in /api/connect/start
   return (
-    <div className="space-y-2">
-      <button
-        type="button"
-        onClick={handleConnect}
-        disabled={loading}
-        className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold px-5 py-2.5 rounded-xl transition-colors"
-      >
-        {loading ? 'Redirecting to Stripe…' : 'Connect Stripe account'}
-      </button>
-      {error && (
-        <p className="text-red-400 text-sm flex items-center gap-1">
-          <AlertCircle className="w-4 h-4" /> {error}
-        </p>
-      )}
-    </div>
+    <a
+      href="/api/connect/start"
+      className="inline-block bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-5 py-2.5 rounded-xl transition-colors"
+    >
+      Connect Stripe account
+    </a>
   );
 }
 

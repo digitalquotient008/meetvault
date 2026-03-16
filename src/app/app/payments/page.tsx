@@ -1,12 +1,6 @@
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import {
-  getAccountBalance,
-  getPayoutHistory,
-  getConnectAccountStatus,
-  markShopOnboarded,
-  clearShopConnectAccount,
-} from '@/lib/services/stripe-connect';
+import { getAccountBalance, getPayoutHistory } from '@/lib/services/stripe-connect';
 import type Stripe from 'stripe';
 import {
   ConnectButton,
@@ -30,12 +24,14 @@ function bankLabel(destination: Stripe.Payout['destination']): string {
 export default async function PaymentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ setup?: string }>;
+  searchParams: Promise<{ setup?: string; connect_error?: string }>;
 }) {
   const { shopId } = await requireShopAccess();
-  const { setup } = await searchParams;
+  const { setup, connect_error } = await searchParams;
 
-  let shop = await prisma.shop.findUnique({
+  // Only read DB — no Stripe API calls in the page render.
+  // Stripe syncing happens in /app/connect/return and server actions.
+  const shop = await prisma.shop.findUnique({
     where: { id: shopId },
     select: {
       stripeConnectAccountId: true,
@@ -44,20 +40,9 @@ export default async function PaymentsPage({
     },
   });
 
-  let onboarded = shop?.stripeConnectOnboarded ?? false;
-
-  // Verify live with Stripe if DB says not onboarded
-  if (!onboarded && shop?.stripeConnectAccountId) {
-    const status = await getConnectAccountStatus(shop.stripeConnectAccountId);
-    if (status.forbidden) {
-      // Stored account ID belongs to a different Stripe key — clear it so the shop can reconnect
-      await clearShopConnectAccount(shopId);
-      shop = { ...shop!, stripeConnectAccountId: null, stripeConnectOnboarded: false };
-    } else if (status.chargesEnabled) {
-      await markShopOnboarded(shopId);
-      onboarded = true;
-    }
-  }
+  const onboarded = shop?.stripeConnectOnboarded ?? false;
+  const notConnected = !shop?.stripeConnectAccountId;
+  const notOnboarded = !!shop?.stripeConnectAccountId && !onboarded;
 
   let balance: { available: number; pending: number; currency: string } | null = null;
   let payouts: Stripe.Payout[] = [];
@@ -74,9 +59,6 @@ export default async function PaymentsPage({
     }
   }
 
-  const notConnected = !shop?.stripeConnectAccountId;
-  const notOnboarded = shop?.stripeConnectAccountId && !onboarded;
-
   return (
     <div className="p-6 lg:p-8 max-w-4xl space-y-8">
       <div>
@@ -87,6 +69,27 @@ export default async function PaymentsPage({
       {setup === 'required' && (
         <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-amber-300 text-sm">
           Connect your Stripe account to start accepting payments and enable checkout.
+        </div>
+      )}
+
+      {connect_error === 'stripe-connect-not-enabled' && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+          Stripe Connect is not enabled on your account. Visit{' '}
+          <a
+            href="https://dashboard.stripe.com/connect/accounts/overview"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            dashboard.stripe.com → Connect
+          </a>{' '}
+          to activate it, then try again.
+        </div>
+      )}
+
+      {connect_error && connect_error !== 'stripe-connect-not-enabled' && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+          Failed to connect Stripe account: {decodeURIComponent(connect_error)}
         </div>
       )}
 
@@ -180,7 +183,9 @@ export default async function PaymentsPage({
                       <span
                         className={`px-2 py-0.5 rounded-full text-xs font-medium ${payoutStatusBadge(payout.status)}`}
                       >
-                        {payout.status === 'in_transit' ? 'In transit' : payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
+                        {payout.status === 'in_transit'
+                          ? 'In transit'
+                          : payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-3 text-slate-400">{bankLabel(payout.destination)}</td>
