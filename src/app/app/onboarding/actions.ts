@@ -6,7 +6,14 @@ import { createBarberProfile } from '@/lib/services/barber';
 import { setAvailabilityRules } from '@/lib/services/availability';
 
 export async function createShopAction(userId: string, data: { name: string; slug: string; timezone?: string }) {
-  return createShop(userId, { name: data.name, slug: data.slug, timezone: data.timezone ?? 'America/New_York' });
+  return createShop(userId, {
+    name: data.name,
+    slug: data.slug,
+    timezone: data.timezone ?? 'America/New_York',
+    country: 'US',
+    depositRequired: false,
+    tippingEnabled: true,
+  });
 }
 
 export async function addServiceAction(shopId: string, data: { name: string; durationMin: number; price: number }) {
