@@ -40,7 +40,6 @@ export default function HowItWorks() {
                 <div className="hidden md:block absolute top-10 left-full w-full h-px bg-gradient-to-r from-slate-700 to-transparent -translate-x-6 z-0" />
               )}
               <div className="relative bg-slate-800/50 border border-slate-700/60 rounded-2xl p-8 hover:border-slate-600 transition-colors">
-                <span className="text-4xl font-black text-amber-500/20 absolute top-4 right-6">{s.step}</span>
                 <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-5">
                   <span className="text-lg font-bold text-amber-400">{s.step}</span>
                 </div>
