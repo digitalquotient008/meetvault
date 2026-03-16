@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
+
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
-  NEXT_PUBLIC_APP_URL: z.string().min(1, 'NEXT_PUBLIC_APP_URL is required'),
+  NEXT_PUBLIC_APP_URL: z.string().min(1).default('http://localhost:3000'),
 
   // Clerk
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1, 'Clerk publishable key is required'),
@@ -25,10 +27,9 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
-    // During Vercel build, env vars may not be available yet — warn but don't crash
+  if (isBuildPhase) {
     // eslint-disable-next-line no-console
-    console.warn('Env validation skipped during build (vars not yet injected).');
+    console.warn('Env validation skipped during build phase.');
   } else {
     // eslint-disable-next-line no-console
     console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
