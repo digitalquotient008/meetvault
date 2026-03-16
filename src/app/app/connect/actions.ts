@@ -29,14 +29,25 @@ export async function createConnectAccountAction(): Promise<{ onboardingUrl: str
 
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
-  // If already onboarded, just return the onboarding link for re-auth
-  if (!shop.stripeConnectAccountId) {
-    const ownerEmail = shop.email ?? '';
-    await createConnectAccount(shopId, ownerEmail);
-  }
+  try {
+    if (!shop.stripeConnectAccountId) {
+      const ownerEmail = shop.email ?? '';
+      await createConnectAccount(shopId, ownerEmail);
+    }
 
-  const { url } = await createAccountOnboardingLink(shopId, baseUrl);
-  return { onboardingUrl: url };
+    const { url } = await createAccountOnboardingLink(shopId, baseUrl);
+    return { onboardingUrl: url };
+  } catch (err) {
+    const status = (err as { statusCode?: number })?.statusCode;
+    if (status === 403) {
+      throw new Error(
+        'Stripe Connect is not enabled on your Stripe account. Go to dashboard.stripe.com → Connect → Get started to activate it.',
+      );
+    }
+    throw new Error(
+      err instanceof Error ? err.message : 'Failed to connect Stripe account. Please try again.',
+    );
+  }
 }
 
 export async function getConnectStatusAction(): Promise<{
