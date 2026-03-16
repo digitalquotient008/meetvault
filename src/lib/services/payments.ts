@@ -24,6 +24,12 @@ type CreatePaymentIntentParams = {
   currency?: string;
   type: PaymentType;
   idempotencyKey?: string;
+  // Stripe Connect fields (optional — omit for platform-account payments)
+  stripeConnectAccountId?: string;
+  platformFeePercent?: number;
+  // Card-on-file fields (only used when stripeConnectAccountId is set)
+  stripeCustomerId?: string;
+  stripePaymentMethodId?: string;
 };
 
 export async function createPaymentIntent(params: CreatePaymentIntentParams) {
@@ -37,24 +43,51 @@ export async function createPaymentIntent(params: CreatePaymentIntentParams) {
     currency = 'usd',
     type,
     idempotencyKey,
+    stripeConnectAccountId,
+    platformFeePercent = 0,
+    stripeCustomerId,
+    stripePaymentMethodId,
   } = params;
 
-  const amount = amountCents;
+  const isConnect = Boolean(stripeConnectAccountId);
+  const applicationFeeAmount = isConnect
+    ? Math.round(amountCents * (platformFeePercent / 100))
+    : 0;
 
-  const paymentIntent = await stripe.paymentIntents.create(
-    {
-      amount,
-      currency,
-      automatic_payment_methods: { enabled: true },
-      metadata: {
-        shopId,
-        ...(appointmentId ? { appointmentId } : {}),
-        ...(customerId ? { customerId } : {}),
-        type,
-      },
+  const piParams: Stripe.PaymentIntentCreateParams = {
+    amount: amountCents,
+    currency,
+    metadata: {
+      shopId,
+      ...(appointmentId ? { appointmentId } : {}),
+      ...(customerId ? { customerId } : {}),
+      type,
     },
-    idempotencyKey ? { idempotencyKey } : undefined,
-  );
+  };
+
+  if (isConnect) {
+    piParams.application_fee_amount = applicationFeeAmount;
+    piParams.transfer_data = { destination: stripeConnectAccountId! };
+
+    if (stripePaymentMethodId && stripeCustomerId) {
+      // Charge card on file — confirm immediately
+      piParams.customer = stripeCustomerId;
+      piParams.payment_method = stripePaymentMethodId;
+      piParams.confirm = true;
+      piParams.off_session = false;
+      piParams.automatic_payment_methods = { enabled: true, allow_redirects: 'never' };
+    } else {
+      piParams.automatic_payment_methods = { enabled: true };
+    }
+  } else {
+    piParams.automatic_payment_methods = { enabled: true };
+  }
+
+  const requestOptions: Stripe.RequestOptions = idempotencyKey
+    ? { idempotencyKey }
+    : {};
+
+  const paymentIntent = await stripe.paymentIntents.create(piParams, requestOptions);
 
   const payment = await prisma.payment.create({
     data: {
@@ -67,13 +100,19 @@ export async function createPaymentIntent(params: CreatePaymentIntentParams) {
       currency,
       type,
       status: PaymentStatus.PENDING,
+      ...(applicationFeeAmount > 0
+        ? { platformFeeAmount: applicationFeeAmount / 100 }
+        : {}),
     },
   });
 
   return { paymentIntent, payment };
 }
 
-export async function markPaymentAsSucceeded(stripePaymentIntentId: string) {
+export async function markPaymentAsSucceeded(
+  stripePaymentIntentId: string,
+  stripeConnectAccountId?: string,
+) {
   const payment = await prisma.payment.findFirst({
     where: { stripePaymentIntentId },
   });
@@ -82,13 +121,20 @@ export async function markPaymentAsSucceeded(stripePaymentIntentId: string) {
   }
 
   const stripe = getStripe();
-  const pi = await stripe.paymentIntents.retrieve(stripePaymentIntentId, {
-    expand: ['latest_charge'],
-  });
+  const retrieveOptions: Stripe.RequestOptions = stripeConnectAccountId
+    ? { stripeAccount: stripeConnectAccountId }
+    : {};
 
-  const latestCharge = pi.latest_charge && typeof pi.latest_charge !== 'string'
-    ? pi.latest_charge
-    : null;
+  const pi = await stripe.paymentIntents.retrieve(
+    stripePaymentIntentId,
+    { expand: ['latest_charge', 'latest_charge.transfer'] },
+    retrieveOptions,
+  );
+
+  const latestCharge =
+    pi.latest_charge && typeof pi.latest_charge !== 'string'
+      ? pi.latest_charge
+      : null;
 
   const receiptUrl =
     latestCharge && latestCharge.receipt_url ? latestCharge.receipt_url : null;
@@ -103,12 +149,18 @@ export async function markPaymentAsSucceeded(stripePaymentIntentId: string) {
       ? (latestCharge.payment_method_details.card as { brand?: string }).brand
       : undefined;
 
+  // Extract transfer ID if this was a Connect payment
+  const transfer = latestCharge?.transfer;
+  const transferId =
+    transfer && typeof transfer !== 'string' ? transfer.id : undefined;
+
   const updated = await prisma.payment.update({
     where: { id: payment.id },
     data: {
       status: PaymentStatus.SUCCEEDED,
       receiptUrl: receiptUrl ?? undefined,
       methodBrand: methodBrand ?? undefined,
+      ...(transferId ? { transferId } : {}),
     },
   });
 
@@ -118,6 +170,27 @@ export async function markPaymentAsSucceeded(stripePaymentIntentId: string) {
     entityId: payment.id,
     action: 'succeeded',
     afterJson: JSON.stringify({ status: 'SUCCEEDED', amount: Number(payment.amount) }),
+  });
+  return updated;
+}
+
+export async function markPaymentAsFailed(stripePaymentIntentId: string) {
+  const payment = await prisma.payment.findFirst({
+    where: { stripePaymentIntentId },
+  });
+  if (!payment) return null;
+
+  const updated = await prisma.payment.update({
+    where: { id: payment.id },
+    data: { status: PaymentStatus.FAILED },
+  });
+
+  await createAuditLog({
+    shopId: payment.shopId,
+    entityType: 'Payment',
+    entityId: payment.id,
+    action: 'failed',
+    afterJson: JSON.stringify({ status: 'FAILED' }),
   });
   return updated;
 }
@@ -137,9 +210,7 @@ export async function refundPayment(params: {
   }
 
   const amount =
-    typeof params.amountCents === 'number'
-      ? params.amountCents
-      : undefined;
+    typeof params.amountCents === 'number' ? params.amountCents : undefined;
 
   const refund = await stripe.refunds.create({
     payment_intent: payment.stripePaymentIntentId,
@@ -167,7 +238,10 @@ export async function refundPayment(params: {
   await prisma.payment.update({
     where: { id: payment.id },
     data: {
-      status: refund.status === 'succeeded' && isFullRefund ? PaymentStatus.REFUNDED : PaymentStatus.PARTIAL_REFUNDED,
+      status:
+        refund.status === 'succeeded' && isFullRefund
+          ? PaymentStatus.REFUNDED
+          : PaymentStatus.PARTIAL_REFUNDED,
     },
   });
 
@@ -176,7 +250,7 @@ export async function refundPayment(params: {
     entityType: 'Payment',
     entityId: payment.id,
     action: isFullRefund ? 'refunded' : 'partial_refunded',
-    afterJson: JSON.stringify({ refundAmount: refundAmount }),
+    afterJson: JSON.stringify({ refundAmount }),
   });
   return refund;
 }
@@ -203,9 +277,14 @@ export async function createPaymentIntentForAppointment(params: {
     amountCents = totalCents;
   } else {
     if (!shop.depositRequired || !shop.depositValue) {
-      amountCents = Math.min(totalCents, Math.round(Number(appointment.subtotal ?? 0) * 100 * 0.2));
+      amountCents = Math.min(
+        totalCents,
+        Math.round(Number(appointment.subtotal ?? 0) * 100 * 0.2),
+      );
     } else if (shop.depositType === 'PERCENT') {
-      amountCents = Math.round((Number(appointment.subtotal ?? 0) * 100 * Number(shop.depositValue)) / 100);
+      amountCents = Math.round(
+        (Number(appointment.subtotal ?? 0) * 100 * Number(shop.depositValue)) / 100,
+      );
     } else {
       amountCents = Math.round(Number(shop.depositValue) * 100);
     }
@@ -221,7 +300,13 @@ export async function createPaymentIntentForAppointment(params: {
     amountCents,
     type: type === 'DEPOSIT' ? 'DEPOSIT' : 'FULL',
     idempotencyKey,
+    // Pass Connect params if shop is onboarded
+    ...(shop.stripeConnectAccountId && shop.stripeConnectOnboarded
+      ? {
+          stripeConnectAccountId: shop.stripeConnectAccountId,
+          platformFeePercent: Number(shop.platformFeePercent ?? 0),
+        }
+      : {}),
   });
   return { clientSecret: paymentIntent.client_secret!, paymentId: payment.id };
 }
-

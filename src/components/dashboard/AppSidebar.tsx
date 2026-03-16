@@ -15,6 +15,7 @@ import {
   ClipboardList,
   TrendingUp,
   Megaphone,
+  CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/app/growth', label: 'Growth', icon: TrendingUp },
   { href: '/app/broadcast', label: 'Broadcast', icon: Megaphone },
   { href: '/app/reports', label: 'Reports', icon: FileText },
+  { href: '/app/payments', label: 'Payments', icon: CreditCard },
   { href: '/app/settings/shop', label: 'Settings', icon: Settings },
 ];
 

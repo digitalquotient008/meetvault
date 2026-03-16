@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { env } from '@/lib/env';
-import { markPaymentAsSucceeded } from '@/lib/services/payments';
+import { markPaymentAsSucceeded, markPaymentAsFailed } from '@/lib/services/payments';
 
 export async function POST(request: NextRequest) {
   const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
@@ -33,14 +33,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (event.type === 'payment_intent.succeeded') {
-    const pi = event.data.object as Stripe.PaymentIntent;
-    try {
+  try {
+    if (event.type === 'payment_intent.succeeded') {
+      const pi = event.data.object as Stripe.PaymentIntent;
       await markPaymentAsSucceeded(pi.id);
-    } catch (e) {
-      console.error('Failed to mark payment succeeded:', e);
-      return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
+    } else if (event.type === 'payment_intent.payment_failed') {
+      const pi = event.data.object as Stripe.PaymentIntent;
+      await markPaymentAsFailed(pi.id);
     }
+  } catch (e) {
+    console.error(`Webhook error [${event.type}]:`, e);
+    return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

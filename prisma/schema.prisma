@@ -105,9 +105,12 @@ model Shop {
   depositRequired      Boolean   @default(false)
   depositType          DepositType?
   depositValue         Decimal?  @db.Decimal(10, 2)
-  tippingEnabled       Boolean   @default(true)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  tippingEnabled          Boolean   @default(true)
+  stripeConnectAccountId  String?
+  stripeConnectOnboarded  Boolean   @default(false)
+  platformFeePercent      Decimal?  @db.Decimal(5, 2)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   memberships          Membership[]
   barberProfiles       BarberProfile[]
@@ -252,6 +255,7 @@ model Customer {
   lastVisitAt             DateTime?
   nextSuggestedAt         DateTime?
   noShowCount             Int      @default(0)
+  stripeCustomerId        String?
   marketingOptInSms       Boolean  @default(false)
   marketingOptInEmail     Boolean  @default(true)
   createdAt               DateTime @default(now())
@@ -345,6 +349,8 @@ model Payment {
   status               PaymentStatus @default(PENDING)
   methodBrand          String?
   receiptUrl           String?
+  platformFeeAmount    Decimal?      @db.Decimal(10, 2)
+  transferId           String?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 

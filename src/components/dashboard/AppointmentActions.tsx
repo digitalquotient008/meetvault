@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { updateAppointmentStatusAction } from '@/app/app/actions';
 import type { AppointmentStatus } from '@prisma/client';
@@ -37,13 +38,24 @@ export function AppointmentActions({ appointmentId, status }: Props) {
         </button>
       )}
       {(status === 'CONFIRMED' || status === 'IN_PROGRESS') && (
-        <button
-          type="button"
-          onClick={() => handle('complete')}
-          className="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500"
-        >
-          Complete
-        </button>
+        <>
+          {/* Primary: Squire-style checkout with tip + card payment */}
+          <Link
+            href={`/app/appointments/${appointmentId}/checkout`}
+            className="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+          >
+            Checkout
+          </Link>
+          {/* Secondary: mark complete without payment (cash / already paid) */}
+          <button
+            type="button"
+            onClick={() => handle('complete')}
+            className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600"
+            title="Mark complete without card payment (cash or already paid)"
+          >
+            Cash
+          </button>
+        </>
       )}
       {(status === 'CONFIRMED' || status === 'IN_PROGRESS') && (
         <>
