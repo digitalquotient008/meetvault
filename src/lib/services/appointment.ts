@@ -3,6 +3,14 @@ import { Decimal } from '@prisma/client/runtime/library';
 import { addMinutes, addDays } from 'date-fns';
 import { randomBytes } from 'crypto';
 import { createAuditLog } from '@/lib/audit';
+import {
+  sendBookingConfirmationToClient,
+  sendBookingNotificationToShop,
+  sendCancellationToClient,
+  sendCancellationToShop,
+  sendCompletionThankYou,
+  buildEmailData,
+} from '@/lib/services/email-notifications';
 
 function generateConfirmationCode(): string {
   return randomBytes(4).toString('hex').toUpperCase();
@@ -95,6 +103,10 @@ export async function createAppointment(params: {
       action: 'created',
       afterJson: JSON.stringify({ status: result.status, confirmationCode: result.confirmationCode }),
     });
+
+    const emailData = buildEmailData(result);
+    sendBookingConfirmationToClient(emailData).catch(() => {});
+    sendBookingNotificationToShop(emailData).catch(() => {});
   }
   return result;
 }
@@ -165,10 +177,14 @@ export async function completeAppointment(shopId: string, appointmentId: string)
     action: 'completed',
     afterJson: JSON.stringify({ status: 'COMPLETED' }),
   });
-  return prisma.appointment.findUnique({
+  const full = await prisma.appointment.findUnique({
     where: { id: appointmentId },
-    include: { customer: true, barberProfile: true },
+    include: { customer: true, barberProfile: true, appointmentServices: true, shop: true },
   });
+  if (full) {
+    sendCompletionThankYou(buildEmailData(full)).catch(() => {});
+  }
+  return full;
 }
 
 export async function cancelAppointment(shopId: string, appointmentId: string) {
@@ -177,7 +193,7 @@ export async function cancelAppointment(shopId: string, appointmentId: string) {
   });
   if (!apt) throw new Error('Appointment not found');
   if (apt.status === 'CANCELED') return apt;
-  const updated = await prisma.appointment.update({
+  await prisma.appointment.update({
     where: { id: appointmentId },
     data: { status: 'CANCELED' },
   });
@@ -188,7 +204,17 @@ export async function cancelAppointment(shopId: string, appointmentId: string) {
     action: 'canceled',
     afterJson: JSON.stringify({ status: 'CANCELED' }),
   });
-  return updated;
+
+  const full = await prisma.appointment.findUnique({
+    where: { id: appointmentId },
+    include: { customer: true, barberProfile: true, appointmentServices: true, shop: true },
+  });
+  if (full) {
+    const emailData = buildEmailData(full);
+    sendCancellationToClient(emailData).catch(() => {});
+    sendCancellationToShop(emailData).catch(() => {});
+  }
+  return full ?? apt;
 }
 
 export async function markNoShowAppointment(shopId: string, appointmentId: string) {
