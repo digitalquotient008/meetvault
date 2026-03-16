@@ -4,49 +4,48 @@ interface CTAProps {
   title?: string;
   description?: string;
   buttonText?: string;
-  variant?: 'primary' | 'secondary';
 }
 
-export default function CTA({ 
-  title = 'Ready to get started?',
-  description = 'Join barbershops who run their book with MeetingVault.',
-  buttonText = 'Sign up for free',
-  variant = 'primary'
+export default function CTA({
+  title = 'Ready to run your book?',
+  description = 'Join barbers who stopped chasing bookings and started getting paid on time.',
+  buttonText = 'Start your 14-day free trial',
 }: CTAProps) {
   return (
-    <section className={`py-16 sm:py-20 ${variant === 'primary' ? 'bg-gradient-to-br from-amber-600 to-amber-700' : 'bg-slate-900'}`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 ${variant === 'primary' ? 'text-white' : 'text-white'}`}>
+    <section className="relative py-20 sm:py-28 overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-600 via-amber-600 to-amber-700" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-amber-500/30 via-transparent to-transparent" />
+
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-5 leading-tight">
           {title}
         </h2>
-        <p className={`text-lg sm:text-xl md:text-2xl mb-8 sm:mb-10 leading-relaxed ${variant === 'primary' ? 'text-amber-100' : 'text-slate-400'}`}>
+        <p className="text-lg sm:text-xl text-amber-100/90 mb-10 leading-relaxed max-w-2xl mx-auto">
           {description}
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-          <Link
-            href="/sign-up"
-            className={`inline-block px-8 py-3.5 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all shadow-md hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 w-full sm:w-auto text-center ${
-              variant === 'primary'
-                ? 'bg-white text-amber-600 hover:bg-slate-100 focus-visible:outline-white'
-                : 'bg-amber-600 text-white hover:bg-amber-500 focus-visible:outline-amber-500'
-            }`}
-          >
-            {buttonText}
-          </Link>
-          <Link
-            href="/contact"
-            className={`inline-block px-8 py-3.5 sm:py-4 rounded-lg text-base sm:text-lg font-semibold transition-all border-2 w-full sm:w-auto text-center ${
-              variant === 'primary'
-                ? 'border-white text-white hover:bg-white/10 focus-visible:outline-white'
-                : 'border-slate-600 text-slate-200 hover:border-amber-500 hover:bg-slate-800/50'
-            }`}
-          >
-            Schedule a demo
-          </Link>
+
+        <Link
+          href="/sign-up"
+          className="inline-block bg-white text-amber-700 px-10 py-4 rounded-xl text-lg font-bold hover:bg-amber-50 transition-all shadow-xl shadow-amber-900/30 hover:shadow-amber-900/40"
+        >
+          {buttonText}
+        </Link>
+
+        <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-amber-200/80">
+          <span className="flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+            14-day free trial
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+            No credit card required
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+            Cancel anytime
+          </span>
         </div>
-        {variant === 'primary' && (
-          <p className="text-sm text-amber-200 mt-5 sm:mt-6">No credit card required • Setup in 2 minutes</p>
-        )}
       </div>
     </section>
   );

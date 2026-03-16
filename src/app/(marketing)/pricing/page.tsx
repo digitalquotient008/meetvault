@@ -3,44 +3,71 @@ import PricingCards from '@/components/PricingCards';
 
 export const metadata = {
   title: 'Pricing',
-  description: 'Simple, transparent pricing for independent barbers. One plan, everything included.',
+  description: 'Simple, transparent pricing for independent barbers. One plan at $25/month with a 14-day free trial.',
 };
 
 export default function PricingPage() {
   const faqs = [
-    { question: 'How do I get started?', answer: 'Sign up with your email. No credit card required. Create your shop, add your services and hours, and share your booking link.' },
-    { question: "What's included in the $25/month?", answer: 'Everything: online booking, deposits, client CRM, walk-in queue, waitlist, staff scheduling, reminders, growth tools, reports, and white-label branding.' },
-    { question: 'Can I use my own branding?', answer: 'Yes. Your booking page uses your shop name, colors, and custom URL slug. Clients see your brand, not ours.' },
-    { question: 'How do payments work?', answer: 'Deposits and payments are processed via Stripe. Money goes directly to your Stripe account. We never hold your funds.' },
+    {
+      question: 'How does the free trial work?',
+      answer: 'Sign up with your email — no credit card required. You get full access to every feature for 14 days. If you love it, subscribe for $25/month. If not, your account simply pauses. No charge, no hassle.',
+    },
+    {
+      question: "What\u2019s included in the $25/month?",
+      answer: 'Everything: online booking, deposits, no-show protection, client CRM, walk-in queue, waitlist, staff scheduling, appointment reminders, growth tools, revenue reports, and custom branding. One plan, zero add-ons.',
+    },
+    {
+      question: 'Can I use my own branding?',
+      answer: 'Yes. Your booking page uses your shop name, logo, brand colors, and custom URL slug. Clients see your brand, not ours.',
+    },
+    {
+      question: 'How do payments work?',
+      answer: 'Deposits and payments are processed through Stripe. Money goes directly to your Stripe account. We never touch or hold your funds.',
+    },
+    {
+      question: 'Can I cancel anytime?',
+      answer: 'Yes. No contracts, no cancellation fees. Cancel from your dashboard whenever you want and your subscription stops at the end of the billing period.',
+    },
   ];
 
   return (
     <div className="bg-slate-950 min-h-screen">
-      <section className="py-20 bg-slate-900">
+      <section className="pt-20 pb-24 bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">One plan. Everything included.</h1>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-12">
-              No tiers, no upsells. Get every feature for one flat price.
+          <div className="text-center mb-14">
+            <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple pricing</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
+              One plan. Everything included.
+            </h1>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              No tiers, no upsells, no hidden fees. Try free for 14 days, then $25/month.
             </p>
-            <PricingCards />
           </div>
+          <PricingCards />
         </div>
       </section>
+
       <section id="faq" className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">Frequently Asked Questions</h2>
-          <div className="space-y-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl font-bold text-white mb-4">Questions &amp; answers</h2>
+            <p className="text-slate-400">Everything you need to know before you start.</p>
+          </div>
+          <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <div key={index} className="bg-slate-800/80 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition-colors">
+              <div key={index} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-7 hover:border-slate-700 transition-colors">
                 <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>
-                <p className="text-slate-400">{faq.answer}</p>
+                <p className="text-slate-400 leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <CTA />
+
+      <CTA
+        title="Try it free for 14 days"
+        description="Full access, no credit card, no commitment. See why barbers are switching."
+      />
     </div>
   );
 }
