@@ -1,6 +1,5 @@
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import Stripe from 'stripe';
 import {
   getAccountBalance,
   getPayoutHistory,
@@ -8,6 +7,7 @@ import {
   markShopOnboarded,
   clearShopConnectAccount,
 } from '@/lib/services/stripe-connect';
+import type Stripe from 'stripe';
 import {
   ConnectButton,
   StripeDashboardButton,
@@ -48,23 +48,14 @@ export default async function PaymentsPage({
 
   // Verify live with Stripe if DB says not onboarded
   if (!onboarded && shop?.stripeConnectAccountId) {
-    try {
-      const { chargesEnabled } = await getConnectAccountStatus(shop.stripeConnectAccountId);
-      if (chargesEnabled) {
-        await markShopOnboarded(shopId);
-        onboarded = true;
-      }
-    } catch (err) {
-      // If Stripe returns Forbidden, the stored account ID belongs to a different
-      // Stripe platform key — clear it so the shop can reconnect with the correct key.
-      if (
-        err instanceof Stripe.errors.StripePermissionError ||
-        (err instanceof Stripe.errors.StripeError && (err as { statusCode?: number }).statusCode === 403)
-      ) {
-        await clearShopConnectAccount(shopId);
-        shop = { ...shop!, stripeConnectAccountId: null, stripeConnectOnboarded: false };
-      }
-      // For all other errors (network, auth), just degrade silently
+    const status = await getConnectAccountStatus(shop.stripeConnectAccountId);
+    if (status.forbidden) {
+      // Stored account ID belongs to a different Stripe key — clear it so the shop can reconnect
+      await clearShopConnectAccount(shopId);
+      shop = { ...shop!, stripeConnectAccountId: null, stripeConnectOnboarded: false };
+    } else if (status.chargesEnabled) {
+      await markShopOnboarded(shopId);
+      onboarded = true;
     }
   }
 

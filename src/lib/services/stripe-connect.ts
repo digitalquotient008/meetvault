@@ -144,12 +144,23 @@ export async function clearShopConnectAccount(shopId: string): Promise<void> {
 
 export async function getConnectAccountStatus(
   stripeConnectAccountId: string,
-): Promise<{ chargesEnabled: boolean; detailsSubmitted: boolean }> {
+): Promise<{ chargesEnabled: boolean; detailsSubmitted: boolean; forbidden: boolean }> {
   const stripe = getStripe();
-  const account = await stripe.accounts.retrieve(stripeConnectAccountId);
-  return {
-    chargesEnabled: account.charges_enabled,
-    detailsSubmitted: account.details_submitted,
-  };
+  try {
+    const account = await stripe.accounts.retrieve(stripeConnectAccountId);
+    return {
+      chargesEnabled: account.charges_enabled,
+      detailsSubmitted: account.details_submitted,
+      forbidden: false,
+    };
+  } catch (err) {
+    const status = (err as { statusCode?: number })?.statusCode;
+    // 403 means this account belongs to a different Stripe platform key
+    if (status === 403) {
+      return { chargesEnabled: false, detailsSubmitted: false, forbidden: true };
+    }
+    // Any other error (network, auth) — treat as not-onboarded
+    return { chargesEnabled: false, detailsSubmitted: false, forbidden: false };
+  }
 }
 
