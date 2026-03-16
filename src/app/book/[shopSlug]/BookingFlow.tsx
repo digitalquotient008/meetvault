@@ -120,12 +120,10 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
       if (appointment) {
         if (shop.depositRequired) {
           router.push(`/book/${shop.slug}/pay/${appointment.id}?type=deposit`);
-        } else if (shop.noShowFeeAmount || shop.cardRequiredForBooking) {
-          // Show card capture step before confirmation
+        } else {
+          // Always collect card before confirming
           setBookedAppointmentId(appointment.id);
           setStep('card');
-        } else {
-          router.push(`/book/${shop.slug}/confirm/${appointment.id}`);
         }
       } else {
         throw new Error('Booking failed');

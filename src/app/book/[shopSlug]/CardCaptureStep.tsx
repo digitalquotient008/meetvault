@@ -81,13 +81,6 @@ function CardForm({
       >
         {loading ? 'Saving…' : 'Save card & confirm booking'}
       </button>
-      <button
-        type="button"
-        onClick={onSkip}
-        className="w-full py-2.5 text-slate-400 hover:text-white text-sm transition-colors"
-      >
-        Skip — book without saving card
-      </button>
     </form>
   );
 }
@@ -140,9 +133,7 @@ export default function CardCaptureStep({
       <div>
         <h2 className="text-lg font-semibold text-white">Save a card on file</h2>
         <p className="text-slate-400 text-sm mt-1">
-          {cardRequired
-            ? 'A card on file is required to complete your booking.'
-            : 'Optionally save a card to guarantee your appointment.'}
+          A card on file is required to complete your booking.
         </p>
       </div>
 
@@ -157,18 +148,7 @@ export default function CardCaptureStep({
       </div>
 
       {loadError && (
-        <div className="space-y-3">
-          <p className="text-red-400 text-sm">{loadError}</p>
-          {!cardRequired && (
-            <button
-              type="button"
-              onClick={onDone}
-              className="w-full py-2.5 text-slate-400 hover:text-white text-sm transition-colors"
-            >
-              Skip — book without saving card
-            </button>
-          )}
-        </div>
+        <p className="text-red-400 text-sm">{loadError}</p>
       )}
 
       {!loadError && !clientSecret && (
