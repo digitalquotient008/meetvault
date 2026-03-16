@@ -48,8 +48,8 @@ export async function createPaymentIntent(params: CreatePaymentIntentParams) {
       automatic_payment_methods: { enabled: true },
       metadata: {
         shopId,
-        appointmentId: appointmentId ?? undefined,
-        customerId: customerId ?? undefined,
+        ...(appointmentId ? { appointmentId } : {}),
+        ...(customerId ? { customerId } : {}),
         type,
       },
     },
