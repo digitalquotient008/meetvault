@@ -18,22 +18,36 @@ export async function createConnectAccount(
 ): Promise<{ accountId: string }> {
   const stripe = getStripe();
 
-  const account = await stripe.accounts.create({
-    type: 'express',
-    email,
-    capabilities: {
-      card_payments: { requested: true },
-      transfers: { requested: true },
-    },
-    metadata: { shopId },
-  });
+  // Check if a connected account already exists for this shop (e.g. DB was cleared
+  // but the Stripe account survived). Search by metadata.shopId.
+  let accountId: string | null = null;
+  try {
+    const existing = await stripe.accounts.list({ limit: 100 });
+    const match = existing.data.find((a) => a.metadata?.shopId === shopId);
+    if (match) accountId = match.id;
+  } catch {
+    // If listing fails, proceed to create a new one
+  }
+
+  if (!accountId) {
+    const account = await stripe.accounts.create({
+      type: 'express',
+      email,
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+      metadata: { shopId },
+    });
+    accountId = account.id;
+  }
 
   await prisma.shop.update({
     where: { id: shopId },
-    data: { stripeConnectAccountId: account.id, stripeConnectOnboarded: false },
+    data: { stripeConnectAccountId: accountId, stripeConnectOnboarded: false },
   });
 
-  return { accountId: account.id };
+  return { accountId };
 }
 
 export async function createAccountOnboardingLink(
