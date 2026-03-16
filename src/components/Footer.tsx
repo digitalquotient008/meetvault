@@ -51,7 +51,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href={`${APP_URL}/auth/login`} className="hover:text-white transition-colors">
+                <Link href="/sign-in" className="hover:text-white transition-colors">
                   Log In
                 </Link>
               </li>
