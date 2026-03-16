@@ -25,9 +25,6 @@ export default function Header() {
               <Link href="/pricing" className="text-slate-400 hover:text-white text-sm font-medium">
                 Pricing
               </Link>
-              <Link href="/integrations" className="text-slate-400 hover:text-white text-sm font-medium">
-                Integrations
-              </Link>
               <Link href="/about" className="text-slate-400 hover:text-white text-sm font-medium">
                 About
               </Link>
@@ -77,9 +74,6 @@ export default function Header() {
             </Link>
             <Link href="/pricing" className="block text-slate-400 hover:text-white">
               Pricing
-            </Link>
-            <Link href="/integrations" className="block text-slate-400 hover:text-white">
-              Integrations
             </Link>
             <Link href="/about" className="block text-slate-400 hover:text-white">
               About

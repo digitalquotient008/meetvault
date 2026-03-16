@@ -1,18 +1,17 @@
-import Link from 'next/link';
 import CTA from '@/components/CTA';
 import PricingCards from '@/components/PricingCards';
 
 export const metadata = {
   title: 'Pricing',
-  description: 'Simple, transparent pricing for MeetingVault — the operating system for modern barbershops.',
+  description: 'Simple, transparent pricing for independent barbers. One plan, everything included.',
 };
 
 export default function PricingPage() {
   const faqs = [
-    { question: 'How do I get started?', answer: 'Sign up with your email. No credit card required. Create your shop, add services and staff, and share your booking link.' },
-    { question: "What's included?", answer: 'Booking engine, deposits, client CRM, staff schedules, availability, and white-label booking pages. Payments and reminders in later phases.' },
-    { question: 'Can I use my own branding?', answer: 'Yes. Your booking page uses your logo, colors, and slug. The shop is the hero, not MeetingVault.' },
-    { question: 'Is there a free tier?', answer: 'Yes. Start free and upgrade as you grow. No hidden fees.' },
+    { question: 'How do I get started?', answer: 'Sign up with your email. No credit card required. Create your shop, add your services and hours, and share your booking link.' },
+    { question: "What's included in the $25/month?", answer: 'Everything: online booking, deposits, client CRM, walk-in queue, waitlist, staff scheduling, reminders, growth tools, reports, and white-label branding.' },
+    { question: 'Can I use my own branding?', answer: 'Yes. Your booking page uses your shop name, colors, and custom URL slug. Clients see your brand, not ours.' },
+    { question: 'How do payments work?', answer: 'Deposits and payments are processed via Stripe. Money goes directly to your Stripe account. We never hold your funds.' },
   ];
 
   return (
@@ -20,14 +19,11 @@ export default function PricingPage() {
       <section className="py-20 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Simple pricing for barbershops</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">One plan. Everything included.</h1>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-12">
+              No tiers, no upsells. Get every feature for one flat price.
+            </p>
             <PricingCards />
-            <div className="text-center mt-8">
-              <Link href="/contact" className="inline-flex items-center text-amber-400 hover:text-amber-300 font-semibold">
-                Need help choosing? Schedule a demo
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </Link>
-            </div>
           </div>
         </div>
       </section>
