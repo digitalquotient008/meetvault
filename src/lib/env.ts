@@ -25,13 +25,18 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  // Fail fast in dev / build if core env vars are invalid
-  // eslint-disable-next-line no-console
-  console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
-  throw new Error('Invalid environment variables');
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    // During Vercel build, env vars may not be available yet — warn but don't crash
+    // eslint-disable-next-line no-console
+    console.warn('Env validation skipped during build (vars not yet injected).');
+  } else {
+    // eslint-disable-next-line no-console
+    console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors);
+    throw new Error('Invalid environment variables');
+  }
 }
 
-export const env = parsed.data;
+export const env = (parsed.success ? parsed.data : process.env) as z.infer<typeof envSchema>;
 
 export function requireStripeSecretKey(): string {
   if (!env.STRIPE_SECRET_KEY) {
