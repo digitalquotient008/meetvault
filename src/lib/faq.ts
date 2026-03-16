@@ -1,14 +1,8 @@
-/**
- * FAQ data for the chat/FAQ widget and FAQ page (no LLM).
- */
-
 export interface FAQItem {
   question: string;
   answer: string;
-  /** Optional CTA link (e.g. /pricing, /contact) */
   link?: string;
   linkLabel?: string;
-  /** Keywords for simple client-side matching (e.g. ["pricing", "price", "cost"]) */
   keywords?: string[];
 }
 
@@ -16,60 +10,57 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'What is MeetingVault?',
     answer:
-      'MeetingVault is booking and payments software for salons and barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders you control—no spam. Includes client history and notes. Built for solo barbers and salons.',
-    link: '/',
-    linkLabel: 'Learn more',
-    keywords: ['what', 'meetingvault', 'salon', 'barber', 'booking', 'scheduling'],
+      'MeetingVault is booking and payments software for independent barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders — no spam. Includes client history, walk-in queue, and growth tools.',
+    link: '/features',
+    linkLabel: 'See all features',
+    keywords: ['what', 'meetingvault', 'barber', 'booking', 'scheduling'],
   },
   {
-    question: 'How do I book an appointment?',
+    question: 'How do clients book an appointment?',
     answer:
-      'Visit the barber or salon\'s booking page (they share a link), choose a service, pick a date and time, and confirm. You\'ll get a confirmation email. Pay online or in-person depending on how they set it up.',
-    keywords: ['book', 'booking', 'schedule', 'appointment', 'how'],
+      'You share your booking link (e.g. meetingvault.app/book/your-shop). Clients pick a service, choose a barber, select a time, and confirm. They get a confirmation email automatically.',
+    keywords: ['book', 'booking', 'schedule', 'appointment', 'how', 'client'],
   },
   {
-    question: 'How do I get started as a barber or salon?',
+    question: 'How do I get started?',
     answer:
-      'Sign up with your email and password—no credit card required. Create your services, set your availability, and share your booking link. Start taking bookings in minutes.',
-    link: '/',
-    linkLabel: 'Sign up for free',
-    keywords: ['start', 'get started', 'host', 'sign up'],
+      'Sign up with your email — no credit card required. Create your shop, pick from common services (or add your own), set your hours, and share your booking link. Takes about 5 minutes.',
+    link: '/sign-up',
+    linkLabel: 'Start free trial',
+    keywords: ['start', 'get started', 'sign up', 'setup'],
   },
   {
-    question: 'What makes MeetingVault different?',
+    question: 'How much does it cost?',
     answer:
-      'We focus on: payments confirm before the appointment (no “booked but payment failed”), and reminders are appointment-only—no spam or marketing blasts you can’t turn off. Booking, deposits, no-show protection, and client history. Built for solo barbers and salons, with optional self-hosting.',
-    keywords: ['different', 'vs', 'compare', 'why'],
-  },
-  {
-    question: 'Pricing',
-    answer:
-      'MeetingVault is free to start with no credit card required. We offer simple, transparent pricing for solo barbers and salons. Check our pricing page for current plans.',
+      'One plan: $25/month. Everything included — online booking, deposits, no-show protection, client CRM, walk-in queue, waitlist, reminders, growth tools, reports, and custom branding. Free trial, no credit card required.',
     link: '/pricing',
     linkLabel: 'View pricing',
-    keywords: ['pricing', 'price', 'cost', 'plan', 'free', 'paid'],
+    keywords: ['pricing', 'price', 'cost', 'plan', 'free', 'paid', 'how much'],
   },
   {
-    question: 'Book a demo',
+    question: 'How do payments and deposits work?',
     answer:
-      'Want to see MeetingVault in action or discuss a Teams or custom plan? Get in touch and we\'ll schedule a demo.',
-    link: '/contact',
-    linkLabel: 'Schedule a demo',
-    keywords: ['demo', 'contact', 'sales', 'team', 'enterprise'],
+      'Deposits and payments are processed through Stripe. Money goes directly to your Stripe account — we never hold your funds. You can require deposits at booking to protect against no-shows.',
+    keywords: ['payment', 'deposit', 'stripe', 'money', 'pay'],
   },
   {
-    question: 'Contact / Support',
+    question: 'Can I use my own branding?',
     answer:
-      'For questions, Teams plans, or custom solutions, reach out via our contact page. We typically respond within one business day.',
+      'Yes. Your booking page uses your shop name, logo, colors, and custom URL slug. Clients see your brand, not ours.',
+    link: '/features',
+    linkLabel: 'See features',
+    keywords: ['brand', 'branding', 'logo', 'custom', 'white label'],
+  },
+  {
+    question: 'How do I contact support?',
+    answer:
+      'Reach out via the contact page. We typically respond within one business day.',
     link: '/contact',
     linkLabel: 'Contact us',
     keywords: ['contact', 'support', 'help', 'email'],
   },
 ];
 
-/**
- * Simple keyword match: find FAQ items whose question or keywords contain the query (case-insensitive).
- */
 export function matchFAQ(query: string): FAQItem | null {
   if (!query || !query.trim()) return null;
   const q = query.trim().toLowerCase();

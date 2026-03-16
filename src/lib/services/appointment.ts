@@ -123,7 +123,7 @@ export async function checkInAppointment(shopId: string, appointmentId: string) 
   if (!apt) throw new Error('Appointment not found or not confirmable');
   return prisma.appointment.update({
     where: { id: appointmentId },
-    data: { status: 'CONFIRMED' },
+    data: { status: 'IN_PROGRESS' },
   });
 }
 

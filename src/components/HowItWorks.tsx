@@ -16,7 +16,7 @@ export default function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {HOW_IT_WORKS.map((step) => (
             <div key={step.step} className="text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-6 shadow-lg">
+              <div className="w-20 h-20 bg-amber-600 text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-6 shadow-lg">
                 {step.step}
               </div>
               <h3 className="text-2xl font-semibold text-white mb-3">{step.title}</h3>

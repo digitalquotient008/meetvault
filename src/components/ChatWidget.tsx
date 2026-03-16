@@ -65,12 +65,12 @@ export default function ChatWidget() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="Type a question..."
-                className="flex-1 rounded-lg border border-slate-600 bg-slate-800 text-white placeholder-slate-500 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                className="flex-1 rounded-lg border border-slate-600 bg-slate-800 text-white placeholder-slate-500 px-3 py-2 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
               />
               <button
                 type="button"
                 onClick={handleSearch}
-                className="rounded-lg bg-blue-600 text-white px-3 py-2 text-sm font-medium hover:bg-blue-500"
+                className="rounded-lg bg-amber-600 text-white px-3 py-2 text-sm font-medium hover:bg-amber-500"
               >
                 Search
               </button>
@@ -99,7 +99,7 @@ export default function ChatWidget() {
                 {showAnswer.link && (
                   <Link
                     href={showAnswer.link}
-                    className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300"
+                    className="inline-flex items-center text-sm font-medium text-amber-400 hover:text-amber-300"
                     onClick={() => setOpen(false)}
                   >
                     {showAnswer.linkLabel ?? 'Learn more'}
@@ -128,7 +128,7 @@ export default function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-500 transition-colors"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-600 text-white shadow-lg hover:bg-amber-500 transition-colors"
         aria-label="Open quick answers"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
