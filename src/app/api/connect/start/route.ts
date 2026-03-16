@@ -8,7 +8,7 @@ export async function GET() {
   const appUrl = env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
   try {
-    const { shopId } = await requireShopAccess(['OWNER']);
+    const { shopId } = await requireShopAccess();
 
     const shop = await prisma.shop.findUnique({
       where: { id: shopId },
