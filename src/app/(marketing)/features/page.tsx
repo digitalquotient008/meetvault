@@ -198,7 +198,7 @@ export default function FeaturesPage() {
           <div className="bg-gradient-to-r from-amber-600/10 to-amber-500/5 border border-amber-500/20 rounded-2xl p-10 md:p-14 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Built by someone who sat in the chair</h2>
             <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-              We watched barbers lose hundreds every month to no-shows, juggle DMs to book appointments, and scribble client notes on paper. MeetingVault exists because the tools out there weren't built for how you actually work.
+              We watched barbers lose hundreds every month to no-shows, juggle DMs to book appointments, and scribble client notes on paper. MeetingVault exists because the tools out there weren&apos;t built for how you actually work.
             </p>
             <Link href="/sign-up" className="inline-flex bg-amber-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-amber-500 transition-colors">
               Try it free
