@@ -14,10 +14,15 @@ export function ConnectButton() {
     setLoading(true);
     setError(null);
     try {
-      const { onboardingUrl } = await createConnectAccountAction();
-      window.location.href = onboardingUrl;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start onboarding');
+      const result = await createConnectAccountAction();
+      if (result.error) {
+        setError(result.error);
+        setLoading(false);
+      } else if (result.onboardingUrl) {
+        window.location.href = result.onboardingUrl;
+      }
+    } catch {
+      setError('Failed to start onboarding. Please try again.');
       setLoading(false);
     }
   };
