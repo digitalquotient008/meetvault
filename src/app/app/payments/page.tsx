@@ -13,7 +13,6 @@ import {
   StripeDashboardButton,
   RequestPayoutButton,
 } from './PaymentsClient';
-import type { Payout } from 'stripe';
 
 function payoutStatusBadge(status: string) {
   if (status === 'paid') return 'text-emerald-400 bg-emerald-500/10';
@@ -21,7 +20,7 @@ function payoutStatusBadge(status: string) {
   return 'text-red-400 bg-red-500/10';
 }
 
-function bankLabel(destination: Payout['destination']): string {
+function bankLabel(destination: Stripe.Payout['destination']): string {
   if (!destination || typeof destination === 'string') return '—';
   const ba = destination as Stripe.BankAccount;
   if (ba.last4) return `••••${ba.last4}`;
@@ -70,7 +69,7 @@ export default async function PaymentsPage({
   }
 
   let balance: { available: number; pending: number; currency: string } | null = null;
-  let payouts: Payout[] = [];
+  let payouts: Stripe.Payout[] = [];
   let stripeError: string | null = null;
 
   if (onboarded && shop?.stripeConnectAccountId) {
