@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/db';
 import type { CreateShopInput, UpdateShopInput } from '@/lib/validators/shop';
 import { Decimal } from '@prisma/client/runtime/library';
-import { isMeetingVaultBackendEnabled, fetchShopBySlug as fetchShopFromBackend } from '@/lib/meetingvault-api';
 
 export type ShopForBooking = {
   id: string;
@@ -63,29 +62,6 @@ export async function updateShop(shopId: string, input: UpdateShopInput) {
 }
 
 export async function getShopBySlug(slug: string): Promise<ShopForBooking | null> {
-  if (isMeetingVaultBackendEnabled()) {
-    const shop = await fetchShopFromBackend(slug);
-    if (!shop) return null;
-    return {
-      id: String(shop.id),
-      name: shop.name,
-      slug: shop.slug,
-      logoUrl: shop.logoUrl ?? null,
-      depositRequired: shop.depositRequired ?? false,
-      depositType: shop.depositType ?? null,
-      depositValue: shop.depositValue ?? null,
-      services: shop.services.map((s) => ({
-        id: String(s.id),
-        name: s.name,
-        durationMin: s.durationMin,
-        price: Number(s.price),
-      })),
-      barberProfiles: shop.barberProfiles.map((b) => ({
-        id: String(b.id),
-        displayName: b.displayName,
-      })),
-    };
-  }
   const row = await prisma.shop.findUnique({
     where: { slug },
     include: {

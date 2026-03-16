@@ -20,9 +20,6 @@ const envSchema = z.object({
   TWILIO_PHONE_NUMBER: z.string().optional(),
 
   SENTRY_DSN: z.string().optional(),
-
-  MEETINGVAULT_API_URL: z.string().url().optional(),
-  MEETINGVAULT_API_KEY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

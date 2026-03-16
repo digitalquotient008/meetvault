@@ -20,8 +20,6 @@
 | `STRIPE_WEBHOOK_SECRET` | Payments | Stripe webhook signing secret |
 | `RESEND_API_KEY` | Optional | Dormant-client / reminder emails |
 | `SENTRY_DSN` | Optional | Error tracking |
-| `MEETINGVAULT_API_URL` | Optional | Consultslot backend URL; when set, public booking uses this API for shop data |
-| `MEETINGVAULT_API_KEY` | Optional | API key for consultslot (if required by backend) |
 
 ## Demo mode
 
