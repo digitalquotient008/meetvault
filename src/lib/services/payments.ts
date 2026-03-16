@@ -159,7 +159,7 @@ export async function refundPayment(params: {
       paymentId: payment.id,
       amount: refundAmount,
       reason: params.reason ?? refund.reason ?? null,
-      status: refund.status,
+      status: refund.status ?? 'pending',
       stripeRefundId: refund.id,
     },
   });
