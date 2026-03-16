@@ -14,7 +14,7 @@ function getStripe(): Stripe {
 
 export async function createConnectAccount(
   shopId: string,
-  email: string,
+  email: string | null,
 ): Promise<{ accountId: string }> {
   const stripe = getStripe();
 
@@ -32,7 +32,7 @@ export async function createConnectAccount(
   if (!accountId) {
     const account = await stripe.accounts.create({
       type: 'express',
-      email,
+      ...(email ? { email } : {}),
       capabilities: {
         card_payments: { requested: true },
         transfers: { requested: true },

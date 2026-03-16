@@ -20,7 +20,7 @@ export async function GET() {
     }
 
     if (!shop.stripeConnectAccountId) {
-      await createConnectAccount(shopId, shop.email ?? '');
+      await createConnectAccount(shopId, shop.email || null);
     }
 
     const { url } = await createAccountOnboardingLink(shopId, appUrl);
