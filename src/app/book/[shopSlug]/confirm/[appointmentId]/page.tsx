@@ -17,9 +17,18 @@ export default async function ConfirmPage({ params }: Props) {
       customer: true,
       barberProfile: true,
       appointmentServices: true,
+      payments: true,
     },
   });
   if (!appointment) notFound();
+
+  const hasDepositPaid = appointment.payments.some(
+    (p) => p.type === 'DEPOSIT' && p.status === 'SUCCEEDED'
+  );
+  const hasFullPaid = appointment.payments.some(
+    (p) => (p.type === 'FULL' || p.type === 'DEPOSIT') && p.status === 'SUCCEEDED'
+  );
+  const showPayDeposit = shop.depositRequired && !hasDepositPaid && !hasFullPaid;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col items-center justify-center p-4">
@@ -33,12 +42,20 @@ export default async function ConfirmPage({ params }: Props) {
         <p className="text-slate-400 mb-6">
           Your appointment at {shop.name} is confirmed.
         </p>
-        <div className="bg-slate-800 rounded-lg p-4 text-left space-y-2 text-sm mb-6">
+        <div className="bg-slate-800 rounded-lg p-4 text-left space-y-2 text-sm mb-4">
           <p><span className="text-slate-500">Confirmation:</span> <span className="text-amber-400 font-mono">{appointment.confirmationCode}</span></p>
           <p><span className="text-slate-500">When:</span> {new Date(appointment.startDateTime).toLocaleString()}</p>
           <p><span className="text-slate-500">With:</span> {appointment.barberProfile.displayName}</p>
           <p><span className="text-slate-500">Service:</span> {appointment.appointmentServices[0]?.serviceNameSnapshot ?? '—'}</p>
         </div>
+        {showPayDeposit && (
+          <Link
+            href={`/book/${shop.slug}/pay/${appointmentId}?type=deposit`}
+            className="inline-block w-full bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-500 mb-4"
+          >
+            Pay deposit
+          </Link>
+        )}
         <Link
           href={`/book/${shop.slug}`}
           className="inline-block text-amber-400 hover:text-amber-300 font-medium"

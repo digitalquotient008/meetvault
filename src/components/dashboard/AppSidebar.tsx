@@ -11,6 +11,9 @@ import {
   Settings,
   FileText,
   ListOrdered,
+  List,
+  ClipboardList,
+  TrendingUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +24,9 @@ const navItems = [
   { href: '/app/customers', label: 'Customers', icon: Users },
   { href: '/app/services', label: 'Services', icon: Scissors },
   { href: '/app/staff', label: 'Staff', icon: UserCog },
+  { href: '/app/queue', label: 'Queue', icon: List },
+  { href: '/app/waitlist', label: 'Waitlist', icon: ClipboardList },
+  { href: '/app/growth', label: 'Growth', icon: TrendingUp },
   { href: '/app/reports', label: 'Reports', icon: FileText },
   { href: '/app/settings/shop', label: 'Settings', icon: Settings },
 ];

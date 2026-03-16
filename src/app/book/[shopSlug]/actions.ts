@@ -2,6 +2,46 @@
 
 import { createOrFindCustomer } from '@/lib/services/customer';
 import { createAppointment } from '@/lib/services/appointment';
+import { createPaymentIntentForAppointment } from '@/lib/services/payments';
+import { addWaitlistEntry } from '@/lib/services/waitlist';
+import { prisma } from '@/lib/db';
+
+export async function createPaymentIntentForBookingAction(
+  shopSlug: string,
+  appointmentId: string,
+  type: 'DEPOSIT' | 'FULL'
+) {
+  const shop = await prisma.shop.findUnique({ where: { slug: shopSlug } });
+  if (!shop) throw new Error('Shop not found');
+  return createPaymentIntentForAppointment({ shopId: shop.id, appointmentId, type });
+}
+
+export async function joinWaitlistAction(
+  shopSlug: string,
+  data: {
+    firstName: string;
+    lastName: string;
+    email?: string;
+    phone?: string;
+    preferredServiceId?: string;
+    preferredBarberProfileId?: string;
+    notes?: string;
+  }
+) {
+  const shop = await prisma.shop.findUnique({ where: { slug: shopSlug } });
+  if (!shop) throw new Error('Shop not found');
+  const customer = await createOrFindCustomer(shop.id, {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+  });
+  return addWaitlistEntry(shop.id, customer.id, {
+    preferredServiceId: data.preferredServiceId ?? null,
+    preferredBarberProfileId: data.preferredBarberProfileId ?? null,
+    notes: data.notes ?? null,
+  });
+}
 
 export async function bookAppointmentAction(params: {
   shopId: string;

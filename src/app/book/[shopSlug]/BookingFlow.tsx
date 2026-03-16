@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Shop, Service, BarberProfile } from '@prisma/client';
-import { bookAppointmentAction } from './actions';
+import { bookAppointmentAction, joinWaitlistAction } from './actions';
 
 type ShopWithRelations = Shop & {
   services: Service[];
@@ -20,10 +20,14 @@ export default function BookingFlow({ shop }: { shop: ShopWithRelations }) {
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; barberProfileId: string } | null>(null);
   const [slots, setSlots] = useState<Array<{ start: Date; barberProfileId: string }>>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loadingBook, setLoadingBook] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [details, setDetails] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [waitlistForm, setWaitlistForm] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
 
   const fetchSlots = async (date: Date) => {
     if (!selectedService) return;
@@ -61,12 +65,35 @@ export default function BookingFlow({ shop }: { shop: ShopWithRelations }) {
   };
 
   const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
     fetchSlots(date);
   };
 
   const handleSlotSelect = (slot: { start: Date; barberProfileId: string }) => {
     setSelectedSlot(slot);
     setStep('details');
+  };
+
+  const handleJoinWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistForm.firstName.trim() || !waitlistForm.lastName.trim()) return;
+    setWaitlistLoading(true);
+    setError(null);
+    try {
+      await joinWaitlistAction(shop.slug, {
+        firstName: waitlistForm.firstName.trim(),
+        lastName: waitlistForm.lastName.trim(),
+        email: waitlistForm.email.trim() || undefined,
+        phone: waitlistForm.phone.trim() || undefined,
+        preferredServiceId: selectedService?.id,
+        preferredBarberProfileId: selectedBarber?.id ?? undefined,
+      });
+      setWaitlistSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to join waitlist');
+    } finally {
+      setWaitlistLoading(false);
+    }
   };
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
@@ -92,7 +119,11 @@ export default function BookingFlow({ shop }: { shop: ShopWithRelations }) {
         },
       });
       if (appointment) {
-        router.push(`/book/${shop.slug}/confirm/${appointment.id}`);
+        if (shop.depositRequired) {
+          router.push(`/book/${shop.slug}/pay/${appointment.id}?type=deposit`);
+        } else {
+          router.push(`/book/${shop.slug}/confirm/${appointment.id}`);
+        }
       } else {
         throw new Error('Booking failed');
       }
@@ -190,7 +221,7 @@ export default function BookingFlow({ shop }: { shop: ShopWithRelations }) {
             <div className="grid grid-cols-3 gap-2">
               {slots.map((slot) => (
                 <button
-                  key={slot.start.toISOString()}
+                  key={typeof slot.start === 'string' ? slot.start : slot.start.toISOString()}
                   type="button"
                   onClick={() => handleSlotSelect(slot)}
                   className="py-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-200 hover:border-amber-500/50 text-sm"
@@ -200,6 +231,26 @@ export default function BookingFlow({ shop }: { shop: ShopWithRelations }) {
               ))}
             </div>
           </>
+        )}
+        {selectedDate && slots.length === 0 && !loadingSlots && (
+          <div className="mt-4 p-4 bg-slate-800 rounded-lg border border-slate-700">
+            <p className="text-slate-300 text-sm mb-3">No slots available for this date. Join the waitlist and we&apos;ll get in touch when something opens.</p>
+            {waitlistSuccess ? (
+              <p className="text-emerald-400 text-sm">You&apos;re on the list! We&apos;ll be in touch.</p>
+            ) : (
+              <form onSubmit={handleJoinWaitlist} className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="text" required placeholder="First name" value={waitlistForm.firstName} onChange={(e) => setWaitlistForm((f) => ({ ...f, firstName: e.target.value }))} className="rounded bg-slate-900 border border-slate-600 text-white px-3 py-2 text-sm" />
+                  <input type="text" required placeholder="Last name" value={waitlistForm.lastName} onChange={(e) => setWaitlistForm((f) => ({ ...f, lastName: e.target.value }))} className="rounded bg-slate-900 border border-slate-600 text-white px-3 py-2 text-sm" />
+                </div>
+                <input type="email" placeholder="Email" value={waitlistForm.email} onChange={(e) => setWaitlistForm((f) => ({ ...f, email: e.target.value }))} className="w-full rounded bg-slate-900 border border-slate-600 text-white px-3 py-2 text-sm" />
+                <input type="tel" placeholder="Phone" value={waitlistForm.phone} onChange={(e) => setWaitlistForm((f) => ({ ...f, phone: e.target.value }))} className="w-full rounded bg-slate-900 border border-slate-600 text-white px-3 py-2 text-sm" />
+                <button type="submit" disabled={waitlistLoading} className="w-full py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 disabled:opacity-50">
+                  {waitlistLoading ? 'Joining…' : 'Join waitlist'}
+                </button>
+              </form>
+            )}
+          </div>
         )}
       </div>
     );

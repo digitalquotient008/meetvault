@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/db';
 import { Decimal } from '@prisma/client/runtime/library';
-import { addMinutes } from 'date-fns';
+import { addMinutes, addDays } from 'date-fns';
 import { randomBytes } from 'crypto';
+import { createAuditLog } from '@/lib/audit';
 
 function generateConfirmationCode(): string {
   return randomBytes(4).toString('hex').toUpperCase();
@@ -77,7 +78,7 @@ export async function createAppointment(params: {
     return apt;
   });
 
-  return prisma.appointment.findUnique({
+  const result = await prisma.appointment.findUnique({
     where: { id: appointment.id },
     include: {
       customer: true,
@@ -86,6 +87,16 @@ export async function createAppointment(params: {
       shop: true,
     },
   });
+  if (result) {
+    await createAuditLog({
+      shopId,
+      entityType: 'Appointment',
+      entityId: result.id,
+      action: 'created',
+      afterJson: JSON.stringify({ status: result.status, confirmationCode: result.confirmationCode }),
+    });
+  }
+  return result;
 }
 
 export async function getAppointmentsForShop(shopId: string, from: Date, to: Date) {
@@ -102,5 +113,108 @@ export async function getAppointmentsForShop(shopId: string, from: Date, to: Dat
       appointmentServices: true,
     },
     orderBy: { startDateTime: 'asc' },
+  });
+}
+
+export async function checkInAppointment(shopId: string, appointmentId: string) {
+  const apt = await prisma.appointment.findFirst({
+    where: { id: appointmentId, shopId, status: 'CONFIRMED' },
+  });
+  if (!apt) throw new Error('Appointment not found or not confirmable');
+  return prisma.appointment.update({
+    where: { id: appointmentId },
+    data: { status: 'CONFIRMED' },
+  });
+}
+
+export async function startAppointment(shopId: string, appointmentId: string) {
+  const apt = await prisma.appointment.findFirst({
+    where: { id: appointmentId, shopId, status: { in: ['CONFIRMED'] } },
+  });
+  if (!apt) throw new Error('Appointment not found');
+  return prisma.appointment.update({
+    where: { id: appointmentId },
+    data: { status: 'IN_PROGRESS' },
+  });
+}
+
+export async function completeAppointment(shopId: string, appointmentId: string) {
+  const apt = await prisma.appointment.findFirst({
+    where: { id: appointmentId, shopId, status: { in: ['CONFIRMED', 'IN_PROGRESS'] } },
+  });
+  if (!apt) throw new Error('Appointment not found');
+  const updated = await prisma.$transaction(async (tx) => {
+    const apt = await tx.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'COMPLETED' },
+    });
+    await tx.customer.update({
+      where: { id: apt.customerId },
+      data: {
+        lastVisitAt: new Date(),
+        totalSpend: { increment: apt.totalAmount ?? apt.subtotal ?? 0 },
+        nextSuggestedAt: addDays(new Date(), 30),
+      },
+    });
+    return apt;
+  });
+  await createAuditLog({
+    shopId,
+    entityType: 'Appointment',
+    entityId: appointmentId,
+    action: 'completed',
+    afterJson: JSON.stringify({ status: 'COMPLETED' }),
+  });
+  return prisma.appointment.findUnique({
+    where: { id: appointmentId },
+    include: { customer: true, barberProfile: true },
+  });
+}
+
+export async function cancelAppointment(shopId: string, appointmentId: string) {
+  const apt = await prisma.appointment.findFirst({
+    where: { id: appointmentId, shopId },
+  });
+  if (!apt) throw new Error('Appointment not found');
+  if (apt.status === 'CANCELED') return apt;
+  const updated = await prisma.appointment.update({
+    where: { id: appointmentId },
+    data: { status: 'CANCELED' },
+  });
+  await createAuditLog({
+    shopId,
+    entityType: 'Appointment',
+    entityId: appointmentId,
+    action: 'canceled',
+    afterJson: JSON.stringify({ status: 'CANCELED' }),
+  });
+  return updated;
+}
+
+export async function markNoShowAppointment(shopId: string, appointmentId: string) {
+  const apt = await prisma.appointment.findFirst({
+    where: { id: appointmentId, shopId, status: { in: ['CONFIRMED', 'IN_PROGRESS'] } },
+  });
+  if (!apt) throw new Error('Appointment not found');
+  await prisma.$transaction([
+    prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: 'NO_SHOW' },
+    }),
+    prisma.customer.update({
+      where: { id: apt.customerId },
+      data: { noShowCount: { increment: 1 } },
+    }),
+  ]);
+  await createAuditLog({
+    shopId,
+    entityType: 'Appointment',
+    entityId: appointmentId,
+    action: 'no_show',
+    afterJson: JSON.stringify({ status: 'NO_SHOW' }),
+  });
+  return prisma.appointment.findUnique({
+    where: { id: appointmentId },
+    include: { customer: true, barberProfile: true },
   });
 }

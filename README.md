@@ -73,6 +73,10 @@ npm run dev
 | `npm run db:push` | Push schema to DB     |
 | `npm run db:seed` | Run seed              |
 | `npm run db:studio` | Open Prisma Studio  |
+| `npm run test` | Run unit tests (Vitest) |
+| `npm run test:e2e` | Run E2E tests (Playwright) |
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for Vercel, env vars, and demo mode.
 
 ## Project structure
 

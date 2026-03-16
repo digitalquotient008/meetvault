@@ -1,0 +1,222 @@
+import Stripe from 'stripe';
+import { PaymentStatus, PaymentType } from '@prisma/client';
+import { prisma } from '@/lib/db';
+import { requireStripeSecretKey } from '@/lib/env';
+import { createAuditLog } from '@/lib/audit';
+
+let stripeClient: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripeClient) {
+    const secretKey = requireStripeSecretKey();
+    stripeClient = new Stripe(secretKey, {
+      apiVersion: '2024-06-20',
+    });
+  }
+  return stripeClient;
+}
+
+type CreatePaymentIntentParams = {
+  shopId: string;
+  appointmentId?: string | null;
+  customerId?: string | null;
+  amountCents: number;
+  currency?: string;
+  type: PaymentType;
+  idempotencyKey?: string;
+};
+
+export async function createPaymentIntent(params: CreatePaymentIntentParams) {
+  const stripe = getStripe();
+
+  const {
+    shopId,
+    appointmentId = null,
+    customerId = null,
+    amountCents,
+    currency = 'usd',
+    type,
+    idempotencyKey,
+  } = params;
+
+  const amount = amountCents;
+
+  const paymentIntent = await stripe.paymentIntents.create(
+    {
+      amount,
+      currency,
+      automatic_payment_methods: { enabled: true },
+      metadata: {
+        shopId,
+        appointmentId: appointmentId ?? undefined,
+        customerId: customerId ?? undefined,
+        type,
+      },
+    },
+    idempotencyKey ? { idempotencyKey } : undefined,
+  );
+
+  const payment = await prisma.payment.create({
+    data: {
+      shopId,
+      appointmentId: appointmentId ?? null,
+      customerId: customerId ?? null,
+      stripePaymentIntentId: paymentIntent.id,
+      idempotencyKey: idempotencyKey ?? null,
+      amount: amountCents / 100,
+      currency,
+      type,
+      status: PaymentStatus.PENDING,
+    },
+  });
+
+  return { paymentIntent, payment };
+}
+
+export async function markPaymentAsSucceeded(stripePaymentIntentId: string) {
+  const payment = await prisma.payment.findFirst({
+    where: { stripePaymentIntentId },
+  });
+  if (!payment) {
+    return null;
+  }
+
+  const stripe = getStripe();
+  const pi = await stripe.paymentIntents.retrieve(stripePaymentIntentId, {
+    expand: ['latest_charge'],
+  });
+
+  const latestCharge = pi.latest_charge && typeof pi.latest_charge !== 'string'
+    ? pi.latest_charge
+    : null;
+
+  const receiptUrl =
+    latestCharge && latestCharge.receipt_url ? latestCharge.receipt_url : null;
+  const methodBrand =
+    latestCharge &&
+    latestCharge.payment_method_details &&
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (latestCharge.payment_method_details as any).card?.brand;
+
+  const updated = await prisma.payment.update({
+    where: { id: payment.id },
+    data: {
+      status: PaymentStatus.SUCCEEDED,
+      receiptUrl: receiptUrl ?? undefined,
+      methodBrand: methodBrand ?? undefined,
+    },
+  });
+
+  await createAuditLog({
+    shopId: payment.shopId,
+    entityType: 'Payment',
+    entityId: payment.id,
+    action: 'succeeded',
+    afterJson: JSON.stringify({ status: 'SUCCEEDED', amount: Number(payment.amount) }),
+  });
+  return updated;
+}
+
+export async function refundPayment(params: {
+  paymentId: string;
+  amountCents?: number;
+  reason?: string;
+}) {
+  const stripe = getStripe();
+
+  const payment = await prisma.payment.findUnique({
+    where: { id: params.paymentId },
+  });
+  if (!payment || !payment.stripePaymentIntentId) {
+    throw new Error('Payment not found or not linked to Stripe');
+  }
+
+  const amount =
+    typeof params.amountCents === 'number'
+      ? params.amountCents
+      : undefined;
+
+  const refund = await stripe.refunds.create({
+    payment_intent: payment.stripePaymentIntentId,
+    amount,
+    metadata: {
+      paymentId: payment.id,
+      shopId: payment.shopId,
+    },
+  });
+
+  const refundAmount = refund.amount != null ? refund.amount / 100 : Number(payment.amount);
+  const isFullRefund = refundAmount >= Number(payment.amount) - 0.01;
+
+  await prisma.refund.create({
+    data: {
+      shopId: payment.shopId,
+      paymentId: payment.id,
+      amount: refundAmount,
+      reason: params.reason ?? refund.reason ?? null,
+      status: refund.status,
+      stripeRefundId: refund.id,
+    },
+  });
+
+  await prisma.payment.update({
+    where: { id: payment.id },
+    data: {
+      status: refund.status === 'succeeded' && isFullRefund ? PaymentStatus.REFUNDED : PaymentStatus.PARTIAL_REFUNDED,
+    },
+  });
+
+  await createAuditLog({
+    shopId: payment.shopId,
+    entityType: 'Payment',
+    entityId: payment.id,
+    action: isFullRefund ? 'refunded' : 'partial_refunded',
+    afterJson: JSON.stringify({ refundAmount: refundAmount }),
+  });
+  return refund;
+}
+
+export async function createPaymentIntentForAppointment(params: {
+  shopId: string;
+  appointmentId: string;
+  type: 'DEPOSIT' | 'FULL';
+}) {
+  const { shopId, appointmentId, type } = params;
+  const [appointment, shop] = await Promise.all([
+    prisma.appointment.findFirst({
+      where: { id: appointmentId, shopId },
+      include: { appointmentServices: true },
+    }),
+    prisma.shop.findUnique({ where: { id: shopId } }),
+  ]);
+  if (!appointment || !shop) throw new Error('Appointment or shop not found');
+  if (appointment.status === 'CANCELED') throw new Error('Appointment is canceled');
+
+  const totalCents = Math.round(Number(appointment.totalAmount ?? 0) * 100);
+  let amountCents: number;
+  if (type === 'FULL') {
+    amountCents = totalCents;
+  } else {
+    if (!shop.depositRequired || !shop.depositValue) {
+      amountCents = Math.min(totalCents, Math.round(Number(appointment.subtotal ?? 0) * 100 * 0.2));
+    } else if (shop.depositType === 'PERCENT') {
+      amountCents = Math.round((Number(appointment.subtotal ?? 0) * 100 * Number(shop.depositValue)) / 100);
+    } else {
+      amountCents = Math.round(Number(shop.depositValue) * 100);
+    }
+    amountCents = Math.min(amountCents, totalCents);
+  }
+  if (amountCents < 50) throw new Error('Amount too small for Stripe');
+
+  const idempotencyKey = `apt-${appointmentId}-${type}-${Date.now()}`;
+  const { paymentIntent, payment } = await createPaymentIntent({
+    shopId,
+    appointmentId,
+    customerId: appointment.customerId,
+    amountCents,
+    type: type === 'DEPOSIT' ? 'DEPOSIT' : 'FULL',
+    idempotencyKey,
+  });
+  return { clientSecret: paymentIntent.client_secret!, paymentId: payment.id };
+}
+

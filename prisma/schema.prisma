@@ -122,6 +122,7 @@ model Shop {
   waitlistEntries      WaitlistEntry[]
   walkInQueueEntries   WalkInQueueEntry[]
   auditLogs            AuditLog[]
+  customerNotes        CustomerNote[]
 }
 
 model User {
@@ -249,6 +250,7 @@ model Customer {
   totalSpend              Decimal  @default(0) @db.Decimal(12, 2)
   totalVisits             Int      @default(0)
   lastVisitAt             DateTime?
+  nextSuggestedAt         DateTime?
   noShowCount             Int      @default(0)
   marketingOptInSms       Boolean  @default(false)
   marketingOptInEmail     Boolean  @default(true)
@@ -261,8 +263,25 @@ model Customer {
   waitlistEntries         WaitlistEntry[]
   walkInQueueEntries      WalkInQueueEntry[]
 
+  customerNotes        CustomerNote[]
+
   @@index([shopId])
   @@index([shopId, email])
+}
+
+model CustomerNote {
+  id        String   @id @default(cuid())
+  shopId    String
+  customerId String
+  content   String
+  createdByUserId String?
+  createdAt DateTime @default(now())
+
+  shop     Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([customerId])
 }
 
 model Appointment {
@@ -317,6 +336,7 @@ model Payment {
   appointmentId        String?
   customerId           String?
   stripePaymentIntentId String?
+  idempotencyKey       String?
   amount               Decimal       @db.Decimal(10, 2)
   currency             String        @default("usd")
   type                 PaymentType
@@ -341,6 +361,7 @@ model Refund {
   amount    Decimal  @db.Decimal(10, 2)
   reason    String?
   status    String
+  stripeRefundId String?
   createdAt DateTime @default(now())
 
   shop    Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
