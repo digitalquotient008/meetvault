@@ -20,6 +20,24 @@ export async function addServiceAction(shopId: string, data: { name: string; dur
   return createService(shopId, { name: data.name, durationMin: data.durationMin, price: data.price, depositEligible: false });
 }
 
+export async function addBulkServicesAction(
+  shopId: string,
+  services: { name: string; durationMin: number; price: number; category?: string }[],
+) {
+  const results = await Promise.all(
+    services.map((s) =>
+      createService(shopId, {
+        name: s.name,
+        durationMin: s.durationMin,
+        price: s.price,
+        depositEligible: false,
+        category: s.category,
+      }),
+    ),
+  );
+  return results;
+}
+
 export async function addStaffAction(shopId: string, userId: string, data: { displayName: string }) {
   return createBarberProfile(shopId, userId, { displayName: data.displayName });
 }

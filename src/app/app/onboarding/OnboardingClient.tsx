@@ -2,9 +2,66 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createShopAction, addServiceAction, addStaffAction, setHoursAction } from './actions';
+import { createShopAction, addServiceAction, addBulkServicesAction, addStaffAction, setHoursAction } from './actions';
 
 type Step = 'shop' | 'services' | 'staff' | 'hours' | 'done';
+
+interface ServiceTemplate {
+  name: string;
+  durationMin: number;
+  price: number;
+  category: string;
+}
+
+interface AddedService {
+  name: string;
+  durationMin: number;
+  price: number;
+}
+
+const SERVICE_TEMPLATES: { heading: string; category: string; items: ServiceTemplate[] }[] = [
+  {
+    heading: "Men's Services",
+    category: 'mens',
+    items: [
+      { name: 'Haircut', durationMin: 30, price: 30, category: 'mens' },
+      { name: 'Skin Fade', durationMin: 40, price: 35, category: 'mens' },
+      { name: 'Buzz Cut', durationMin: 20, price: 20, category: 'mens' },
+      { name: 'Beard Trim', durationMin: 15, price: 15, category: 'mens' },
+      { name: 'Haircut + Beard', durationMin: 45, price: 40, category: 'mens' },
+      { name: 'Lineup / Edge Up', durationMin: 15, price: 15, category: 'mens' },
+      { name: 'Hot Towel Shave', durationMin: 30, price: 25, category: 'mens' },
+      { name: 'Hair Design / Part', durationMin: 15, price: 10, category: 'mens' },
+    ],
+  },
+  {
+    heading: "Kids' Services",
+    category: 'kids',
+    items: [
+      { name: 'Kids Haircut (under 12)', durationMin: 25, price: 20, category: 'kids' },
+      { name: 'Kids Fade', durationMin: 30, price: 25, category: 'kids' },
+    ],
+  },
+  {
+    heading: "Women's Services",
+    category: 'womens',
+    items: [
+      { name: 'Women\'s Haircut', durationMin: 45, price: 45, category: 'womens' },
+      { name: 'Blowout / Blow Dry', durationMin: 30, price: 35, category: 'womens' },
+      { name: 'Bang Trim', durationMin: 10, price: 10, category: 'womens' },
+      { name: 'Deep Conditioning', durationMin: 30, price: 25, category: 'womens' },
+    ],
+  },
+  {
+    heading: 'Add-Ons',
+    category: 'addon',
+    items: [
+      { name: 'Eyebrow Cleanup', durationMin: 10, price: 8, category: 'addon' },
+      { name: 'Scalp Treatment', durationMin: 15, price: 15, category: 'addon' },
+      { name: 'Hair Wash', durationMin: 10, price: 10, category: 'addon' },
+    ],
+  },
+];
 
 export default function OnboardingClient({ userId }: { userId: string }) {
   const router = useRouter();
@@ -14,6 +71,32 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [selectedTemplates, setSelectedTemplates] = useState<Set<string>>(new Set());
+  const [addedServices, setAddedServices] = useState<AddedService[]>([]);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+
+  const toggleTemplate = (name: string) => {
+    setSelectedTemplates((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+
+  const selectAllInGroup = (items: ServiceTemplate[]) => {
+    setSelectedTemplates((prev) => {
+      const next = new Set(prev);
+      const allSelected = items.every((t) => next.has(t.name));
+      if (allSelected) {
+        items.forEach((t) => next.delete(t.name));
+      } else {
+        items.forEach((t) => next.add(t.name));
+      }
+      return next;
+    });
+  };
 
   const handleCreateShop = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,7 +123,24 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     }
   };
 
-  const handleAddService = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddTemplates = async () => {
+    if (!shopId || selectedTemplates.size === 0) return;
+    setError(null);
+    setLoading(true);
+    const allTemplates = SERVICE_TEMPLATES.flatMap((g) => g.items);
+    const toAdd = allTemplates.filter((t) => selectedTemplates.has(t.name));
+    try {
+      await addBulkServicesAction(shopId, toAdd);
+      setAddedServices((prev) => [...prev, ...toAdd.map((t) => ({ name: t.name, durationMin: t.durationMin, price: t.price }))]);
+      setSelectedTemplates(new Set());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add services');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddCustomService = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!shopId) return;
     setError(null);
@@ -56,8 +156,9 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     }
     try {
       await addServiceAction(shopId, { name, durationMin, price });
+      setAddedServices((prev) => [...prev, { name, durationMin, price }]);
       form.reset();
-      setStep('staff');
+      setShowCustomForm(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add service');
     } finally {
@@ -105,6 +206,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
 
   const skipToDone = () => setStep('done');
 
+  /* ─── Step: Create shop ─── */
   if (step === 'shop') {
     return (
       <form onSubmit={handleCreateShop} className="space-y-6">
@@ -125,36 +227,169 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     );
   }
 
+  /* ─── Step: Services (templates + custom) ─── */
   if (step === 'services') {
     return (
-      <form onSubmit={handleAddService} className="space-y-6">
+      <div className="space-y-6">
         {error && <p className="text-red-400 text-sm">{error}</p>}
+
+        {/* Added services list */}
+        {addedServices.length > 0 && (
+          <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-4">
+            <p className="text-sm font-medium text-emerald-400 mb-3">
+              Added ({addedServices.length})
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {addedServices.map((s, i) => (
+                <span key={i} className="bg-emerald-900/40 text-emerald-300 text-xs px-3 py-1.5 rounded-full">
+                  {s.name} &middot; {s.durationMin}min &middot; ${s.price}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Template groups */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Service name</label>
-          <input name="serviceName" type="text" required placeholder="e.g. Haircut" className="w-full rounded-lg bg-slate-800 border border-slate-600 text-white px-4 py-3" />
+          <p className="text-sm text-slate-400 mb-4">
+            Tap to select common services, then hit &quot;Add selected&quot;. You can edit prices later.
+          </p>
+
+          {SERVICE_TEMPLATES.map((group) => {
+            const alreadyAdded = new Set(addedServices.map((s) => s.name));
+            const available = group.items.filter((t) => !alreadyAdded.has(t.name));
+            if (available.length === 0) return null;
+
+            const allSelected = available.every((t) => selectedTemplates.has(t.name));
+
+            return (
+              <div key={group.category} className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-white">{group.heading}</h3>
+                  <button
+                    type="button"
+                    onClick={() => selectAllInGroup(available)}
+                    className="text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                  >
+                    {allSelected ? 'Deselect all' : 'Select all'}
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {available.map((t) => {
+                    const selected = selectedTemplates.has(t.name);
+                    return (
+                      <button
+                        key={t.name}
+                        type="button"
+                        onClick={() => toggleTemplate(t.name)}
+                        className={`flex items-center justify-between rounded-lg border px-4 py-3 text-left transition-all ${
+                          selected
+                            ? 'bg-amber-600/15 border-amber-500/50 ring-1 ring-amber-500/30'
+                            : 'bg-slate-800/60 border-slate-700 hover:border-slate-500'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-5 h-5 rounded flex-shrink-0 flex items-center justify-center border transition-colors ${
+                            selected ? 'bg-amber-600 border-amber-600' : 'border-slate-500'
+                          }`}>
+                            {selected && (
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className={`text-sm font-medium truncate ${selected ? 'text-white' : 'text-slate-200'}`}>
+                            {t.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-slate-400 flex-shrink-0 ml-2">
+                          <span>{t.durationMin}min</span>
+                          <span className="font-medium text-slate-300">${t.price}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Duration (min)</label>
-            <input name="durationMin" type="number" defaultValue={30} min={5} max={480} className="w-full rounded-lg bg-slate-800 border border-slate-600 text-white px-4 py-3" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Price ($)</label>
-            <input name="price" type="number" step="0.01" defaultValue={25} min={0} className="w-full rounded-lg bg-slate-800 border border-slate-600 text-white px-4 py-3" />
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button type="submit" disabled={loading} className="flex-1 bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-500 disabled:opacity-50">
-            {loading ? 'Adding...' : 'Add service'}
+
+        {/* Add selected button */}
+        {selectedTemplates.size > 0 && (
+          <button
+            type="button"
+            disabled={loading}
+            onClick={handleAddTemplates}
+            className="w-full bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-500 disabled:opacity-50 transition-colors"
+          >
+            {loading ? 'Adding...' : `Add ${selectedTemplates.size} selected service${selectedTemplates.size > 1 ? 's' : ''}`}
           </button>
-          <button type="button" onClick={() => setStep('staff')} className="px-4 py-3 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800">
-            Skip
+        )}
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-700" /></div>
+          <div className="relative flex justify-center">
+            <span className="bg-slate-950 px-3 text-xs text-slate-500">or add your own</span>
+          </div>
+        </div>
+
+        {/* Custom service form */}
+        {showCustomForm ? (
+          <form onSubmit={handleAddCustomService} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Service name</label>
+              <input name="serviceName" type="text" required placeholder="e.g. Premium Fade + Design" className="w-full rounded-lg bg-slate-900 border border-slate-600 text-white px-4 py-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Duration (min)</label>
+                <input name="durationMin" type="number" defaultValue={30} min={5} max={480} className="w-full rounded-lg bg-slate-900 border border-slate-600 text-white px-4 py-2.5 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Price ($)</label>
+                <input name="price" type="number" step="0.01" defaultValue={25} min={0} className="w-full rounded-lg bg-slate-900 border border-slate-600 text-white px-4 py-2.5 text-sm" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button type="submit" disabled={loading} className="flex-1 bg-amber-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-500 disabled:opacity-50">
+                {loading ? 'Adding...' : 'Add service'}
+              </button>
+              <button type="button" onClick={() => setShowCustomForm(false)} className="px-4 py-2.5 rounded-lg border border-slate-600 text-slate-400 text-sm hover:bg-slate-800">
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowCustomForm(true)}
+            className="w-full py-3 rounded-lg border border-dashed border-slate-600 text-slate-400 text-sm hover:border-slate-500 hover:text-slate-300 transition-colors"
+          >
+            + Add a custom service
+          </button>
+        )}
+
+        {/* Continue / Skip */}
+        <div className="flex gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => setStep('staff')}
+            className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
+              addedServices.length > 0
+                ? 'bg-amber-600 text-white hover:bg-amber-500'
+                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+            }`}
+          >
+            {addedServices.length > 0 ? 'Continue' : 'Skip for now'}
           </button>
         </div>
-      </form>
+      </div>
     );
   }
 
+  /* ─── Step: Staff ─── */
   if (step === 'staff') {
     return (
       <form onSubmit={handleAddStaff} className="space-y-6">
@@ -170,11 +405,12 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     );
   }
 
+  /* ─── Step: Hours ─── */
   if (step === 'hours') {
     return (
       <form onSubmit={handleSetHours} className="space-y-6">
         {error && <p className="text-red-400 text-sm">{error}</p>}
-        <p className="text-slate-400">Default hours: Mon–Fri 9am–5pm. You can change this later in Staff → Availability.</p>
+        <p className="text-slate-400">Default hours: Mon&ndash;Fri 9am&ndash;5pm. You can change this later in Staff &rarr; Availability.</p>
         <div className="flex gap-3">
           <button type="submit" disabled={loading} className="flex-1 bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-500 disabled:opacity-50">
             {loading ? 'Saving...' : 'Set hours & finish'}
@@ -187,6 +423,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     );
   }
 
+  /* ─── Step: Done ─── */
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
       <h2 className="text-xl font-semibold text-white mb-2">You&apos;re all set</h2>
