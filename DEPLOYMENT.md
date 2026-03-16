@@ -4,39 +4,39 @@
 
 1. Connect the repo to Vercel and deploy.
 2. Set environment variables in the Vercel project (see below).
-3. Use **Postgres** (e.g. Neon or Supabase) and set `DATABASE_URL`.
-4. Run migrations after first deploy: from the project root, `npx prisma migrate deploy` (or use `db:push` for prototyping).
+3. Use **PostgreSQL** (e.g. Neon or Supabase) and set `DATABASE_URL`.
+4. The build script runs `prisma migrate deploy` automatically — tables are created/updated on each deploy.
 
 ## Environment variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `NEXT_PUBLIC_APP_URL` | Yes | Full app URL (e.g. `https://your-app.vercel.app`) |
+| `NEXT_PUBLIC_APP_URL` | Yes | Full app URL (e.g. `https://www.meetvault.app`) |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes | Clerk dashboard |
 | `CLERK_SECRET_KEY` | Yes | Clerk dashboard |
-| `STRIPE_SECRET_KEY` | Payments | For deposits/full payment |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Payments | Stripe dashboard |
-| `STRIPE_WEBHOOK_SECRET` | Payments | Stripe webhook signing secret |
-| `RESEND_API_KEY` | Optional | Dormant-client / reminder emails |
+| `STRIPE_SECRET_KEY` | Yes (payments) | Stripe dashboard |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes (payments) | Stripe dashboard |
+| `STRIPE_WEBHOOK_SECRET` | Yes (payments) | Stripe webhook signing secret |
+| `RESEND_API_KEY` | Optional | Email notifications (reminders, dormant-client outreach) |
+| `TWILIO_ACCOUNT_SID` | Optional | SMS notifications |
+| `TWILIO_AUTH_TOKEN` | Optional | SMS notifications |
+| `TWILIO_PHONE_NUMBER` | Optional | SMS sender number |
 | `SENTRY_DSN` | Optional | Error tracking |
 
-## Demo mode
+## Database migrations
 
-After deployment, run the seed once (e.g. from a one-off script or locally with production `DATABASE_URL`) to create a demo shop:
+Migrations live in `prisma/migrations/` and are applied automatically during the Vercel build (`prisma migrate deploy`).
+
+To create a new migration locally:
 
 ```bash
-npm run db:seed
+npx prisma migrate dev --name describe_the_change
 ```
 
-The seed creates a shop with slug `demo-shop` (or as configured in `prisma/seed.ts`). Share the booking link: `https://your-app.vercel.app/book/demo-shop`.
-
-## Tests
-
-- **Unit (Vitest):** `npm run test`
-- **E2E (Playwright):** Start the app, then `npm run test:e2e`. In CI, Playwright can start the server automatically.
+This generates a new migration file. Commit it and push — Vercel applies it on the next deploy.
 
 ## Observability
 
-- **Sentry:** Set `SENTRY_DSN` to enable error tracking. The app initializes Sentry in `instrument.ts` when the DSN is present.
+- **Sentry:** Set `SENTRY_DSN` to enable error tracking.
 - **Audit logs:** Key actions (appointment created/completed/canceled, payment succeeded/refunded) write to `AuditLog` for compliance and debugging.

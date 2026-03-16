@@ -6,9 +6,9 @@ Bookings, payments, customer relationships, staff payouts, and growth workflows 
 ## Stack
 
 - **Next.js 15** (App Router), TypeScript, Tailwind CSS
-- **Clerk** for auth
+- **Clerk** for authentication
 - **Prisma** + PostgreSQL
-- Stripe-ready (Phase 2)
+- **Stripe** for payments (deposits, full payments, tips, refunds)
 
 ## Getting started
 
@@ -27,11 +27,12 @@ Copy `.env.example` to `.env.local` and set:
 - `CLERK_SECRET_KEY`
 - `NEXT_PUBLIC_APP_URL` — e.g. `http://localhost:3000`
 
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full list.
+
 ### 3. Database
 
 ```bash
-npm run db:generate
-npm run db:push
+npx prisma migrate dev
 npm run db:seed
 ```
 
@@ -41,42 +42,22 @@ npm run db:seed
 npm run dev
 ```
 
-- **Marketing:** http://localhost:3000  
-- **Sign up / Sign in:** http://localhost:3000/sign-up, /sign-in  
-- **Dashboard:** http://localhost:3000/app (after sign-in)  
+- **Marketing:** http://localhost:3000
+- **Sign up / Sign in:** http://localhost:3000/sign-up, /sign-in
+- **Dashboard:** http://localhost:3000/app (after sign-in)
 - **Public booking:** http://localhost:3000/book/demo-shop (after seed)
-
-## Phase 0 & 1 (current)
-
-- [x] App skeleton, auth (Clerk), Prisma schema, tenant structure
-- [x] Marketing site (MeetingVault branding), pricing, FAQ
-- [x] Protected app shell (sidebar, dashboard)
-- [x] Owner onboarding (shop → services → staff → hours → booking link)
-- [x] Services & staff (list views; full CRUD in Phase 2)
-- [x] Scheduling engine (slots, conflict check, transactional booking)
-- [x] Public booking flow: service → barber → date/time → details → confirm
-- [x] Confirmation page
-- [x] Seed (demo shop, barber, service, customer)
-
-## Phase 2 (next)
-
-- Customer CRM (detail, notes, visit history)
-- Stripe deposits & checkout, tips, receipts, refunds
-- Appointment completion flow, dashboard metrics
 
 ## Commands
 
-| Command        | Description              |
-|----------------|--------------------------|
-| `npm run dev`  | Start dev server         |
-| `npm run build`| Build for production     |
-| `npm run db:push` | Push schema to DB     |
-| `npm run db:seed` | Run seed              |
-| `npm run db:studio` | Open Prisma Studio  |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Build for production |
+| `npx prisma migrate dev --name <name>` | Create a new migration |
+| `npm run db:seed` | Run seed |
+| `npm run db:studio` | Open Prisma Studio |
 | `npm run test` | Run unit tests (Vitest) |
 | `npm run test:e2e` | Run E2E tests (Playwright) |
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for Vercel, env vars, and demo mode.
 
 ## Project structure
 
@@ -87,3 +68,6 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for Vercel, env vars, and demo mode.
 - `src/lib/services/` — Shop, service, barber, availability, appointment, customer
 - `src/lib/auth.ts` — Clerk + membership, requireShopAccess
 - `prisma/schema.prisma` — Full multi-tenant schema
+- `prisma/migrations/` — Database migrations (applied automatically on deploy)
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for Vercel deployment, environment variables, and migration workflow.
