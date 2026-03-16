@@ -17,7 +17,7 @@ export async function createShopAction(userId: string, data: { name: string; slu
 }
 
 export async function addServiceAction(shopId: string, data: { name: string; durationMin: number; price: number }) {
-  return createService(shopId, { name: data.name, durationMin: data.durationMin, price: data.price });
+  return createService(shopId, { name: data.name, durationMin: data.durationMin, price: data.price, depositEligible: false });
 }
 
 export async function addStaffAction(shopId: string, userId: string, data: { displayName: string }) {
