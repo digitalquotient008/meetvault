@@ -37,57 +37,6 @@ export const MVP_FEATURES = [
   },
 ];
 
-/** Four-layer feature structure for salons/barbers: Core → Revenue → Workflow → Automation */
-export const FEATURE_LAYERS = [
-  {
-    id: 'core',
-    name: 'Core Layer',
-    description: 'Get booked without the back-and-forth.',
-    items: [
-      'Booking calendar',
-      'Time zone detection',
-      'Individual booking links',
-      'Appointment reminders',
-    ],
-  },
-  {
-    id: 'revenue',
-    name: 'Revenue Layer',
-    description: 'Get paid and protect your time with no-show protection.',
-    items: [
-      'Service payments',
-      'Deposits',
-      'Cancellation fees',
-    ],
-  },
-  {
-    id: 'workflow',
-    name: 'Workflow Layer',
-    description: 'Client context in one place.',
-    items: [
-      'Client history',
-      'Notes & preferences',
-      'Booking history',
-    ],
-  },
-  {
-    id: 'automation',
-    name: 'Automation Layer',
-    description: 'Fill the book and cut no-shows.',
-    items: [
-      'Reminder emails',
-      'Rescheduling',
-      'Waitlists',
-    ],
-  },
-];
-
-export const FUTURE_FEATURES = [
-  'Waitlist management',
-  'Instagram / website embed',
-  'Calendar sync (Google, Outlook)',
-  'Tap to Pay (in-shop)',
-];
 
 export const VALUE_PROPOSITIONS = [
   {
