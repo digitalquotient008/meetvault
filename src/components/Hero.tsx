@@ -43,12 +43,13 @@ export default function Hero() {
 
         {/* Trust indicators */}
         <div className="mt-20 pt-10 border-t border-slate-800/60">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-4xl mx-auto">
             {[
               { value: '5 min', label: 'Setup time' },
               { value: '$25', label: 'Per month, flat' },
               { value: '0%', label: 'Hidden fees' },
               { value: '14 days', label: 'Free trial' },
+              { value: '1 click', label: 'Client import' },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <p className="text-2xl md:text-3xl font-bold text-white">{s.value}</p>

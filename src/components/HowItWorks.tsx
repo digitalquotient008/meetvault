@@ -8,8 +8,8 @@ const steps = [
   },
   {
     step: '02',
-    title: 'Add services & hours',
-    description: 'Choose from ready-made templates or add custom services. Set your schedule and buffers.',
+    title: 'Add services & import clients',
+    description: 'Choose from ready-made service templates, set your schedule, and import your existing client list from any CSV in one click.',
   },
   {
     step: '03',

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Calendar, DollarSign, ShieldCheck, Users, Clock, TrendingUp } from 'lucide-react';
+import { Calendar, DollarSign, ShieldCheck, Users, Clock, Upload } from 'lucide-react';
 
 const features = [
   {
@@ -33,10 +33,10 @@ const features = [
     accent: 'from-violet-500/20 to-violet-600/10',
   },
   {
-    icon: TrendingUp,
-    title: 'Growth Tools',
-    description: 'Rebooking prompts and dormant-client outreach to fill the book.',
-    accent: 'from-amber-500/20 to-amber-600/10',
+    icon: Upload,
+    title: 'Easy Migration',
+    description: 'Import your client list from Square, Vagaro, Booksy, or any CSV. Switch in minutes, not weeks.',
+    accent: 'from-cyan-500/20 to-cyan-600/10',
   },
 ];
 

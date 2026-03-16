@@ -13,6 +13,7 @@ import {
   ClipboardList,
   TrendingUp,
   Palette,
+  Upload,
 } from 'lucide-react';
 
 export const metadata = {
@@ -48,6 +49,7 @@ const all_features = [
   { icon: TrendingUp, title: 'Growth Tools', description: 'See which clients are due for rebooking. Reach out to dormant clients before they forget about you.' },
   { icon: BarChart3, title: 'Revenue Reports', description: 'Track earnings by barber, by day, by service. Export to CSV. Know exactly how the shop is doing.' },
   { icon: Palette, title: 'Your Brand, Not Ours', description: 'Custom logo, colors, and booking URL. Clients see your shop — MeetingVault stays invisible.' },
+  { icon: Upload, title: 'One-Click Client Import', description: 'Moving from Square, Vagaro, Squire, Boulevard, or Booksy? Upload your CSV and we import every client — names, emails, phones, notes. Done in seconds.' },
 ];
 
 const pain_points = [
@@ -57,6 +59,7 @@ const pain_points = [
   { before: '\u201CWhat time works?\u201D back-and-forth texts', after: 'Clients self-book from your live calendar' },
   { before: 'Walk-ins crowding the shop with no order', after: 'Digital queue — everyone knows their spot' },
   { before: "No idea which clients haven\u2019t been back", after: 'Growth alerts for dormant and due clients' },
+  { before: 'Scared to switch because you\u2019ll lose your client list', after: 'One-click CSV import — bring everyone with you' },
 ];
 
 export default function FeaturesPage() {

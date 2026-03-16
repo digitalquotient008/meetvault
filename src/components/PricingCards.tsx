@@ -13,6 +13,7 @@ const features = [
   'Growth tools (rebooking prompts, dormant client outreach)',
   'Revenue reports & CSV export',
   'Custom branding (logo, colors, booking slug)',
+  'One-click client import (Square, Vagaro, Booksy, any CSV)',
 ];
 
 export default function PricingCards() {

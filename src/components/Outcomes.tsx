@@ -63,7 +63,7 @@ export default function Outcomes() {
                 {[
                   '14-day free trial',
                   'No credit card to start',
-                  'Payments go straight to your Stripe',
+                  'Import clients from Square, Vagaro, Booksy',
                   'Cancel anytime — no contracts',
                 ].map((point) => (
                   <div key={point} className="flex items-center gap-2.5">
