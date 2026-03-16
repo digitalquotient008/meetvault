@@ -11,6 +11,8 @@ export type ShopForBooking = {
   depositRequired: boolean;
   depositType?: string | null;
   depositValue?: number | null;
+  noShowFeeAmount: number | null;
+  cardRequiredForBooking: boolean;
   services: { id: string; name: string; durationMin: number; price: number }[];
   barberProfiles: { id: string; displayName: string }[];
 };
@@ -80,6 +82,8 @@ export async function getShopBySlug(slug: string): Promise<ShopForBooking | null
     depositRequired: row.depositRequired ?? false,
     depositType: row.depositType ?? null,
     depositValue: row.depositValue != null ? Number(row.depositValue) : null,
+    noShowFeeAmount: row.noShowFeeAmount != null ? Number(row.noShowFeeAmount) : null,
+    cardRequiredForBooking: row.cardRequiredForBooking ?? false,
     services: row.services.map((s) => ({
       id: s.id,
       name: s.name,

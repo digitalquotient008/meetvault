@@ -4,6 +4,8 @@ import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { fmtDateTime } from '@/lib/format-date';
 import RefundButton from './RefundButton';
+import NoShowChargeButton from './NoShowChargeButton';
+import { CreditCard } from 'lucide-react';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,22 +23,88 @@ export default async function AppointmentDetailPage({ params }: Props) {
   });
   if (!appointment) notFound();
 
-  const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { timezone: true } });
+  const shop = await prisma.shop.findUnique({
+    where: { id: shopId },
+    select: { timezone: true, noShowFeeAmount: true },
+  });
   const tz = shop?.timezone ?? 'America/New_York';
 
+  const { customer } = appointment;
+  const hasCardOnFile = Boolean(customer.stripePaymentMethodId);
+  const noShowFeeAmount = shop?.noShowFeeAmount ? Number(shop.noShowFeeAmount) : null;
+
+  // Check if no-show fee was already charged
+  const noShowFeeCharged = appointment.payments.some(
+    (p) => p.status === 'SUCCEEDED' && p.type === 'FULL' &&
+      appointment.status === 'NO_SHOW',
+  );
+
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 lg:p-8 max-w-3xl">
       <Link href="/app/appointments" className="text-sm text-slate-400 hover:text-white mb-4 inline-block">
         ← Appointments
       </Link>
       <h1 className="text-2xl font-bold text-white mb-6">Appointment</h1>
+
+      {/* Details */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 mb-6">
-        <p><span className="text-slate-400">When:</span> {fmtDateTime(appointment.startDateTime, tz)}</p>
-        <p><span className="text-slate-400">Customer:</span> {appointment.customer.firstName} {appointment.customer.lastName}</p>
-        <p><span className="text-slate-400">Barber:</span> {appointment.barberProfile.displayName}</p>
-        <p><span className="text-slate-400">Status:</span> <span className="text-amber-400">{appointment.status}</span></p>
-        <p><span className="text-slate-400">Total:</span> ${Number(appointment.totalAmount ?? 0).toFixed(2)}</p>
+        <p><span className="text-slate-400">When:</span> <span className="text-white">{fmtDateTime(appointment.startDateTime, tz)}</span></p>
+        <p><span className="text-slate-400">Customer:</span> <span className="text-white">{customer.firstName} {customer.lastName}</span></p>
+        <p><span className="text-slate-400">Barber:</span> <span className="text-white">{appointment.barberProfile.displayName}</span></p>
+        <p>
+          <span className="text-slate-400">Status:</span>{' '}
+          <span className={appointment.status === 'NO_SHOW' ? 'text-red-400 font-semibold' : 'text-amber-400'}>
+            {appointment.status.replace('_', ' ')}
+          </span>
+        </p>
+        <p><span className="text-slate-400">Total:</span> <span className="text-white">${Number(appointment.totalAmount ?? 0).toFixed(2)}</span></p>
       </div>
+
+      {/* Card on file */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-slate-400" />
+          Card on file
+        </h2>
+        {hasCardOnFile ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-6 bg-slate-700 rounded flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-slate-300" />
+              </div>
+              <span className="text-white text-sm">
+                {customer.cardBrand
+                  ? customer.cardBrand.charAt(0).toUpperCase() + customer.cardBrand.slice(1)
+                  : 'Card'}{' '}
+                •••• {customer.cardLastFour}
+              </span>
+            </div>
+            <span className="text-emerald-400 text-xs font-medium">On file</span>
+          </div>
+        ) : (
+          <p className="text-slate-500 text-sm">No card on file for this customer.</p>
+        )}
+
+        {/* No-show fee charge section */}
+        {appointment.status === 'NO_SHOW' && noShowFeeAmount && (
+          <div className="mt-4 pt-4 border-t border-slate-800">
+            {noShowFeeCharged ? (
+              <p className="text-emerald-400 text-sm font-medium">No-show fee already charged.</p>
+            ) : hasCardOnFile ? (
+              <NoShowChargeButton
+                appointmentId={appointment.id}
+                feeAmount={noShowFeeAmount}
+              />
+            ) : (
+              <p className="text-slate-500 text-sm">
+                No card on file — cannot charge no-show fee of ${noShowFeeAmount.toFixed(2)}.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Payments */}
       <h2 className="text-lg font-semibold text-white mb-3">Payments</h2>
       <div className="space-y-2 mb-6">
         {appointment.payments.length === 0 ? (

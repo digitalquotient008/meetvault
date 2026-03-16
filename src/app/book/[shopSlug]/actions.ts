@@ -4,6 +4,7 @@ import { createOrFindCustomer } from '@/lib/services/customer';
 import { createAppointment } from '@/lib/services/appointment';
 import { createPaymentIntentForAppointment } from '@/lib/services/payments';
 import { addWaitlistEntry } from '@/lib/services/waitlist';
+import { saveCardFromSetupIntent } from '@/lib/services/card-on-file';
 import { prisma } from '@/lib/db';
 
 export async function createPaymentIntentForBookingAction(
@@ -67,4 +68,21 @@ export async function bookAppointmentAction(params: {
   });
 
   return appointment;
+}
+
+export async function saveCardAction(params: {
+  appointmentId: string;
+  setupIntentId: string;
+}) {
+  const appointment = await prisma.appointment.findUnique({
+    where: { id: params.appointmentId },
+    select: { customerId: true, shopId: true },
+  });
+  if (!appointment) throw new Error('Appointment not found');
+
+  await saveCardFromSetupIntent({
+    customerId: appointment.customerId,
+    shopId: appointment.shopId,
+    setupIntentId: params.setupIntentId,
+  });
 }

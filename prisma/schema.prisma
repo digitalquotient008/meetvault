@@ -106,10 +106,12 @@ model Shop {
   depositRequired      Boolean   @default(false)
   depositType          DepositType?
   depositValue         Decimal?  @db.Decimal(10, 2)
-  tippingEnabled          Boolean   @default(true)
-  stripeConnectAccountId  String?
-  stripeConnectOnboarded  Boolean   @default(false)
-  platformFeePercent      Decimal?  @db.Decimal(5, 2)
+  tippingEnabled            Boolean   @default(true)
+  stripeConnectAccountId    String?
+  stripeConnectOnboarded    Boolean   @default(false)
+  platformFeePercent        Decimal?  @db.Decimal(5, 2)
+  noShowFeeAmount           Decimal?  @db.Decimal(10, 2)
+  cardRequiredForBooking    Boolean   @default(false)
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
 
@@ -255,9 +257,13 @@ model Customer {
   totalVisits             Int      @default(0)
   lastVisitAt             DateTime?
   nextSuggestedAt         DateTime?
-  noShowCount             Int      @default(0)
-  stripeCustomerId        String?
-  marketingOptInSms       Boolean  @default(false)
+  noShowCount                Int      @default(0)
+  stripeCustomerId           String?
+  platformStripeCustomerId   String?
+  stripePaymentMethodId      String?
+  cardLastFour               String?
+  cardBrand                  String?
+  marketingOptInSms          Boolean  @default(false)
   marketingOptInEmail     Boolean  @default(true)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt

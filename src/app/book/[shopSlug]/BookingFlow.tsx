@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import type { ShopForBooking } from '@/lib/services/shop';
 import { bookAppointmentAction, joinWaitlistAction } from './actions';
+import CardCaptureStep from './CardCaptureStep';
 
-type Step = 'service' | 'barber' | 'datetime' | 'details' | 'confirm';
+type Step = 'service' | 'barber' | 'datetime' | 'details' | 'confirm' | 'card';
 type Service = ShopForBooking['services'][number];
 type BarberProfile = ShopForBooking['barberProfiles'][number];
 
@@ -22,6 +23,7 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [loadingBook, setLoadingBook] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bookedAppointmentId, setBookedAppointmentId] = useState<string | null>(null);
 
   const [details, setDetails] = useState({ firstName: '', lastName: '', email: '', phone: '' });
   const [waitlistForm, setWaitlistForm] = useState({ firstName: '', lastName: '', email: '', phone: '' });
@@ -118,6 +120,10 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
       if (appointment) {
         if (shop.depositRequired) {
           router.push(`/book/${shop.slug}/pay/${appointment.id}?type=deposit`);
+        } else if (shop.noShowFeeAmount || shop.cardRequiredForBooking) {
+          // Show card capture step before confirmation
+          setBookedAppointmentId(appointment.id);
+          setStep('card');
         } else {
           router.push(`/book/${shop.slug}/confirm/${appointment.id}`);
         }
@@ -337,6 +343,17 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
           </button>
         </div>
       </div>
+    );
+  }
+
+  if (step === 'card' && bookedAppointmentId) {
+    return (
+      <CardCaptureStep
+        appointmentId={bookedAppointmentId}
+        noShowFeeAmount={shop.noShowFeeAmount}
+        cardRequired={shop.cardRequiredForBooking}
+        onDone={() => router.push(`/book/${shop.slug}/confirm/${bookedAppointmentId}`)}
+      />
     );
   }
 
