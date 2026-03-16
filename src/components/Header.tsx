@@ -22,9 +22,6 @@ export default function Header() {
               <Link href="/#use-cases" className="text-slate-400 hover:text-white text-sm font-medium">
                 Built for how you work
               </Link>
-              <Link href="/polls" className="text-slate-400 hover:text-white text-sm font-medium">
-                Polls
-              </Link>
               <Link href="/pricing" className="text-slate-400 hover:text-white text-sm font-medium">
                 Pricing
               </Link>
@@ -64,14 +61,27 @@ export default function Header() {
         </div>
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-2 border-t border-slate-800">
-            <Link href="/contact" className="block py-2 text-blue-400 font-semibold hover:text-blue-300">Schedule a demo</Link>
-            <Link href="/features" className="block text-slate-400 hover:text-white">Features</Link>
-            <Link href="/#use-cases" className="block text-slate-400 hover:text-white">Built for how you work</Link>
-            <Link href="/polls" className="block text-slate-400 hover:text-white">Polls</Link>
-            <Link href="/pricing" className="block text-slate-400 hover:text-white">Pricing</Link>
-            <Link href="/integrations" className="block text-slate-400 hover:text-white">Integrations</Link>
-            <Link href="/about" className="block text-slate-400 hover:text-white">About</Link>
-            <Link href="/contact" className="block text-slate-400 hover:text-white">Contact</Link>
+            <Link href="/contact" className="block py-2 text-blue-400 font-semibold hover:text-blue-300">
+              Schedule a demo
+            </Link>
+            <Link href="/features" className="block text-slate-400 hover:text-white">
+              Features
+            </Link>
+            <Link href="/#use-cases" className="block text-slate-400 hover:text-white">
+              Built for how you work
+            </Link>
+            <Link href="/pricing" className="block text-slate-400 hover:text-white">
+              Pricing
+            </Link>
+            <Link href="/integrations" className="block text-slate-400 hover:text-white">
+              Integrations
+            </Link>
+            <Link href="/about" className="block text-slate-400 hover:text-white">
+              About
+            </Link>
+            <Link href="/contact" className="block text-slate-400 hover:text-white">
+              Contact
+            </Link>
           </div>
         )}
       </div>
