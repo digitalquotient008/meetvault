@@ -39,7 +39,6 @@ export function AppointmentActions({ appointmentId, status }: Props) {
       )}
       {(status === 'CONFIRMED' || status === 'IN_PROGRESS') && (
         <>
-          {/* Primary: Squire-style checkout with tip + card payment */}
           <Link
             href={`/app/appointments/${appointmentId}/checkout`}
             className="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500"

@@ -64,7 +64,7 @@ All times displayed in the **shop's timezone** (not browser or server UTC).
 | Broadcast | `/app/broadcast` | Bulk email send to all/recent/dormant clients with templates (out of office, events, promotions, general) and `{{first_name}}` personalization |
 | Reports | `/app/reports` | Barber earnings by date range with CSV export |
 | Payments | `/app/payments` | Stripe Connect dashboard: available/pending balance, payout history, request withdrawal |
-| Checkout | `/app/appointments/[id]/checkout` | Squire-style in-dashboard checkout: tip selection (15/20/25/custom/skip) → card-on-file or new card → complete appointment |
+| Checkout | `/app/appointments/[id]/checkout` | In-dashboard checkout: tip selection (15/20/25/custom/skip) → card-on-file or new card → complete appointment |
 | Settings: Shop | `/app/settings/shop` | Shop name, timezone, branding, deposit config |
 | Settings: Payments | `/app/settings/payments` | Stripe Connect status, platform fee, tipping toggle |
 | Onboarding | `/app/onboarding` | New shop setup wizard: shop profile → services (templates + custom) → staff → hours → done |
@@ -90,7 +90,7 @@ All emails use the shop's timezone, are branded with the shop name, logged to `N
 - **Booking engine:** 15-minute slot intervals, buffer-before/after per barber, conflict detection in a transaction, random confirmation codes.
 - **Payments:** Stripe PaymentIntents for deposits and full payments. Platform webhook at `/api/stripe/webhook`. Refund support.
 - **Stripe Connect:** Each shop onboards a Stripe Express account via `/app/payments`. Payments route through the platform with a configurable `PLATFORM_FEE_PERCENT` deducted as `application_fee_amount`. Connect webhook at `/api/stripe/connect-webhook` handles `account.updated`, `payment_intent.succeeded/failed`, `payout.paid/failed`.
-- **Squire-style checkout:** After service, barber opens `/app/appointments/[id]/checkout` — tip grid (15/20/25/custom/skip), charge card on file or new card via Stripe Elements, success animation, appointment marked COMPLETED.
+- **In-dashboard checkout:** After service, barber opens `/app/appointments/[id]/checkout` — tip grid (15/20/25/custom/skip), charge card on file or new card via Stripe Elements, success animation, appointment marked COMPLETED.
 - **Card on file:** After first successful payment, a Stripe Customer is created on the connected account and the PaymentMethod attached. Future checkouts offer one-tap charge.
 - **Payouts:** Shop owners can view available/pending balance and request instant or standard payouts to their bank directly from `/app/payments`.
 - **Audit trail:** `AuditLog` table records appointment created/completed/canceled, payment succeeded/refunded, and payout paid/failed events.

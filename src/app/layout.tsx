@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ),
   title: { default: 'MeetingVault – The operating system for modern barbershops', template: '%s | MeetingVault' },
   description: 'Bookings, payments, customer relationships, staff payouts, and growth workflows in one clean platform that the shop actually controls.',
-  keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetingVault, Squire alternative',
+  keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetingVault',
   openGraph: {
     title: 'MeetingVault – The operating system for modern barbershops',
     description: 'Bookings, payments, customers, and payouts — finally in one clean system.',
