@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    const stripe = new Stripe(stripeSecret, { apiVersion: '2024-06-20' });
+    const stripe = new Stripe(stripeSecret, { apiVersion: '2025-02-24.acacia' });
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     return NextResponse.json(
