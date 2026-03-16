@@ -2,21 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Shop, Service, BarberProfile } from '@prisma/client';
+import type { ShopForBooking } from '@/lib/services/shop';
 import { bookAppointmentAction, joinWaitlistAction } from './actions';
-
-type ShopWithRelations = Shop & {
-  services: Service[];
-  barberProfiles: BarberProfile[];
-};
 
 type Step = 'service' | 'barber' | 'datetime' | 'details' | 'confirm';
 
-export default function BookingFlow({ shop }: { shop: ShopWithRelations }) {
+export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>('service');
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [selectedBarber, setSelectedBarber] = useState<BarberProfile | null>(null);
+  const [selectedService, setSelectedService] = useState<ShopForBooking['services'][number] | null>(null);
+  const [selectedBarber, setSelectedBarber] = useState<ShopForBooking['barberProfiles'][number] | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; barberProfileId: string } | null>(null);
   const [slots, setSlots] = useState<Array<{ start: Date; barberProfileId: string }>>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);

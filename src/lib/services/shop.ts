@@ -1,6 +1,19 @@
 import { prisma } from '@/lib/db';
 import type { CreateShopInput, UpdateShopInput } from '@/lib/validators/shop';
 import { Decimal } from '@prisma/client/runtime/library';
+import { isMeetingVaultBackendEnabled, fetchShopBySlug as fetchShopFromBackend } from '@/lib/meetingvault-api';
+
+export type ShopForBooking = {
+  id: string;
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+  depositRequired: boolean;
+  depositType?: string | null;
+  depositValue?: number | null;
+  services: { id: string; name: string; durationMin: number; price: number }[];
+  barberProfiles: { id: string; displayName: string }[];
+};
 
 export async function createShop(ownerUserId: string, input: CreateShopInput) {
   const existing = await prisma.shop.findUnique({ where: { slug: input.slug } });
@@ -49,14 +62,57 @@ export async function updateShop(shopId: string, input: UpdateShopInput) {
   });
 }
 
-export async function getShopBySlug(slug: string) {
-  return prisma.shop.findUnique({
+export async function getShopBySlug(slug: string): Promise<ShopForBooking | null> {
+  if (isMeetingVaultBackendEnabled()) {
+    const shop = await fetchShopFromBackend(slug);
+    if (!shop) return null;
+    return {
+      id: String(shop.id),
+      name: shop.name,
+      slug: shop.slug,
+      logoUrl: shop.logoUrl ?? null,
+      depositRequired: shop.depositRequired ?? false,
+      depositType: shop.depositType ?? null,
+      depositValue: shop.depositValue ?? null,
+      services: shop.services.map((s) => ({
+        id: String(s.id),
+        name: s.name,
+        durationMin: s.durationMin,
+        price: Number(s.price),
+      })),
+      barberProfiles: shop.barberProfiles.map((b) => ({
+        id: String(b.id),
+        displayName: b.displayName,
+      })),
+    };
+  }
+  const row = await prisma.shop.findUnique({
     where: { slug },
     include: {
       services: { where: { isActive: true } },
       barberProfiles: { where: { isBookable: true } },
     },
   });
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    logoUrl: row.logoUrl ?? null,
+    depositRequired: row.depositRequired ?? false,
+    depositType: row.depositType ?? null,
+    depositValue: row.depositValue != null ? Number(row.depositValue) : null,
+    services: row.services.map((s) => ({
+      id: s.id,
+      name: s.name,
+      durationMin: s.durationMin,
+      price: Number(s.price),
+    })),
+    barberProfiles: row.barberProfiles.map((b) => ({
+      id: b.id,
+      displayName: b.displayName,
+    })),
+  };
 }
 
 export async function getShopById(shopId: string) {
