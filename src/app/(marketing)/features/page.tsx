@@ -297,6 +297,29 @@ export default function FeaturesPage() {
         </div>
       </section>
 
+      {/* ─── TEAM CALLOUT ─── */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-start gap-6">
+            <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
+              <Users className="w-6 h-6 text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-white mb-2">Running a multi-barber shop?</h3>
+              <p className="text-slate-400 leading-relaxed mb-4">
+                The Team plan adds unlimited staff, per-barber scheduling, commission tracking, staff permissions, and per-barber revenue reports. Custom pricing based on your shop size.
+              </p>
+              <Link
+                href="/contact?plan=team"
+                className="inline-flex px-5 py-2.5 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 rounded-xl text-sm font-semibold transition-colors"
+              >
+                Talk to Sales →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── BEFORE / AFTER ─── */}
       <section className="py-20 sm:py-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

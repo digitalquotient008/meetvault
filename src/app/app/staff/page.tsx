@@ -1,10 +1,17 @@
+import Link from 'next/link';
 import { requireShopAccess } from '@/lib/auth';
 import { listBarberProfiles } from '@/lib/services/barber';
-import { UserCog } from 'lucide-react';
+import { prisma } from '@/lib/db';
+import { UserCog, Users } from 'lucide-react';
 
 export default async function StaffPage() {
   const { shopId } = await requireShopAccess();
-  const staff = await listBarberProfiles(shopId);
+  const [staff, shop] = await Promise.all([
+    listBarberProfiles(shopId),
+    prisma.shop.findUnique({ where: { id: shopId }, select: { subscriptionStatus: true } }),
+  ]);
+  const isStarter = shop?.subscriptionStatus === 'active' || shop?.subscriptionStatus === 'trialing';
+  const atLimit = isStarter && staff.length >= 1;
 
   return (
     <div className="p-6 lg:p-8">
@@ -68,6 +75,27 @@ export default async function StaffPage() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Upgrade prompt */}
+      {atLimit && (
+        <div className="mt-6 bg-blue-500/5 border border-blue-500/20 rounded-xl p-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5 text-blue-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-white font-semibold mb-1">Need more barbers?</h3>
+            <p className="text-slate-400 text-sm mb-3">
+              The Starter plan includes 1 staff member. Upgrade to Team for unlimited barbers, per-barber scheduling, commission tracking, and more.
+            </p>
+            <Link
+              href="/contact?plan=team"
+              className="inline-flex px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/15 rounded-lg text-sm font-medium transition-colors"
+            >
+              Talk to Sales →
+            </Link>
+          </div>
         </div>
       )}
     </div>

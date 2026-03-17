@@ -3,26 +3,30 @@ import PricingCards from '@/components/PricingCards';
 
 export const metadata = {
   title: 'Pricing',
-  description: 'Simple, transparent pricing for independent barbers. One plan at $25/month with a 14-day free trial.',
+  description: 'Simple pricing for barbers. Starter at $25/month for solo barbers. Team plan for multi-barber shops — talk to sales.',
 };
 
 export default function PricingPage() {
   const faqs = [
     {
       question: 'How does the free trial work?',
-      answer: 'Add a card during signup — you won\'t be charged until the 14-day trial ends. You get full access to every feature immediately. If you cancel before the trial is up, you pay nothing.',
+      answer: 'Add a card during signup — you won\'t be charged until the 14-day trial ends. You get full access to every Starter feature immediately. If you cancel before the trial is up, you pay nothing.',
     },
     {
-      question: "What\u2019s included in the $25/month?",
-      answer: 'Everything: online booking, deposits, no-show protection, client CRM, walk-in queue, waitlist, staff scheduling, appointment reminders, growth tools, revenue reports, and custom branding. One plan, zero add-ons.',
+      question: 'What\'s the difference between Starter and Team?',
+      answer: 'Starter is for solo barbers — 1 staff member, all features included. Team is for shops with multiple barbers or salon suites — unlimited staff, per-barber scheduling, commission tracking, staff permissions, and priority support. Team pricing is custom based on your shop size.',
     },
     {
-      question: 'Can I use my own branding?',
-      answer: 'Yes. Your booking page uses your shop name, logo, brand colors, and custom URL slug. Clients see your brand, not ours.',
+      question: 'How does Team pricing work?',
+      answer: 'We price Team plans based on the number of barbers in your shop. Get in touch and we\'ll put together a plan that fits. No long-term contracts required.',
+    },
+    {
+      question: 'Can I upgrade from Starter to Team later?',
+      answer: 'Yes. Start with Starter and upgrade anytime. Your client data, appointments, and settings all carry over — nothing is lost.',
     },
     {
       question: 'How do payments work?',
-      answer: 'Deposits and payments are processed through Stripe. Money goes directly to your Stripe account. We never touch or hold your funds.',
+      answer: 'Client deposits and payments are processed through Stripe. Money goes directly to your Stripe account. We never touch or hold your funds.',
     },
     {
       question: 'Can I cancel anytime?',
@@ -37,10 +41,10 @@ export default function PricingPage() {
           <div className="text-center mb-14">
             <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-3">Simple pricing</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 leading-tight">
-              One plan. Everything included.
+              Solo or team. We&apos;ve got you.
             </h1>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              No tiers, no upsells, no hidden fees. Try free for 14 days, then $25/month.
+              Start with Starter for $25/month. Running a multi-barber shop? Talk to us about Team.
             </p>
           </div>
           <PricingCards />
