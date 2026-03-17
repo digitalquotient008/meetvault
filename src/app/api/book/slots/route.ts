@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAvailableSlots } from '@/lib/services/availability';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
+  // 60 requests / minute per IP — prevents slot-scraping abuse
+  if (!checkRateLimit(getClientIp(request), 60, 60_000)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   const { searchParams } = new URL(request.url);
   const shopId = searchParams.get('shopId');
   const serviceId = searchParams.get('serviceId');

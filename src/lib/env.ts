@@ -27,6 +27,9 @@ const envSchema = z.object({
 
   // Observability
   SENTRY_DSN: z.string().optional(),
+
+  // Cron job protection — set to a random secret in Vercel environment variables
+  CRON_SECRET: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

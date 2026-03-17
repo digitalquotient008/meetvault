@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db';
 import { AppointmentActions } from '@/components/dashboard/AppointmentActions';
 import { fmtDateTime } from '@/lib/format-date';
 
+const PAGE_SIZE = 50;
+
 function paymentBadge(apt: { payments: { status: string; amount: unknown; type: string }[]; totalAmount: unknown }) {
   const total = Number(apt.totalAmount ?? 0);
   const paid = apt.payments
@@ -14,21 +16,48 @@ function paymentBadge(apt: { payments: { status: string; amount: unknown; type: 
   return { label: 'Unpaid', className: 'text-slate-400' };
 }
 
-export default async function AppointmentsPage() {
+function statusColor(status: string): string {
+  switch (status) {
+    case 'CONFIRMED':   return 'text-amber-400';
+    case 'PENDING':     return 'text-slate-400';
+    case 'IN_PROGRESS': return 'text-sky-400';
+    case 'COMPLETED':   return 'text-emerald-400';
+    case 'CANCELED':
+    case 'NO_SHOW':     return 'text-red-400';
+    default:            return 'text-slate-400';
+  }
+}
+
+type Props = { searchParams: Promise<{ page?: string }> };
+
+export default async function AppointmentsPage({ searchParams }: Props) {
   const { shopId } = await requireShopAccess();
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
+  const skip = (page - 1) * PAGE_SIZE;
+
   const shop = await prisma.shop.findUnique({ where: { id: shopId }, select: { timezone: true } });
   const tz = shop?.timezone ?? 'America/New_York';
 
-  const appointments = await prisma.appointment.findMany({
-    where: { shopId },
-    take: 50,
-    orderBy: { startDateTime: 'desc' },
-    include: { customer: true, barberProfile: true, payments: true },
-  });
+  const [total, appointments] = await Promise.all([
+    prisma.appointment.count({ where: { shopId } }),
+    prisma.appointment.findMany({
+      where: { shopId },
+      take: PAGE_SIZE,
+      skip,
+      orderBy: { startDateTime: 'desc' },
+      include: { customer: true, barberProfile: true, payments: true },
+    }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-bold text-white mb-6">Appointments</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-white">Appointments</h1>
+        <p className="text-slate-400 text-sm">{total} total</p>
+      </div>
       <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-800 text-slate-400 text-left">
@@ -51,15 +80,7 @@ export default async function AppointmentsPage() {
                   <td className="p-3 text-slate-300">{apt.customer.firstName} {apt.customer.lastName}</td>
                   <td className="p-3 text-slate-300">{apt.barberProfile.displayName}</td>
                   <td className="p-3">
-                    <span className={
-                      apt.status === 'CONFIRMED' ? 'text-amber-400' :
-                      apt.status === 'PENDING' ? 'text-slate-400' :
-                      apt.status === 'IN_PROGRESS' ? 'text-sky-400' :
-                      apt.status === 'COMPLETED' ? 'text-emerald-400' :
-                      apt.status === 'CANCELED' ? 'text-red-400' :
-                      apt.status === 'NO_SHOW' ? 'text-red-400' :
-                      'text-slate-400'
-                    }>
+                    <span className={statusColor(apt.status)}>
                       {apt.status.replace('_', ' ')}
                     </span>
                   </td>
@@ -79,6 +100,33 @@ export default async function AppointmentsPage() {
         </table>
         {appointments.length === 0 && <p className="p-6 text-slate-500">No appointments yet.</p>}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-slate-400 text-sm">
+            Page {page} of {totalPages}
+          </p>
+          <div className="flex gap-2">
+            {page > 1 && (
+              <Link
+                href={`/app/appointments?page=${page - 1}`}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 text-sm"
+              >
+                ← Previous
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link
+                href={`/app/appointments?page=${page + 1}`}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 text-sm"
+              >
+                Next →
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

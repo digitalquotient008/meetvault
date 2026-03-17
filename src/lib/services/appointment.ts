@@ -78,16 +78,18 @@ export async function createAppointment(params: {
         priceSnapshot: service.price,
       },
     });
-    await tx.customer.update({
-      where: { id: customerId },
-      data: {
-        lastVisitAt: new Date(),
-        // ONLINE bookings start as PENDING — only count visits once the card
-        // is saved and the appointment is CONFIRMED (see saveCardAction).
-        // STAFF / WALK_IN bookings are confirmed immediately so count now.
-        ...(channel !== 'ONLINE' ? { totalVisits: { increment: 1 } } : {}),
-      },
-    });
+    // ONLINE bookings start as PENDING — defer lastVisitAt and totalVisits
+    // until the card is saved and the appointment is CONFIRMED (saveCardAction).
+    // STAFF / WALK_IN bookings are confirmed immediately so update stats now.
+    if (channel !== 'ONLINE') {
+      await tx.customer.update({
+        where: { id: customerId },
+        data: {
+          lastVisitAt: new Date(),
+          totalVisits: { increment: 1 },
+        },
+      });
+    }
     return apt;
   });
 
@@ -224,6 +226,30 @@ export async function cancelAppointment(shopId: string, appointmentId: string) {
     sendCancellationToShop(emailData).catch(() => {});
   }
   return full ?? apt;
+}
+
+/**
+ * Cancels all PENDING appointments older than the given age.
+ * Safe to run repeatedly — only touches PENDING status.
+ * Called by the /api/cron/cleanup-pending route every 15 minutes.
+ */
+export async function cleanupExpiredPendingAppointments(
+  maxAgeMinutes = 15,
+): Promise<{ canceled: number }> {
+  const expiryTime = new Date(Date.now() - maxAgeMinutes * 60 * 1000);
+  const result = await prisma.appointment.updateMany({
+    where: {
+      status: 'PENDING',
+      createdAt: { lt: expiryTime },
+    },
+    data: {
+      status: 'CANCELED',
+      canceledAt: new Date(),
+      // Treat as customer-actor — they navigated away without completing the flow
+      canceledByRole: 'CUSTOMER',
+    },
+  });
+  return { canceled: result.count };
 }
 
 export async function markNoShowAppointment(shopId: string, appointmentId: string) {
