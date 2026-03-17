@@ -5,7 +5,10 @@ import { prisma } from '@/lib/db';
 import { fmtDateTime } from '@/lib/format-date';
 import RefundButton from './RefundButton';
 import NoShowChargeButton from './NoShowChargeButton';
+import CancelAppointmentButton from './CancelAppointmentButton';
 import { CreditCard } from 'lucide-react';
+
+const CANCELABLE_STATUSES = ['PENDING', 'CONFIRMED', 'IN_PROGRESS'];
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -31,6 +34,10 @@ export default async function AppointmentDetailPage({ params }: Props) {
 
   const { customer } = appointment;
   const hasCardOnFile = Boolean(customer.stripePaymentMethodId);
+  const totalPaid = appointment.payments
+    .filter((p) => p.status === 'SUCCEEDED' && p.type !== 'TIP')
+    .reduce((s, p) => s + Number(p.amount), 0);
+  const canCancel = CANCELABLE_STATUSES.includes(appointment.status);
   const noShowFeeAmount = shop?.noShowFeeAmount ? Number(shop.noShowFeeAmount) : null;
 
   // Check if no-show fee was already charged
@@ -58,6 +65,11 @@ export default async function AppointmentDetailPage({ params }: Props) {
           </span>
         </p>
         <p><span className="text-slate-400">Total:</span> <span className="text-white">${Number(appointment.totalAmount ?? 0).toFixed(2)}</span></p>
+        {canCancel && (
+          <div className="pt-2 border-t border-slate-800">
+            <CancelAppointmentButton appointmentId={appointment.id} totalPaid={totalPaid} />
+          </div>
+        )}
       </div>
 
       {/* Card on file */}

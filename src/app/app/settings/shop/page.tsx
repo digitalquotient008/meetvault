@@ -1,6 +1,7 @@
 import { requireShopAccess } from '@/lib/auth';
 import { getShopById } from '@/lib/services/shop';
 import NoShowFeeForm from './NoShowFeeForm';
+import CancellationPolicyForm from './CancellationPolicyForm';
 
 export default async function ShopSettingsPage() {
   const { shopId } = await requireShopAccess();
@@ -31,6 +32,23 @@ export default async function ShopSettingsPage() {
           shopId={shopId}
           currentFee={shop.noShowFeeAmount ? Number(shop.noShowFeeAmount) : null}
           currentRequired={shop.cardRequiredForBooking ?? false}
+        />
+      </div>
+
+      {/* Cancellation policy */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h2 className="text-white font-semibold text-lg mb-1">Cancellation policy</h2>
+        <p className="text-slate-400 text-sm mb-5">
+          Set a free-cancellation window and choose what fee (if any) applies when customers cancel within it.
+        </p>
+        <CancellationPolicyForm
+          shopId={shopId}
+          current={{
+            cancellationWindowHours: shop.cancellationWindowHours ?? null,
+            cancellationFeeType: shop.cancellationFeeType ?? null,
+            cancellationFeeValue: shop.cancellationFeeValue ? Number(shop.cancellationFeeValue) : null,
+            cancellationPolicy: shop.cancellationPolicy ?? null,
+          }}
         />
       </div>
     </div>

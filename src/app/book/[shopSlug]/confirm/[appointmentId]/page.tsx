@@ -63,6 +63,14 @@ export default async function ConfirmPage({ params }: Props) {
         >
           Book another →
         </Link>
+        <div className="mt-4 pt-4 border-t border-slate-800">
+          <Link
+            href={`/book/${shop.slug}/cancel/${appointmentId}?code=${appointment.confirmationCode}`}
+            className="text-slate-500 hover:text-slate-400 text-sm"
+          >
+            Need to cancel? Click here
+          </Link>
+        </div>
       </div>
     </div>
   );

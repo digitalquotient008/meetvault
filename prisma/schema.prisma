@@ -86,6 +86,18 @@ enum WalkInStatus {
   LEFT
 }
 
+enum CancellationFeeType {
+  NONE
+  DEPOSIT_FORFEIT
+  FIXED_FEE
+  PERCENT_OF_TOTAL
+}
+
+enum CancellationActor {
+  CUSTOMER
+  STAFF
+}
+
 model Shop {
   id                   String    @id @default(cuid())
   name                 String
@@ -112,6 +124,9 @@ model Shop {
   platformFeePercent        Decimal?  @db.Decimal(5, 2)
   noShowFeeAmount           Decimal?  @db.Decimal(10, 2)
   cardRequiredForBooking    Boolean   @default(false)
+  cancellationWindowHours   Int?
+  cancellationFeeType       CancellationFeeType?
+  cancellationFeeValue      Decimal?  @db.Decimal(10, 2)
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
 
@@ -310,10 +325,13 @@ model Appointment {
   totalAmount     Decimal?           @db.Decimal(10, 2)
   depositAmount   Decimal?           @db.Decimal(10, 2)
   balanceDue      Decimal?           @db.Decimal(10, 2)
-  notes           String?
-  confirmationCode String?           @unique
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  notes                String?
+  confirmationCode     String?           @unique
+  canceledAt           DateTime?
+  canceledByRole       CancellationActor?
+  cancellationFeeCharged Boolean         @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
 
   shop              Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
   customer          Customer           @relation(fields: [customerId], references: [id], onDelete: Cascade)
