@@ -24,7 +24,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'How do I get started?',
     answer:
-      'Sign up with your email — no credit card required. You get a 14-day free trial with full access. Create your shop, pick from common services (or add your own), set your hours, and share your booking link. Takes about 5 minutes.',
+      'Sign up, add a card to start your 14-day free trial (you won\'t be charged until it ends). Create your shop, pick from common services (or add your own), set your hours, and share your booking link. Takes about 5 minutes.',
     link: '/sign-up',
     linkLabel: 'Start 14-day free trial',
     keywords: ['start', 'get started', 'sign up', 'setup'],
@@ -32,7 +32,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: 'How much does it cost?',
     answer:
-      'One plan: $25/month. Everything included — online booking, deposits, no-show protection, client CRM, walk-in queue, waitlist, reminders, growth tools, reports, and custom branding. 14-day free trial, no credit card required.',
+      'One plan: $25/month. Everything included — online booking, deposits, no-show protection, client CRM, walk-in queue, waitlist, reminders, growth tools, reports, and custom branding. 14-day free trial — you won\'t be charged until it ends.',
     link: '/pricing',
     linkLabel: 'View pricing',
     keywords: ['pricing', 'price', 'cost', 'plan', 'free', 'paid', 'how much'],

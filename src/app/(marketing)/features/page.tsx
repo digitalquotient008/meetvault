@@ -170,7 +170,7 @@ export default function FeaturesPage() {
             </Link>
           </div>
           <p className="text-slate-500 text-sm mt-4">
-            No credit card required. Cancel anytime.
+            Cancel anytime — you won&apos;t be charged until the trial ends.
           </p>
         </div>
       </section>
@@ -342,7 +342,7 @@ export default function FeaturesPage() {
       {/* ─── FINAL CTA ─── */}
       <CTA
         title="Your next no-show is your last one."
-        description="14-day free trial. No credit card. Takes 5 minutes to set up."
+        description="14-day free trial. Cancel anytime — you won't be charged until the trial ends."
         buttonText="Start My Free Trial"
       />
     </div>

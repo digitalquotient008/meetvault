@@ -62,7 +62,7 @@ export default function Outcomes() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
                   '14-day free trial',
-                  'No credit card to start',
+                  'Not charged until trial ends',
                   'Import clients from Square, Vagaro, Booksy',
                   'Cancel anytime — no contracts',
                 ].map((point) => (

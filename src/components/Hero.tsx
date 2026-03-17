@@ -11,7 +11,7 @@ export default function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 mb-8">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sm font-medium text-amber-200">14-day free trial &middot; No credit card required</span>
+            <span className="text-sm font-medium text-amber-200">14-day free trial &middot; Cancel anytime</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-[1.08] tracking-tight">
@@ -30,7 +30,7 @@ export default function Hero() {
               className="group relative bg-amber-500 text-slate-950 px-8 py-4 rounded-xl text-lg font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-400/30 w-full sm:w-auto text-center"
             >
               Start your free trial
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500 whitespace-nowrap font-normal">No credit card needed</span>
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500 whitespace-nowrap font-normal">Not charged until trial ends</span>
             </Link>
             <Link
               href="#how-it-works"
