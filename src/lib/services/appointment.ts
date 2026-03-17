@@ -139,17 +139,6 @@ export async function getAppointmentsForShop(shopId: string, from: Date, to: Dat
   });
 }
 
-export async function checkInAppointment(shopId: string, appointmentId: string) {
-  const apt = await prisma.appointment.findFirst({
-    where: { id: appointmentId, shopId, status: 'CONFIRMED' },
-  });
-  if (!apt) throw new Error('Appointment not found or not confirmable');
-  return prisma.appointment.update({
-    where: { id: appointmentId },
-    data: { status: 'IN_PROGRESS' },
-  });
-}
-
 export async function startAppointment(shopId: string, appointmentId: string) {
   const apt = await prisma.appointment.findFirst({
     where: { id: appointmentId, shopId, status: { in: ['CONFIRMED'] } },
