@@ -15,7 +15,7 @@ function getStripe(): Stripe {
 /**
  * After a payment succeeds on a connected account, attach the PaymentMethod to
  * a Stripe Customer scoped to that connected account, then save stripeCustomerId
- * on the MeetingVault Customer record.
+ * on the MeetVault Customer record.
  *
  * NOTE: Stripe Customers are scoped per connected account. A customer visiting
  * two shops gets a separate Stripe Customer per shop's Connect account.
@@ -39,7 +39,7 @@ export async function attachPaymentMethodToCustomer(params: {
   const pm = pi.payment_method;
   if (!pm || typeof pm === 'string') return; // no PM to save
 
-  // Look up the MeetingVault customer
+  // Look up the MeetVault customer
   const customer = await prisma.customer.findFirst({
     where: { id: customerId, shopId },
     select: { id: true, stripeCustomerId: true, email: true, firstName: true, lastName: true },

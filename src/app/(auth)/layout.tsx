@@ -8,7 +8,7 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
       <Link href="/" className="text-2xl font-bold text-amber-400 mb-8">
-        MeetingVault
+        MeetVault
       </Link>
       <div className="w-full max-w-md">
         {children}

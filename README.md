@@ -1,4 +1,4 @@
-# MeetingVault
+# MeetVault
 
 **The operating system for modern barbershops.**
 

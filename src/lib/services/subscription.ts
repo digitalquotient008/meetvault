@@ -204,7 +204,7 @@ export function isSubscriptionActive(
 
 /**
  * Get or create the $25/mo recurring price.
- * Searches for an existing product named "MeetingVault Starter" first.
+ * Searches for an existing product named "MeetVault Starter" first.
  */
 async function getOrCreatePrice(stripe: Stripe): Promise<string> {
   // Check env for a pre-configured price ID
@@ -213,7 +213,7 @@ async function getOrCreatePrice(stripe: Stripe): Promise<string> {
 
   // Search for existing product
   const products = await stripe.products.list({ limit: 10, active: true });
-  const existing = products.data.find((p) => p.name === 'MeetingVault Starter');
+  const existing = products.data.find((p) => p.name === 'MeetVault Starter');
 
   if (existing) {
     const prices = await stripe.prices.list({
@@ -227,7 +227,7 @@ async function getOrCreatePrice(stripe: Stripe): Promise<string> {
 
   // Create product + price
   const product = await stripe.products.create({
-    name: 'MeetingVault Starter',
+    name: 'MeetVault Starter',
     description: 'Full barbershop management toolkit — $25/month',
   });
 

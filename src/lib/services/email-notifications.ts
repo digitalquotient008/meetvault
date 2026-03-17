@@ -26,7 +26,7 @@ async function sendEmail(to: string, subject: string, html: string, shopId: stri
     const { Resend } = await import('resend');
     const resend = new Resend(env.RESEND_API_KEY);
     await resend.emails.send({
-      from: 'MeetingVault <onboarding@resend.dev>',
+      from: 'MeetVault <onboarding@resend.dev>',
       to,
       subject,
       html,
@@ -69,7 +69,7 @@ function baseLayout(shopName: string, content: string): string {
       ${content}
     </div>
     <p style="text-align:center;color:#64748b;font-size:11px;margin-top:24px;">
-      Powered by MeetingVault
+      Powered by MeetVault
     </p>
   </div>
 </body>

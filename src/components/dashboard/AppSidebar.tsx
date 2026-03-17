@@ -60,7 +60,7 @@ export default function AppSidebar() {
       {/* Logo */}
       <div className="p-4 border-b border-slate-800">
         <Link href="/app" className="text-xl font-bold text-amber-400">
-          MeetingVault
+          MeetVault
         </Link>
       </div>
 

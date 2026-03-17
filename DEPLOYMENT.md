@@ -1,4 +1,4 @@
-# MeetingVault – Deployment
+# MeetVault – Deployment
 
 ## Vercel
 
@@ -42,7 +42,7 @@ This generates a new migration file. Commit it and push — Vercel applies it on
 
 ## Stripe Connect setup
 
-MeetingVault uses **Stripe Connect Express** so each barbershop receives payouts directly to their bank account. You need to register **two** separate webhook endpoints in the Stripe dashboard:
+MeetVault uses **Stripe Connect Express** so each barbershop receives payouts directly to their bank account. You need to register **two** separate webhook endpoints in the Stripe dashboard:
 
 ### 1. Platform webhook (existing)
 - **URL:** `https://your-domain.com/api/stripe/webhook`

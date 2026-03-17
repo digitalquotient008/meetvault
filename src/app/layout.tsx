@@ -16,11 +16,11 @@ export const metadata: Metadata = {
       return u.startsWith('http') ? u : `https://${u}`;
     })()
   ),
-  title: { default: 'MeetingVault – The operating system for modern barbershops', template: '%s | MeetingVault' },
+  title: { default: 'MeetVault – The operating system for modern barbershops', template: '%s | MeetVault' },
   description: 'Bookings, payments, customer relationships, staff payouts, and growth workflows in one clean platform that the shop actually controls.',
-  keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetingVault',
+  keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetVault',
   openGraph: {
-    title: 'MeetingVault – The operating system for modern barbershops',
+    title: 'MeetVault – The operating system for modern barbershops',
     description: 'Bookings, payments, customers, and payouts — finally in one clean system.',
     type: 'website',
   },

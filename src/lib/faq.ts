@@ -8,9 +8,9 @@ export interface FAQItem {
 
 export const FAQ_ITEMS: FAQItem[] = [
   {
-    question: 'What is MeetingVault?',
+    question: 'What is MeetVault?',
     answer:
-      'MeetingVault is booking and payments software for independent barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders — no spam. Includes client history, walk-in queue, and growth tools.',
+      'MeetVault is booking and payments software for independent barbers. Clients book online, pay deposits to reduce no-shows, and you get appointment reminders — no spam. Includes client history, walk-in queue, and growth tools.',
     link: '/features',
     linkLabel: 'See all features',
     keywords: ['what', 'meetingvault', 'barber', 'booking', 'scheduling'],

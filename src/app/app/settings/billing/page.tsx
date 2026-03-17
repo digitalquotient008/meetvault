@@ -58,7 +58,7 @@ export default async function BillingPage() {
               <span className="text-slate-400 text-sm">Plan</span>
             </div>
             <span className="text-white text-sm font-medium">
-              MeetingVault Starter — $25/mo
+              MeetVault Starter — $25/mo
             </span>
           </div>
 
@@ -81,7 +81,7 @@ export default async function BillingPage() {
           {isPastDue && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
               <p className="text-red-300 text-sm">
-                Your payment failed. Please update your payment method to continue using MeetingVault.
+                Your payment failed. Please update your payment method to continue using MeetVault.
               </p>
             </div>
           )}

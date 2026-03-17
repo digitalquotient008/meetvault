@@ -3,7 +3,7 @@ import CTA from '@/components/CTA';
 
 export const metadata = {
   title: 'Contact Us',
-  description: 'Get in touch about MeetingVault — the operating system for modern barbershops.',
+  description: 'Get in touch about MeetVault — the operating system for modern barbershops.',
 };
 
 type Props = { searchParams: Promise<{ plan?: string }> };

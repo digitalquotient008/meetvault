@@ -168,13 +168,13 @@ export async function sendTrialEndingReminders(): Promise<number> {
 
     try {
       await resend.emails.send({
-        from: 'MeetingVault <onboarding@resend.dev>',
+        from: 'MeetVault <onboarding@resend.dev>',
         to: ownerEmail,
-        subject: `Your MeetingVault trial ends in 2 days`,
+        subject: `Your MeetVault trial ends in 2 days`,
         html: `
           <div style="max-width:520px;margin:0 auto;padding:32px 16px;font-family:-apple-system,sans-serif;">
             <h1 style="font-size:22px;color:#fff;">Your trial ends soon</h1>
-            <p style="color:#94a3b8;">Hey! Your 14-day MeetingVault trial for <strong>${shop.name}</strong> ends in 2 days.</p>
+            <p style="color:#94a3b8;">Hey! Your 14-day MeetVault trial for <strong>${shop.name}</strong> ends in 2 days.</p>
             <p style="color:#94a3b8;">After the trial, your card will be charged $25/month. If you'd like to cancel, you can do so from Settings → Billing before the trial ends.</p>
             <a href="${APP_URL}/app/settings/billing" style="display:inline-block;background:#f59e0b;color:#0f172a;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;margin-top:16px;">Manage subscription</a>
           </div>

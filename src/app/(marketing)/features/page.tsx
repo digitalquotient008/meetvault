@@ -19,9 +19,9 @@ import {
 } from 'lucide-react';
 
 export const metadata = {
-  title: 'Features — MeetingVault',
+  title: 'Features — MeetVault',
   description:
-    'No-shows are costing you $400 a month. MeetingVault requires deposits at booking — so if they ghost, you keep it.',
+    'No-shows are costing you $400 a month. MeetVault requires deposits at booking — so if they ghost, you keep it.',
 };
 
 const steps = [
@@ -106,7 +106,7 @@ const all_features = [
     icon: Palette,
     title: 'Your Brand',
     description:
-      'Custom logo, colors, and booking URL. MeetingVault stays invisible.',
+      'Custom logo, colors, and booking URL. MeetVault stays invisible.',
   },
 ];
 
@@ -158,7 +158,7 @@ export default function FeaturesPage() {
             <span className="text-white">Let&apos;s fix that.</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto">
-            Every empty slot is money you&apos;ll never get back. MeetingVault requires
+            Every empty slot is money you&apos;ll never get back. MeetVault requires
             deposits at booking — so if they ghost, you keep it. Set up in 5 minutes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
@@ -217,7 +217,7 @@ export default function FeaturesPage() {
               How it works
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Here&apos;s how MeetingVault stops it
+              Here&apos;s how MeetVault stops it
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -253,7 +253,7 @@ export default function FeaturesPage() {
             <span className="text-amber-400 text-sm font-semibold">And that&apos;s just the start</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Once your book is protected, MeetingVault handles everything else.
+            Once your book is protected, MeetVault handles everything else.
           </h2>
           <p className="text-slate-400 text-lg">
             So you can focus on the cut, not the calendar.

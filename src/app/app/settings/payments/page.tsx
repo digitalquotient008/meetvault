@@ -80,7 +80,7 @@ export default async function PaymentSettingsPage() {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
         <h2 className="text-white font-semibold">Platform fee</h2>
         <div className="flex items-center justify-between">
-          <p className="text-slate-400 text-sm">Per-transaction fee (deducted by MeetingVault)</p>
+          <p className="text-slate-400 text-sm">Per-transaction fee (deducted by MeetVault)</p>
           <span className="text-white font-mono text-lg">{platformFeeDisplay}%</span>
         </div>
         <p className="text-slate-500 text-xs">

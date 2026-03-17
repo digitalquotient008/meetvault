@@ -4,7 +4,7 @@ import { FAQ_ITEMS } from '@/lib/faq';
 
 export const metadata = {
   title: 'FAQ',
-  description: 'Frequently asked questions about MeetingVault — barbershop booking and payments.',
+  description: 'Frequently asked questions about MeetVault — barbershop booking and payments.',
 };
 
 export default function FAQPage() {
@@ -14,7 +14,7 @@ export default function FAQPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Frequently Asked Questions</h1>
           <p className="text-xl text-slate-400">
-            Quick answers about MeetingVault. <Link href="/contact" className="text-amber-400 hover:text-amber-300 font-medium">Contact us</Link> if you need more.
+            Quick answers about MeetVault. <Link href="/contact" className="text-amber-400 hover:text-amber-300 font-medium">Contact us</Link> if you need more.
           </p>
         </div>
       </section>

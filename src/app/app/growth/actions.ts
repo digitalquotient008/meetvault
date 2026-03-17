@@ -14,7 +14,7 @@ export async function sendReminderAction(customerId: string) {
     const { Resend } = await import('resend');
     const resend = new Resend(env.RESEND_API_KEY);
     await resend.emails.send({
-      from: 'MeetingVault <onboarding@resend.dev>',
+      from: 'MeetVault <onboarding@resend.dev>',
       to: customer.email,
       subject: 'We miss you! Book your next visit',
       html: `Hi ${customer.firstName},<br><br>It's been a while since we've seen you. We'd love to have you back — book your next appointment at your convenience.`,

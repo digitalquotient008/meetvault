@@ -13,7 +13,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold text-amber-400">
-              MeetingVault
+              MeetVault
             </Link>
             <div className="hidden md:flex ml-10 space-x-8">
               <Link href="/features" className="text-slate-400 hover:text-white text-sm font-medium">

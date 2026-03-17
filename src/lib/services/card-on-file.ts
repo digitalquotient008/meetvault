@@ -18,7 +18,7 @@ function getStripe(): Stripe {
  * Customer if one doesn't exist yet and links it to our Customer record.
  */
 export async function createCardSetupIntent(params: {
-  customerId: string; // MeetingVault DB customer ID
+  customerId: string; // MeetVault DB customer ID
   shopId: string;
 }): Promise<{ clientSecret: string }> {
   const stripe = getStripe();

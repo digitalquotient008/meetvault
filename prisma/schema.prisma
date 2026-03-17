@@ -1,4 +1,4 @@
-// MeetingVault — multi-tenant barbershop SaaS
+// MeetVault — multi-tenant barbershop SaaS
 // All tenant-owned tables include shopId, createdAt, updatedAt
 
 generator client {

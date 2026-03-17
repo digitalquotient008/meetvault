@@ -3,9 +3,9 @@ import CTA from '@/components/CTA';
 import { Shield, Eye, Database, Heart } from 'lucide-react';
 
 export const metadata = {
-  title: 'About — MeetingVault',
+  title: 'About — MeetVault',
   description:
-    'MeetingVault was built by someone who watched barbers lose money to no-shows, juggle DMs, and scribble notes on paper. This is the tool that should have existed.',
+    'MeetVault was built by someone who watched barbers lose money to no-shows, juggle DMs, and scribble notes on paper. This is the tool that should have existed.',
 };
 
 const values = [
@@ -19,7 +19,7 @@ const values = [
     icon: Eye,
     title: 'Your brand, not ours',
     description:
-      'Your booking page shows your name, your logo, your colors. Clients see your shop — MeetingVault stays invisible. This is your business, not ours.',
+      'Your booking page shows your name, your logo, your colors. Clients see your shop — MeetVault stays invisible. This is your business, not ours.',
   },
   {
     icon: Database,
@@ -73,7 +73,7 @@ export default function AboutPage() {
               Nobody was building for the independent barber.
             </p>
             <p className="text-slate-300">
-              So we did. MeetingVault is online booking, deposits, no-show protection, client history, and growth tools — in one place, for <span className="text-amber-400 font-semibold">$25/month</span>. No enterprise pricing. No features you&apos;ll never use. No 30-minute onboarding calls.
+              So we did. MeetVault is online booking, deposits, no-show protection, client history, and growth tools — in one place, for <span className="text-amber-400 font-semibold">$25/month</span>. No enterprise pricing. No features you&apos;ll never use. No 30-minute onboarding calls.
             </p>
             <p className="text-slate-300">
               Set it up in 5 minutes. Share your link. Get paid.

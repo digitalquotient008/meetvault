@@ -51,7 +51,7 @@ export async function checkRateLimit(key: string): Promise<boolean> {
 
 | Account | Purpose | Used for |
 |---------|---------|---------|
-| **Platform account** | MeetingVault's own Stripe account | Card-on-file (SetupIntents for no-show fees), booking deposits via platform |
+| **Platform account** | MeetVault's own Stripe account | Card-on-file (SetupIntents for no-show fees), booking deposits via platform |
 | **Connected accounts** (Express) | One per shop | Shop payouts — funds flow to the shop's bank via Stripe Connect |
 
 ### Card-on-file is on the PLATFORM account
@@ -246,4 +246,4 @@ The `/api/cron/send-reminders` cron sends a "Your trial ends in 2 days" email to
 | `trialEndsAt` | DateTime? | When the 14-day trial ends |
 
 ### Price configuration
-Set `STRIPE_PRICE_ID` in env to use a pre-existing Stripe price. If not set, the system auto-creates a "MeetingVault Starter" product with a $25/mo recurring price.
+Set `STRIPE_PRICE_ID` in env to use a pre-existing Stripe price. If not set, the system auto-creates a "MeetVault Starter" product with a $25/mo recurring price.

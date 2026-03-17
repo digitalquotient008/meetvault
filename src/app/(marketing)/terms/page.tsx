@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Terms of Service',
-  description: 'MeetingVault Terms of Service.',
+  description: 'MeetVault Terms of Service.',
 };
 
 export default function TermsPage() {
@@ -14,11 +14,11 @@ export default function TermsPage() {
           <p className="text-sm text-slate-500">Last updated: March 2025</p>
           <section>
             <h2 className="text-2xl font-semibold text-white mt-8 mb-4">1. Acceptance of Terms</h2>
-            <p>By using MeetingVault, you accept and agree to be bound by these terms.</p>
+            <p>By using MeetVault, you accept and agree to be bound by these terms.</p>
           </section>
           <section>
             <h2 className="text-2xl font-semibold text-white mt-8 mb-4">2. Use License</h2>
-            <p>Permission is granted to use MeetingVault for barbershop and salon scheduling. You may not reverse engineer or misuse the service.</p>
+            <p>Permission is granted to use MeetVault for barbershop and salon scheduling. You may not reverse engineer or misuse the service.</p>
           </section>
           <section>
             <h2 className="text-2xl font-semibold text-white mt-8 mb-4">3. Contact</h2>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Privacy Policy',
-  description: 'MeetingVault Privacy Policy — how we collect, use, and protect your data.',
+  description: 'MeetVault Privacy Policy — how we collect, use, and protect your data.',
 };
 
 export default function PrivacyPage() {
