@@ -12,16 +12,16 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(
     (() => {
-      const u = process.env.NEXT_PUBLIC_APP_URL || 'https://meetingvault.app';
+      const u = process.env.NEXT_PUBLIC_APP_URL || 'https://meetvault.app';
       return u.startsWith('http') ? u : `https://${u}`;
     })()
   ),
-  title: { default: 'MeetVault – The operating system for modern barbershops', template: '%s | MeetVault' },
-  description: 'Bookings, payments, customer relationships, staff payouts, and growth workflows in one clean platform that the shop actually controls.',
-  keywords: 'barbershop booking, barber scheduling, salon software, appointment booking, no-show protection, MeetVault',
+  title: { default: 'Barber Booking & No-Show Protection Software | MeetVault — $25/mo', template: '%s | MeetVault' },
+  description: 'Online booking, deposits, and no-show protection for independent barbers. Clients book and pay upfront — you keep the deposit if they ghost. $25/mo.',
+  keywords: 'barbershop booking, barber scheduling, barber no-show protection, barber deposit software, salon booking, appointment booking, MeetVault',
   openGraph: {
-    title: 'MeetVault – The operating system for modern barbershops',
-    description: 'Bookings, payments, customers, and payouts — finally in one clean system.',
+    title: 'Barber Booking & No-Show Protection Software | MeetVault',
+    description: 'Online booking, deposits, and no-show protection for independent barbers. $25/mo — 14-day free trial.',
     type: 'website',
   },
 };
