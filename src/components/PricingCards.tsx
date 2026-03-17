@@ -49,7 +49,7 @@ export default function PricingCards() {
           >
             Start 14-day free trial
           </Link>
-          <p className="text-center text-xs text-slate-500 mb-8">No credit card required &middot; Cancel anytime</p>
+          <p className="text-center text-xs text-slate-500 mb-8">Card required &middot; You won&apos;t be charged until the trial ends &middot; Cancel anytime</p>
 
           {/* Features */}
           <ul className="space-y-3.5">

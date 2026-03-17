@@ -4,6 +4,8 @@ import { createShop } from '@/lib/services/shop';
 import { createService } from '@/lib/services/service';
 import { createBarberProfile } from '@/lib/services/barber';
 import { setAvailabilityRules } from '@/lib/services/availability';
+import { createSubscriptionCheckout } from '@/lib/services/subscription';
+import { prisma } from '@/lib/db';
 
 export async function createShopAction(userId: string, data: { name: string; slug: string; timezone?: string }) {
   return createShop(userId, {
@@ -40,6 +42,21 @@ export async function addBulkServicesAction(
 
 export async function addStaffAction(shopId: string, userId: string, data: { displayName: string }) {
   return createBarberProfile(shopId, userId, { displayName: data.displayName });
+}
+
+export async function startSubscriptionAction(shopId: string, ownerEmail: string) {
+  const shop = await prisma.shop.findUnique({
+    where: { id: shopId },
+    select: { name: true },
+  });
+  if (!shop) throw new Error('Shop not found');
+
+  const { url } = await createSubscriptionCheckout({
+    shopId,
+    shopName: shop.name,
+    ownerEmail,
+  });
+  return { url };
 }
 
 export async function setHoursAction(

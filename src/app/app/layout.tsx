@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { getOrCreateUser } from '@/lib/auth';
+import { getOrCreateUser, getMembershipForUser, checkSubscriptionStatus } from '@/lib/auth';
 import AppSidebar from '@/components/dashboard/AppSidebar';
 
 export default async function AppLayout({
@@ -19,8 +20,26 @@ export default async function AppLayout({
     const firstName = clerkUser?.firstName ?? undefined;
     const lastName = clerkUser?.lastName ?? undefined;
 
-    await getOrCreateUser(userId, { email, firstName, lastName });
+    const user = await getOrCreateUser(userId, { email, firstName, lastName });
+
+    // Check subscription status — skip for onboarding routes
+    const headersList = await headers();
+    const pathname = headersList.get('x-next-pathname') ?? '';
+    const isOnboardingRoute = pathname.startsWith('/app/onboarding');
+
+    if (!isOnboardingRoute) {
+      const membership = await getMembershipForUser(user.id);
+      if (membership) {
+        const subStatus = await checkSubscriptionStatus(membership.shopId);
+        if (subStatus !== null) {
+          // Subscription not active — redirect to subscribe page
+          redirect('/app/onboarding/subscribe');
+        }
+      }
+    }
   } catch (e) {
+    // redirect() throws a special error — re-throw it
+    if (e instanceof Error && e.message === 'NEXT_REDIRECT') throw e;
     console.error('Failed to sync user to database:', e);
     dbError = e instanceof Error ? e.message : 'Unknown database error';
   }

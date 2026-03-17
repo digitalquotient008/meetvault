@@ -548,8 +548,8 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   /* ─── Step: Done ─── */
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-      <h2 className="text-xl font-semibold text-white mb-2">You&apos;re all set</h2>
-      <p className="text-slate-400 mb-4">Your booking page is live. Share it with clients.</p>
+      <h2 className="text-xl font-semibold text-white mb-2">Shop setup complete!</h2>
+      <p className="text-slate-400 mb-4">One last step — start your free 14-day trial to activate your booking page.</p>
       <div className="bg-slate-800 rounded-lg p-4 mb-4">
         <code className="text-amber-400 text-sm break-all">
           {typeof window !== 'undefined' ? `${window.location.origin}/book/${slug}` : `/book/${slug}`}
@@ -557,10 +557,10 @@ export default function OnboardingClient({ userId }: { userId: string }) {
       </div>
       <button
         type="button"
-        onClick={() => router.push('/app')}
+        onClick={() => router.push('/app/onboarding/subscribe')}
         className="w-full bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-500"
       >
-        Go to dashboard
+        Start free trial →
       </button>
     </div>
   );

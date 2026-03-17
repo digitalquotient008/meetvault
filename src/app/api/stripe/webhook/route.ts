@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { env } from '@/lib/env';
 import { markPaymentAsSucceeded, markPaymentAsFailed } from '@/lib/services/payments';
+import { handleSubscriptionUpdated, handleSubscriptionDeleted } from '@/lib/services/subscription';
 
 export async function POST(request: NextRequest) {
   const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
@@ -40,6 +41,15 @@ export async function POST(request: NextRequest) {
     } else if (event.type === 'payment_intent.payment_failed') {
       const pi = event.data.object as Stripe.PaymentIntent;
       await markPaymentAsFailed(pi.id);
+    } else if (
+      event.type === 'customer.subscription.created' ||
+      event.type === 'customer.subscription.updated'
+    ) {
+      const sub = event.data.object as Stripe.Subscription;
+      await handleSubscriptionUpdated(sub);
+    } else if (event.type === 'customer.subscription.deleted') {
+      const sub = event.data.object as Stripe.Subscription;
+      await handleSubscriptionDeleted(sub);
     }
   } catch (e) {
     console.error(`Webhook error [${event.type}]:`, e);

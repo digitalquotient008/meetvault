@@ -1,5 +1,6 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/db';
+import { isSubscriptionActive } from '@/lib/services/subscription';
 
 export type TenantRole = 'OWNER' | 'MANAGER' | 'BARBER' | 'RECEPTIONIST';
 
@@ -60,4 +61,18 @@ export async function requireShopAccess(allowedRoles?: TenantRole[]) {
   }
 
   return { userId: user.id, shopId: membership.shopId, role: membership.role };
+}
+
+/**
+ * Check if the shop's subscription is active or trialing.
+ * Returns null if active, or the subscription status string if not.
+ */
+export async function checkSubscriptionStatus(shopId: string): Promise<string | null> {
+  const shop = await prisma.shop.findUnique({
+    where: { id: shopId },
+    select: { subscriptionStatus: true },
+  });
+  if (!shop) return 'no_shop';
+  if (isSubscriptionActive(shop.subscriptionStatus)) return null;
+  return shop.subscriptionStatus ?? 'none';
 }

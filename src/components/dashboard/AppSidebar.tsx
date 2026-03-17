@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Megaphone,
   CreditCard,
+  Receipt,
   LogOut,
   ChevronUp,
 } from 'lucide-react';
@@ -37,6 +38,7 @@ const navItems = [
   { href: '/app/reports', label: 'Reports', icon: FileText },
   { href: '/app/payments', label: 'Payments', icon: CreditCard },
   { href: '/app/settings/shop', label: 'Settings', icon: Settings },
+  { href: '/app/settings/billing', label: 'Billing', icon: Receipt },
 ];
 
 export default function AppSidebar() {

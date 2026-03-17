@@ -10,7 +10,7 @@ export default function PricingPage() {
   const faqs = [
     {
       question: 'How does the free trial work?',
-      answer: 'Sign up with your email — no credit card required. You get full access to every feature for 14 days. If you love it, subscribe for $25/month. If not, your account simply pauses. No charge, no hassle.',
+      answer: 'Add a card during signup — you won\'t be charged until the 14-day trial ends. You get full access to every feature immediately. If you cancel before the trial is up, you pay nothing.',
     },
     {
       question: "What\u2019s included in the $25/month?",
@@ -66,7 +66,7 @@ export default function PricingPage() {
 
       <CTA
         title="Try it free for 14 days"
-        description="Full access, no credit card, no commitment. See why barbers are switching."
+        description="Full access for 14 days. Cancel anytime — you won't be charged until the trial ends."
       />
     </div>
   );

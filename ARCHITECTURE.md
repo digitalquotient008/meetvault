@@ -202,5 +202,48 @@ All cron jobs run every 15 minutes and are protected by the same `CRON_SECRET` h
 | Route | Purpose |
 |-------|---------|
 | `/api/cron/cleanup-pending` | Cancel PENDING appointments older than 15 min |
-| `/api/cron/send-reminders` | Send 24h + 1h email/SMS reminders |
+| `/api/cron/send-reminders` | Send 24h + 1h email/SMS reminders + trial-ending emails |
 | `/api/cron/auto-noshow` | Detect no-shows, mark status, auto-charge fee |
+
+---
+
+## Subscription & Billing
+
+### Trial model
+Card-upfront, charge-after-trial. When a shop owner completes onboarding, they're redirected to Stripe Checkout with `trial_period_days: 14`. The card is saved immediately, but the first $25/mo charge happens only after 14 days.
+
+### Flow
+```
+Sign up → Clerk auth → Onboarding (shop, services, staff, hours) →
+Stripe Checkout (subscription, 14-day trial) →
+/app/onboarding/subscribe/success → syncSubscriptionFromCheckout() →
+Dashboard unlocked
+```
+
+### Access gating
+`src/app/app/layout.tsx` checks `shop.subscriptionStatus` on every page load. If the status is not `trialing` or `active`, the user is redirected to `/app/onboarding/subscribe`. Onboarding routes are exempt from this gate.
+
+### Subscription lifecycle (webhook-driven)
+The platform Stripe webhook (`/api/stripe/webhook`) handles:
+- `customer.subscription.created` / `updated` → sync `subscriptionStatus` + `trialEndsAt`
+- `customer.subscription.deleted` → mark `canceled`
+
+### Trial-ending reminder
+The `/api/cron/send-reminders` cron sends a "Your trial ends in 2 days" email to shop owners whose `trialEndsAt` is ~48 hours away. Uses `NotificationLog` with `templateKey: 'trial_ending'` to prevent duplicates.
+
+### Billing settings
+`/app/settings/billing` shows subscription status, trial end date, and action buttons:
+- "Manage payment method" → Stripe Customer Portal
+- "Cancel subscription" → `cancel_at_period_end: true` (keeps access until end of period)
+- "Resume subscription" → reverses cancellation
+
+### Schema fields (on Shop)
+| Field | Type | Purpose |
+|-------|------|---------|
+| `stripeSubscriptionId` | String? | Stripe subscription ID |
+| `stripeCustomerId` | String? | Stripe customer for billing |
+| `subscriptionStatus` | String? | `trialing`, `active`, `past_due`, `canceled`, `unpaid` |
+| `trialEndsAt` | DateTime? | When the 14-day trial ends |
+
+### Price configuration
+Set `STRIPE_PRICE_ID` in env to use a pre-existing Stripe price. If not set, the system auto-creates a "MeetingVault Starter" product with a $25/mo recurring price.

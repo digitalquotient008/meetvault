@@ -124,6 +124,11 @@ model Shop {
   platformFeePercent        Decimal?  @db.Decimal(5, 2)
   noShowFeeAmount           Decimal?  @db.Decimal(10, 2)
   cardRequiredForBooking    Boolean   @default(false)
+  // Subscription
+  stripeSubscriptionId      String?
+  stripeCustomerId          String?     // Shop-level Stripe customer (for billing)
+  subscriptionStatus        String?     @default("trialing") // trialing, active, past_due, canceled, unpaid
+  trialEndsAt               DateTime?
   cancellationWindowHours   Int?
   cancellationFeeType       CancellationFeeType?
   cancellationFeeValue      Decimal?  @db.Decimal(10, 2)
