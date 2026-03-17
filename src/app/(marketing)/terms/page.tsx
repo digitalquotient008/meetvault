@@ -26,6 +26,9 @@ export default function TermsPage() {
             <p>
               MeetVault is a cloud-based software platform that provides appointment scheduling, payment processing, client management, and related tools for barbershops and salons. The Service is provided &ldquo;as is&rdquo; and &ldquo;as available.&rdquo;
             </p>
+            <p>
+              The Service may be in an early or evolving stage. Features may change, be added, removed, or be incomplete at any time. We are continuously improving the platform and appreciate your feedback during this process.
+            </p>
           </section>
 
           <section>
@@ -76,6 +79,9 @@ export default function TermsPage() {
               <li>Resell, sublicense, or redistribute the Service without our written consent.</li>
               <li>Use the Service to send unsolicited communications (spam) to customers.</li>
             </ul>
+            <p>
+              We reserve the right to refuse service to anyone at our sole discretion, at any time, for any reason.
+            </p>
           </section>
 
           <section>
@@ -111,7 +117,7 @@ export default function TermsPage() {
           <section>
             <h2>11. Disclaimer of Warranties</h2>
             <p>
-              The Service is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without warranties of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the Service will be uninterrupted, error-free, or secure.
+              The Service is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without warranties of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, and non-infringement. We do not guarantee that the Service will be available at all times or free from interruptions, delays, errors, or security vulnerabilities. Scheduled and unscheduled downtime may occur.
             </p>
           </section>
 
@@ -160,7 +166,7 @@ export default function TermsPage() {
           <section>
             <h2>18. Termination</h2>
             <ul>
-              <li>We may suspend or terminate your account at any time for violation of these Terms, with or without notice.</li>
+              <li>We may suspend, restrict, or terminate your account at any time, without liability, if we believe you have violated these Terms or pose a risk to the Service, its users, or its infrastructure.</li>
               <li>You may terminate your account at any time by canceling your subscription and contacting support.</li>
               <li>Upon termination, your right to use the Service ceases immediately. Data deletion follows the process described in Section 8.</li>
             </ul>

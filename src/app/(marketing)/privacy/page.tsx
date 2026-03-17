@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <section>
             <h2>1. Introduction</h2>
             <p>
-              MeetVault (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) operates the MeetVault platform. This Privacy Policy explains how we collect, use, store, share, and protect information when you use our Service — whether you are a shop owner (merchant) or a customer booking through a shop&apos;s booking page.
+              MeetVault is a product operated by DIGITALQUOTIENT SOLUTIONS LLC, a Texas limited liability company (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;). This Privacy Policy explains how we collect, use, store, share, and protect information when you use our Service — whether you are a shop owner (merchant) or a customer booking through a shop&apos;s booking page.
             </p>
           </section>
 
@@ -117,7 +117,7 @@ export default function PrivacyPage() {
           <section>
             <h2>8. Cookies</h2>
             <p>
-              MeetVault uses essential cookies for authentication (via Clerk) and session management. We do not use advertising cookies, tracking pixels, or third-party analytics cookies. No cookie consent banner is required because we only use strictly necessary cookies.
+              MeetVault uses cookies and similar technologies to operate and improve the Service. These include essential cookies for authentication (via Clerk) and session management. We do not use advertising cookies, tracking pixels, or third-party analytics cookies. You can control cookies through your browser settings, though disabling essential cookies may prevent you from using the Service.
             </p>
           </section>
 
