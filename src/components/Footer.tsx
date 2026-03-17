@@ -23,6 +23,7 @@ export default function Footer() {
               <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><a href="mailto:support@meetvault.app" className="hover:text-white transition-colors">support@meetvault.app</a></li>
             </ul>
           </div>
           <div>
@@ -36,6 +37,16 @@ export default function Footer() {
               <li>
                 <Link href="/sign-in" className="hover:text-white transition-colors">
                   Log In
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-white transition-colors">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
