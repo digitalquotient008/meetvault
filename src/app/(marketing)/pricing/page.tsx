@@ -13,6 +13,10 @@ export default function PricingPage() {
       answer: 'Add a card during signup — you won\'t be charged until the 14-day trial ends. You get full access to every Starter feature immediately. If you cancel before the trial is up, you pay nothing.',
     },
     {
+      question: 'How do payments work?',
+      answer: 'Client deposits and payments are processed securely through Stripe — the same platform used by Shopify, Amazon, and Instacart. Money goes directly to your Stripe account. We never touch, hold, or have access to your funds or your clients\' card details.',
+    },
+    {
       question: 'What\'s the difference between Starter and Team?',
       answer: 'Starter is for solo barbers — 1 staff member, all features included. Team is for shops with multiple barbers or salon suites — unlimited staff, per-barber scheduling, commission tracking, staff permissions, and priority support. Team pricing is custom based on your shop size.',
     },
@@ -23,10 +27,6 @@ export default function PricingPage() {
     {
       question: 'Can I upgrade from Starter to Team later?',
       answer: 'Yes. Start with Starter and upgrade anytime. Your client data, appointments, and settings all carry over — nothing is lost.',
-    },
-    {
-      question: 'How do payments work?',
-      answer: 'Client deposits and payments are processed through Stripe. Money goes directly to your Stripe account. We never touch or hold your funds.',
     },
     {
       question: 'Can I cancel anytime?',

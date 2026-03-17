@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import StripeBadge from '@/components/StripeBadge';
 
 export default function Hero() {
   return (
@@ -56,6 +57,11 @@ export default function Hero() {
                 <p className="text-sm text-slate-500 mt-1">{s.label}</p>
               </div>
             ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 pt-6 border-t border-slate-800/40">
+            <StripeBadge />
+            <span className="text-xs text-slate-500">No app download — clients book from a link on any phone</span>
           </div>
         </div>
       </div>

@@ -16,7 +16,9 @@ import {
   CheckCircle2,
   XCircle,
   Upload,
+  Smartphone,
 } from 'lucide-react';
+import StripeBadge from '@/components/StripeBadge';
 
 export const metadata = {
   title: 'Features — MeetVault',
@@ -241,6 +243,14 @@ export default function FeaturesPage() {
                 </div>
               );
             })}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-10">
+            <StripeBadge />
+            <div className="flex items-center gap-2">
+              <Smartphone className="w-4 h-4 text-slate-500" />
+              <span className="text-xs text-slate-500">No app download — clients book from a link on any phone</span>
+            </div>
           </div>
         </div>
       </section>

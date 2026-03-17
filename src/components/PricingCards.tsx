@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import StripeBadge from '@/components/StripeBadge';
 
 const starterFeatures = [
   '1 staff member (you)',
@@ -78,6 +79,10 @@ export default function PricingCards() {
               </li>
             ))}
           </ul>
+
+          <div className="mt-6 pt-5 border-t border-slate-800/60 flex justify-center">
+            <StripeBadge />
+          </div>
         </div>
       </div>
 
