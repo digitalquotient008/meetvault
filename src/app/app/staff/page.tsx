@@ -89,12 +89,20 @@ export default async function StaffPage() {
             <p className="text-slate-400 text-sm mb-3">
               The Starter plan includes 1 staff member. Upgrade to Team for unlimited barbers, per-barber scheduling, commission tracking, and more.
             </p>
-            <Link
-              href="/contact?plan=team"
-              className="inline-flex px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/15 rounded-lg text-sm font-medium transition-colors"
-            >
-              Talk to Sales →
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/book/meetingvault"
+                className="inline-flex px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/15 rounded-lg text-sm font-medium transition-colors"
+              >
+                Schedule a Demo
+              </Link>
+              <Link
+                href="/contact?plan=team"
+                className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
+              >
+                or contact sales
+              </Link>
+            </div>
           </div>
         </div>
       )}

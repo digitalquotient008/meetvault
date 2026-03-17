@@ -11,9 +11,13 @@ type Step = 'service' | 'barber' | 'datetime' | 'details' | 'confirm' | 'card';
 type Service = ShopForBooking['services'][number];
 type BarberProfile = ShopForBooking['barberProfiles'][number];
 
+const DEMO_SLUG = 'meetingvault';
+
 export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   const router = useRouter();
   const tz = shop.timezone;
+  const isDemo = shop.slug === DEMO_SLUG;
+  const staffLabel = isDemo ? 'staff' : 'barber';
   const [step, setStep] = useState<Step>('service');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedBarber, setSelectedBarber] = useState<BarberProfile | null>(null);
@@ -161,14 +165,14 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
         <button type="button" onClick={() => setStep('service')} className="text-sm text-slate-400 hover:text-white">
           ← Change service
         </button>
-        <h2 className="text-lg font-semibold text-white">Select barber</h2>
+        <h2 className="text-lg font-semibold text-white">Select {staffLabel}</h2>
         <div className="space-y-2">
           <button
             type="button"
             onClick={() => handleBarberSelect(null)}
             className="w-full text-left bg-slate-800 border border-slate-700 rounded-lg p-4 hover:border-amber-500/50"
           >
-            <span className="font-medium text-white">Any available barber</span>
+            <span className="font-medium text-white">Any available {staffLabel}</span>
           </button>
           {shop.barberProfiles.map((b) => (
             <button
@@ -196,7 +200,7 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
     return (
       <div className="space-y-4">
         <button type="button" onClick={() => setStep('barber')} className="text-sm text-slate-400 hover:text-white">
-          ← Change barber
+          ← Change {staffLabel}
         </button>
         <h2 className="text-lg font-semibold text-white">Select date</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -308,7 +312,7 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   }
 
   if (step === 'confirm') {
-    const barberName = shop.barberProfiles.find((b) => b.id === selectedSlot?.barberProfileId)?.displayName ?? 'Barber';
+    const barberName = shop.barberProfiles.find((b) => b.id === selectedSlot?.barberProfileId)?.displayName ?? (isDemo ? 'Staff' : 'Barber');
     return (
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-white">Confirm booking</h2>
