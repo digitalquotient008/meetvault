@@ -67,7 +67,7 @@ export default function AboutPage() {
               We watched barbers lose <span className="text-white font-semibold">$200–$400 a month</span> to no-shows. We watched them juggle bookings across DMs, texts, and phone calls. We watched them scribble client notes on paper and forget what a regular liked last time.
             </p>
             <p className="text-slate-300">
-              The tools that existed were either built for salons (too complex, too expensive) or built for "scheduling" in general (too generic, no payments, no protection).
+              The tools that existed were either built for salons (too complex, too expensive) or built for &ldquo;scheduling&rdquo; in general (too generic, no payments, no protection).
             </p>
             <p className="text-white text-xl font-semibold">
               Nobody was building for the independent barber.
