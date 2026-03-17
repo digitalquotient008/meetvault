@@ -13,13 +13,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing params' }, { status: 400 });
   }
 
+  const parsedFrom = new Date(dateFrom);
+  const parsedTo = new Date(dateTo);
+  if (isNaN(parsedFrom.getTime()) || isNaN(parsedTo.getTime())) {
+    return NextResponse.json({ error: 'Invalid date params' }, { status: 400 });
+  }
+  if (parsedTo <= parsedFrom) {
+    return NextResponse.json({ error: 'dateTo must be after dateFrom' }, { status: 400 });
+  }
+
   try {
     const slots = await getAvailableSlots({
       shopId,
       barberProfileId,
       serviceId,
-      dateFrom: new Date(dateFrom),
-      dateTo: new Date(dateTo),
+      dateFrom: parsedFrom,
+      dateTo: parsedTo,
     });
     return NextResponse.json({
       slots: slots.map((s) => ({ start: s.start.toISOString(), barberProfileId: s.barberProfileId })),

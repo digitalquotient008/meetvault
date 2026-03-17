@@ -99,6 +99,14 @@ export async function saveCardAction(params: {
       data: { status: 'CONFIRMED' },
     });
 
+    // Now that the booking is confirmed, record the visit on the customer record.
+    // (totalVisits was intentionally NOT incremented at appointment creation for
+    // ONLINE bookings to avoid counting abandoned/pending bookings.)
+    await prisma.customer.update({
+      where: { id: appointment.customerId },
+      data: { totalVisits: { increment: 1 } },
+    });
+
     // Send confirmation emails (skipped at booking time for ONLINE/PENDING)
     const full = await prisma.appointment.findUnique({
       where: { id: params.appointmentId },

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateAppointmentStatusAction } from '@/app/app/actions';
 import type { AppointmentStatus } from '@prisma/client';
@@ -12,22 +13,31 @@ type Props = {
 
 export function AppointmentActions({ appointmentId, status }: Props) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const handle = async (action: 'start' | 'complete' | 'cancel' | 'no-show') => {
+    setError(null);
     try {
       await updateAppointmentStatusAction(appointmentId, action);
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Action failed');
+      setError(err instanceof Error ? err.message : 'Action failed');
     }
   };
 
   if (status === 'CANCELED' || status === 'COMPLETED' || status === 'NO_SHOW') {
-    return <span className="text-slate-500 text-xs">{status}</span>;
+    return <span className="text-slate-500 text-xs">{status.replace('_', ' ')}</span>;
+  }
+
+  if (status === 'PENDING') {
+    return <span className="text-slate-400 text-xs italic">Awaiting card</span>;
   }
 
   return (
     <div className="flex flex-wrap gap-1">
+      {error && (
+        <span className="w-full text-xs text-red-400 mb-1">{error}</span>
+      )}
       {status === 'CONFIRMED' && (
         <button
           type="button"

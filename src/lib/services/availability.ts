@@ -48,8 +48,13 @@ export async function getAvailableSlots(params: {
   const slots: Array<{ start: Date; barberProfileId: string }> = [];
   const durationMin = service.durationMin;
 
+  // PENDING appointments older than this are treated as expired (customer navigated away)
+  const pendingExpiryTime = new Date(Date.now() - 15 * 60 * 1000);
+
   for (const barber of barbers) {
-    const [rules, timeOffs] = await Promise.all([
+    // Batch-load everything needed for this barber in a single round-trip.
+    // This eliminates the N+1 query that used to run once per slot candidate.
+    const [rules, timeOffs, rawAppointments] = await Promise.all([
       prisma.availabilityRule.findMany({ where: { barberProfileId: barber.id, isActive: true } }),
       prisma.timeOff.findMany({
         where: {
@@ -58,7 +63,21 @@ export async function getAvailableSlots(params: {
           startDateTime: { lte: dateTo },
         },
       }),
+      prisma.appointment.findMany({
+        where: {
+          barberProfileId: barber.id,
+          status: { in: ['PENDING', 'CONFIRMED', 'IN_PROGRESS'] },
+          startDateTime: { lt: dateTo },
+          endDateTime: { gt: dateFrom },
+        },
+        select: { startDateTime: true, endDateTime: true, status: true, createdAt: true },
+      }),
     ]);
+
+    // Filter out expired PENDING appointments so they don't block slots
+    const existingAppointments = rawAppointments.filter(
+      (apt) => apt.status !== 'PENDING' || apt.createdAt > pendingExpiryTime,
+    );
 
     let current = new Date(dateFrom);
     while (current < dateTo) {
@@ -81,15 +100,10 @@ export async function getAvailableSlots(params: {
           isWithinInterval(slotEnd, { start: t.startDateTime, end: t.endDateTime })
       );
       if (inWindow && !offBlocked) {
-        const overlapping = await prisma.appointment.findFirst({
-          where: {
-            barberProfileId: barber.id,
-            status: { in: ['PENDING', 'CONFIRMED', 'IN_PROGRESS'] },
-            startDateTime: { lt: slotEnd },
-            endDateTime: { gt: current },
-          },
-        });
-        if (!overlapping) {
+        const hasConflict = existingAppointments.some(
+          (apt) => apt.startDateTime < slotEnd && apt.endDateTime > current,
+        );
+        if (!hasConflict) {
           slots.push({ start: new Date(current), barberProfileId: barber.id });
         }
       }

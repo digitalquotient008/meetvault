@@ -82,7 +82,10 @@ export async function createAppointment(params: {
       where: { id: customerId },
       data: {
         lastVisitAt: new Date(),
-        totalVisits: { increment: 1 },
+        // ONLINE bookings start as PENDING — only count visits once the card
+        // is saved and the appointment is CONFIRMED (see saveCardAction).
+        // STAFF / WALK_IN bookings are confirmed immediately so count now.
+        ...(channel !== 'ONLINE' ? { totalVisits: { increment: 1 } } : {}),
       },
     });
     return apt;

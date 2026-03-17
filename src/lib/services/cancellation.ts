@@ -1,6 +1,11 @@
 import { prisma } from '@/lib/db';
 import { refundPayment } from '@/lib/services/payments';
-import { cancelAppointment } from '@/lib/services/appointment';
+import { createAuditLog } from '@/lib/audit';
+import {
+  sendCancellationToClient,
+  sendCancellationToShop,
+  buildEmailData,
+} from '@/lib/services/email-notifications';
 
 type CancellationPolicy = {
   cancellationWindowHours: number | null;
@@ -174,7 +179,7 @@ export async function cancelWithRefund(params: {
     actor,
   });
 
-  // Cancel the appointment (sends cancellation emails)
+  // Cancel the appointment
   await prisma.appointment.update({
     where: { id: appointmentId },
     data: {
@@ -184,17 +189,39 @@ export async function cancelWithRefund(params: {
     },
   });
 
+  await createAuditLog({
+    shopId,
+    entityType: 'Appointment',
+    entityId: appointmentId,
+    action: 'canceled',
+    afterJson: JSON.stringify({ status: 'CANCELED', actor }),
+  });
+
+  // Send cancellation emails (fire-and-forget)
+  const fullForEmail = await prisma.appointment.findUnique({
+    where: { id: appointmentId },
+    include: { customer: true, barberProfile: true, appointmentServices: true, shop: true },
+  });
+  if (fullForEmail) {
+    const emailData = buildEmailData(fullForEmail);
+    sendCancellationToClient(emailData).catch(() => {});
+    sendCancellationToShop(emailData).catch(() => {});
+  }
+
   // Issue refunds — drain forfeit amount across payments in order
   if (preview.refundAmount > 0) {
     let remainingForfeit = preview.forfeitAmount;
 
     for (const payment of succeededPayments) {
-      // Skip deposit entirely when policy is DEPOSIT_FORFEIT (customer actor only)
+      // Skip deposit entirely when policy is DEPOSIT_FORFEIT (customer actor only).
+      // Consume remainingForfeit by the deposit amount so we don't double-deduct
+      // it from subsequent balance payments.
       if (
         shop?.cancellationFeeType === 'DEPOSIT_FORFEIT' &&
         payment.type === 'DEPOSIT' &&
         actor === 'CUSTOMER'
       ) {
+        remainingForfeit = Math.max(0, remainingForfeit - payment.amount);
         continue;
       }
 

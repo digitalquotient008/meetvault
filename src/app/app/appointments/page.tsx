@@ -50,7 +50,19 @@ export default async function AppointmentsPage() {
                   <td className="p-3 text-white">{fmtDateTime(apt.startDateTime, tz)}</td>
                   <td className="p-3 text-slate-300">{apt.customer.firstName} {apt.customer.lastName}</td>
                   <td className="p-3 text-slate-300">{apt.barberProfile.displayName}</td>
-                  <td className="p-3"><span className="text-amber-400">{apt.status}</span></td>
+                  <td className="p-3">
+                    <span className={
+                      apt.status === 'CONFIRMED' ? 'text-amber-400' :
+                      apt.status === 'PENDING' ? 'text-slate-400' :
+                      apt.status === 'IN_PROGRESS' ? 'text-sky-400' :
+                      apt.status === 'COMPLETED' ? 'text-emerald-400' :
+                      apt.status === 'CANCELED' ? 'text-red-400' :
+                      apt.status === 'NO_SHOW' ? 'text-red-400' :
+                      'text-slate-400'
+                    }>
+                      {apt.status.replace('_', ' ')}
+                    </span>
+                  </td>
                   <td className="p-3"><span className={badge.className}>{badge.label}</span></td>
                   <td className="p-3">
                     <AppointmentActions appointmentId={apt.id} status={apt.status} />
