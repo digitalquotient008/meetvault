@@ -6,6 +6,31 @@ import { createShopAction, addServiceAction, addBulkServicesAction, addStaffActi
 
 type Step = 'shop' | 'services' | 'staff' | 'hours' | 'done';
 
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const TIME_OPTIONS = (() => {
+  const opts: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      opts.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+    }
+  }
+  return opts;
+})();
+
+function formatTime12(t: string): string {
+  const [h, m] = t.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return `${hour12}:${String(m).padStart(2, '0')} ${suffix}`;
+}
+
+interface DaySchedule {
+  enabled: boolean;
+  startTime: string;
+  endTime: string;
+}
+
 interface ServiceTemplate {
   name: string;
   durationMin: number;
@@ -71,6 +96,21 @@ export default function OnboardingClient({ userId }: { userId: string }) {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Day schedule — default Mon-Fri 9am-5pm, Sat-Sun off
+  const [schedule, setSchedule] = useState<DaySchedule[]>([
+    { enabled: false, startTime: '09:00', endTime: '17:00' }, // Sun (0)
+    { enabled: true, startTime: '09:00', endTime: '17:00' },  // Mon (1)
+    { enabled: true, startTime: '09:00', endTime: '17:00' },  // Tue (2)
+    { enabled: true, startTime: '09:00', endTime: '17:00' },  // Wed (3)
+    { enabled: true, startTime: '09:00', endTime: '17:00' },  // Thu (4)
+    { enabled: true, startTime: '09:00', endTime: '17:00' },  // Fri (5)
+    { enabled: false, startTime: '09:00', endTime: '17:00' }, // Sat (6)
+  ]);
+
+  const updateDay = (dayIdx: number, updates: Partial<DaySchedule>) => {
+    setSchedule((prev) => prev.map((d, i) => (i === dayIdx ? { ...d, ...updates } : d)));
+  };
 
   const [selectedTemplates, setSelectedTemplates] = useState<Set<string>>(new Set());
   const [addedServices, setAddedServices] = useState<AddedService[]>([]);
@@ -193,9 +233,29 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     e.preventDefault();
     if (!shopId || !barberProfileId) return;
     setError(null);
+
+    // Validate: at least one day enabled
+    const enabledDays = schedule.filter((d) => d.enabled);
+    if (enabledDays.length === 0) {
+      setError('Enable at least one day.');
+      return;
+    }
+
+    // Validate: endTime > startTime for each enabled day
+    for (let i = 0; i < schedule.length; i++) {
+      if (schedule[i].enabled && schedule[i].endTime <= schedule[i].startTime) {
+        setError(`${DAY_LABELS[i]}: end time must be after start time.`);
+        return;
+      }
+    }
+
     setLoading(true);
     try {
-      await setHoursAction(shopId, barberProfileId);
+      const rules = schedule
+        .map((d, i) => ({ dayOfWeek: i, startTime: d.startTime, endTime: d.endTime, enabled: d.enabled }))
+        .filter((r) => r.enabled)
+        .map(({ dayOfWeek, startTime, endTime }) => ({ dayOfWeek, startTime, endTime }));
+      await setHoursAction(shopId, barberProfileId, rules);
       setStep('done');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to set hours');
@@ -410,7 +470,69 @@ export default function OnboardingClient({ userId }: { userId: string }) {
     return (
       <form onSubmit={handleSetHours} className="space-y-6">
         {error && <p className="text-red-400 text-sm">{error}</p>}
-        <p className="text-slate-400">Default hours: Mon&ndash;Fri 9am&ndash;5pm. You can change this later in Staff &rarr; Availability.</p>
+        <div>
+          <h2 className="text-lg font-semibold text-white mb-1">Set your working hours</h2>
+          <p className="text-slate-400 text-sm">Toggle each day on or off and set your start and end times. You can change this later.</p>
+        </div>
+
+        <div className="space-y-2">
+          {schedule.map((day, i) => (
+            <div
+              key={i}
+              className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
+                day.enabled ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-900/50 border-slate-800'
+              }`}
+            >
+              {/* Day toggle */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={day.enabled}
+                onClick={() => updateDay(i, { enabled: !day.enabled })}
+                className={`relative w-10 h-5 rounded-full shrink-0 transition-colors ${
+                  day.enabled ? 'bg-amber-500' : 'bg-slate-700'
+                }`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                  day.enabled ? 'translate-x-5' : 'translate-x-0'
+                }`} />
+              </button>
+
+              {/* Day label */}
+              <span className={`w-10 text-sm font-medium shrink-0 ${day.enabled ? 'text-white' : 'text-slate-500'}`}>
+                {DAY_LABELS[i]}
+              </span>
+
+              {/* Time pickers */}
+              {day.enabled ? (
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <select
+                    value={day.startTime}
+                    onChange={(e) => updateDay(i, { startTime: e.target.value })}
+                    className="bg-slate-900 border border-slate-600 text-white text-sm rounded-lg px-2 py-1.5 focus:border-amber-500 focus:outline-none"
+                  >
+                    {TIME_OPTIONS.map((t) => (
+                      <option key={t} value={t}>{formatTime12(t)}</option>
+                    ))}
+                  </select>
+                  <span className="text-slate-500 text-sm">to</span>
+                  <select
+                    value={day.endTime}
+                    onChange={(e) => updateDay(i, { endTime: e.target.value })}
+                    className="bg-slate-900 border border-slate-600 text-white text-sm rounded-lg px-2 py-1.5 focus:border-amber-500 focus:outline-none"
+                  >
+                    {TIME_OPTIONS.map((t) => (
+                      <option key={t} value={t}>{formatTime12(t)}</option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <span className="text-slate-500 text-sm">Closed</span>
+              )}
+            </div>
+          ))}
+        </div>
+
         <div className="flex gap-3">
           <button type="submit" disabled={loading} className="flex-1 bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-500 disabled:opacity-50">
             {loading ? 'Saving...' : 'Set hours & finish'}

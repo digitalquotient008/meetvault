@@ -42,11 +42,15 @@ export async function addStaffAction(shopId: string, userId: string, data: { dis
   return createBarberProfile(shopId, userId, { displayName: data.displayName });
 }
 
-export async function setHoursAction(shopId: string, barberProfileId: string) {
-  const rules = [1, 2, 3, 4, 5].map((dayOfWeek) => ({
+export async function setHoursAction(
+  shopId: string,
+  barberProfileId: string,
+  rules?: Array<{ dayOfWeek: number; startTime: string; endTime: string }>,
+) {
+  const finalRules = rules ?? [1, 2, 3, 4, 5].map((dayOfWeek) => ({
     dayOfWeek,
     startTime: '09:00',
     endTime: '17:00',
   }));
-  return setAvailabilityRules(shopId, barberProfileId, rules);
+  return setAvailabilityRules(shopId, barberProfileId, finalRules);
 }

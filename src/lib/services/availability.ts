@@ -48,6 +48,9 @@ export async function getAvailableSlots(params: {
   const slots: Array<{ start: Date; barberProfileId: string }> = [];
   const durationMin = service.durationMin;
 
+  // Don't return slots that have already started — customers can't book the past
+  const now = new Date();
+
   // PENDING appointments older than this are treated as expired (customer navigated away)
   const pendingExpiryTime = new Date(Date.now() - 15 * 60 * 1000);
 
@@ -99,7 +102,7 @@ export async function getAvailableSlots(params: {
           isWithinInterval(current, { start: t.startDateTime, end: t.endDateTime }) ||
           isWithinInterval(slotEnd, { start: t.startDateTime, end: t.endDateTime })
       );
-      if (inWindow && !offBlocked) {
+      if (inWindow && !offBlocked && current >= now) {
         const hasConflict = existingAppointments.some(
           (apt) => apt.startDateTime < slotEnd && apt.endDateTime > current,
         );
