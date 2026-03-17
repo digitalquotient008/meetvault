@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { getOrCreateUser, getMembershipForUser } from '@/lib/auth';
+import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { startOfDayInTz, endOfDayInTz, fmtTime } from '@/lib/format-date';
 import { APP_URL } from '@/lib/constants';
@@ -22,27 +21,23 @@ import {
 import CopyBookingLink from '@/components/dashboard/CopyBookingLink';
 
 export default async function AppDashboardPage() {
-  const { userId } = await auth();
-  if (!userId) redirect('/sign-in');
+  const { shopId } = await requireShopAccess();
 
-  const clerkUser = await currentUser();
-  const user = await getOrCreateUser(userId, {
-    email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? '',
-    firstName: clerkUser?.firstName ?? undefined,
-    lastName: clerkUser?.lastName ?? undefined,
-  });
-
-  const membership = await getMembershipForUser(user.id);
-  if (!membership) redirect('/app/onboarding');
-
-  const shop = await prisma.shop.findUnique({
-    where: { id: membership.shopId },
-    include: {
-      _count: {
-        select: { services: true, barberProfiles: true, customers: true },
+  const [shop, user] = await Promise.all([
+    prisma.shop.findUnique({
+      where: { id: shopId },
+      include: {
+        _count: {
+          select: { services: true, barberProfiles: true, customers: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.membership.findFirst({
+      where: { shopId, isActive: true },
+      include: { user: true },
+      orderBy: { createdAt: 'asc' },
+    }),
+  ]);
   if (!shop) redirect('/app/onboarding');
 
   const tz = shop.timezone ?? 'America/New_York';
@@ -84,7 +79,7 @@ export default async function AppDashboardPage() {
   ]);
 
   const todayRevenue = Number(recentRevenue._sum.amount ?? 0);
-  const firstName = user.firstName || 'there';
+  const firstName = user?.user?.firstName || 'there';
 
   const statusColor: Record<string, string> = {
     CONFIRMED: 'bg-emerald-500/20 text-emerald-400',

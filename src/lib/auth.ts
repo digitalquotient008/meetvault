@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/db';
 import { isSubscriptionActive } from '@/lib/services/subscription';
@@ -54,10 +55,16 @@ export async function requireShopAccess(allowedRoles?: TenantRole[]) {
   });
 
   const membership = await getMembershipForUser(user.id);
-  if (!membership) throw new Error('No shop access');
+  if (!membership) redirect('/app/onboarding');
 
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(membership.role)) {
     throw new Error('Forbidden');
+  }
+
+  // Check subscription — redirect to subscribe if not active
+  const subStatus = await checkSubscriptionStatus(membership.shopId);
+  if (subStatus !== null) {
+    redirect('/app/onboarding/subscribe');
   }
 
   return { userId: user.id, shopId: membership.shopId, role: membership.role };

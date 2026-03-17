@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getOrCreateUser, getMembershipForUser, checkSubscriptionStatus } from '@/lib/auth';
 import AppSidebar from '@/components/dashboard/AppSidebar';
@@ -12,43 +11,17 @@ export default async function AppLayout({
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
-  let dbError: string | null = null;
-  let subscriptionActive = true;
-  let isOnboardingRoute = false;
-
+  // Step 1: Sync Clerk user to DB
+  let user;
   try {
     const clerkUser = await currentUser();
-    const email = clerkUser?.emailAddresses?.[0]?.emailAddress ?? '';
-    const firstName = clerkUser?.firstName ?? undefined;
-    const lastName = clerkUser?.lastName ?? undefined;
-
-    const user = await getOrCreateUser(userId, { email, firstName, lastName });
-
-    // Detect onboarding routes to skip subscription gate
-    const headersList = await headers();
-    const referer = headersList.get('referer') ?? '';
-    const url = headersList.get('x-url') ?? headersList.get('x-invoke-path') ?? '';
-    isOnboardingRoute = url.includes('/onboarding') || referer.includes('/onboarding');
-
-    // Also check if user has no membership yet (still in onboarding)
-    const membership = await getMembershipForUser(user.id);
-    if (!membership) {
-      isOnboardingRoute = true;
-    } else if (!isOnboardingRoute) {
-      const subStatus = await checkSubscriptionStatus(membership.shopId);
-      if (subStatus !== null) {
-        subscriptionActive = false;
-      }
-    }
+    user = await getOrCreateUser(clerkUser?.id ?? userId, {
+      email: clerkUser?.emailAddresses?.[0]?.emailAddress ?? '',
+      firstName: clerkUser?.firstName ?? undefined,
+      lastName: clerkUser?.lastName ?? undefined,
+    });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : '';
-    // redirect() throws NEXT_REDIRECT — re-throw it
-    if (msg === 'NEXT_REDIRECT' || msg.includes('NEXT_REDIRECT')) throw e;
     console.error('Failed to sync user to database:', e);
-    dbError = msg || 'Unknown database error';
-  }
-
-  if (dbError) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
@@ -61,23 +34,19 @@ export default async function AppLayout({
           <p className="text-slate-400 text-sm mb-6">
             We couldn&apos;t connect to the database. This is usually temporary. Please try again in a moment.
           </p>
-          <a
-            href="/app"
-            className="inline-block bg-amber-500 text-slate-950 px-6 py-3 rounded-xl font-bold hover:bg-amber-400 transition-colors"
-          >
+          <a href="/app" className="inline-block bg-amber-500 text-slate-950 px-6 py-3 rounded-xl font-bold hover:bg-amber-400 transition-colors">
             Try again
           </a>
-          <details className="mt-6 text-left">
-            <summary className="text-xs text-slate-600 cursor-pointer hover:text-slate-400">Technical details</summary>
-            <pre className="mt-2 text-xs text-red-400/70 bg-slate-950 rounded-lg p-3 overflow-auto max-h-32">{dbError}</pre>
-          </details>
         </div>
       </div>
     );
   }
 
-  // Onboarding / subscribe pages render full-screen (no sidebar, no gate)
-  if (isOnboardingRoute) {
+  // Step 2: Check membership
+  const membership = await getMembershipForUser(user.id);
+
+  // No membership = user hasn't completed onboarding yet → full-screen layout
+  if (!membership) {
     return (
       <div className="min-h-screen bg-slate-950">
         {children}
@@ -85,11 +54,20 @@ export default async function AppLayout({
     );
   }
 
-  // Redirect to subscribe if subscription not active
-  if (!subscriptionActive) {
-    redirect('/app/onboarding/subscribe');
+  // Step 3: Check subscription status
+  const subStatus = await checkSubscriptionStatus(membership.shopId);
+  const hasActiveSubscription = subStatus === null;
+
+  // No active subscription → full-screen layout (subscribe page will render)
+  if (!hasActiveSubscription) {
+    return (
+      <div className="min-h-screen bg-slate-950">
+        {children}
+      </div>
+    );
   }
 
+  // Step 4: Active subscription → full dashboard with sidebar
   return (
     <div className="flex min-h-screen bg-slate-950">
       <AppSidebar />
