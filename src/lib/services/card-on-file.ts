@@ -76,7 +76,9 @@ export async function saveCardFromSetupIntent(params: {
     expand: ['payment_method'],
   });
 
-  if (si.status !== 'succeeded') return;
+  if (si.status !== 'succeeded') {
+    throw new Error(`Card setup did not complete (status: ${si.status})`);
+  }
 
   const pm = si.payment_method;
   if (!pm || typeof pm === 'string') return;
@@ -114,6 +116,7 @@ export async function chargeNoShowFee(params: {
   if (!appointment) throw new Error('Appointment not found');
   if (!shop) throw new Error('Shop not found');
   if (!shop.noShowFeeAmount) throw new Error('No no-show fee configured');
+  if (appointment.noShowFeeCharged) throw new Error('No-show fee has already been charged');
 
   const { customer } = appointment;
   if (!customer.stripePaymentMethodId) throw new Error('No card on file for this customer');
@@ -150,25 +153,27 @@ export async function chargeNoShowFee(params: {
 
   const pi = await stripe.paymentIntents.create(piParams);
 
-  // Record in our payments table
-  await prisma.payment.create({
-    data: {
-      shopId: params.shopId,
-      appointmentId: params.appointmentId,
-      customerId: customer.id,
-      stripePaymentIntentId: pi.id,
-      amount: amountCents / 100,
-      currency: 'usd',
-      type: 'FULL',
-      status: pi.status === 'succeeded' ? 'SUCCEEDED' : 'PENDING',
-    },
-  });
-
-  // Increment noShowCount on customer
-  await prisma.customer.update({
-    where: { id: customer.id },
-    data: { noShowCount: { increment: 1 } },
-  });
+  // Record payment + mark appointment so it can't be charged again
+  await prisma.$transaction([
+    prisma.payment.create({
+      data: {
+        shopId: params.shopId,
+        appointmentId: params.appointmentId,
+        customerId: customer.id,
+        stripePaymentIntentId: pi.id,
+        amount: amountCents / 100,
+        currency: 'usd',
+        type: 'FULL',
+        status: pi.status === 'succeeded' ? 'SUCCEEDED' : 'PENDING',
+      },
+    }),
+    // Mark appointment so UI shows "already charged" and prevents double charge
+    prisma.appointment.update({
+      where: { id: params.appointmentId },
+      data: { noShowFeeCharged: true },
+    }),
+    // noShowCount was already incremented by markNoShowAppointment — do not increment again
+  ]);
 
   return { paymentIntentId: pi.id };
 }

@@ -195,7 +195,7 @@ export async function cancelAppointment(shopId: string, appointmentId: string) {
   if (apt.status === 'CANCELED') return apt;
   await prisma.appointment.update({
     where: { id: appointmentId },
-    data: { status: 'CANCELED' },
+    data: { status: 'CANCELED', canceledAt: new Date(), canceledByRole: 'STAFF' },
   });
   await createAuditLog({
     shopId,

@@ -34,13 +34,13 @@ export function computeRefundPreview(params: {
     .filter((p) => p.type === 'DEPOSIT')
     .reduce((s, p) => s + p.amount, 0);
 
-  // Staff always get full refund authority
+  // Staff always get full refund authority regardless of window
   if (actor === 'STAFF') {
     return {
       refundAmount: totalPaid,
       forfeitAmount: 0,
       reason: 'Canceled by staff — full refund applied.',
-      withinWindow: true,
+      withinWindow: false,
     };
   }
 
@@ -184,10 +184,12 @@ export async function cancelWithRefund(params: {
     },
   });
 
-  // Issue refunds
+  // Issue refunds — drain forfeit amount across payments in order
   if (preview.refundAmount > 0) {
+    let remainingForfeit = preview.forfeitAmount;
+
     for (const payment of succeededPayments) {
-      // Skip deposit if DEPOSIT_FORFEIT
+      // Skip deposit entirely when policy is DEPOSIT_FORFEIT (customer actor only)
       if (
         shop?.cancellationFeeType === 'DEPOSIT_FORFEIT' &&
         payment.type === 'DEPOSIT' &&
@@ -195,11 +197,11 @@ export async function cancelWithRefund(params: {
       ) {
         continue;
       }
-      // For partial refunds, only refund what remains after fee
-      const paymentRefundAmount =
-        preview.forfeitAmount > 0 && shop?.cancellationFeeType !== 'DEPOSIT_FORFEIT'
-          ? Math.max(0, payment.amount - preview.forfeitAmount)
-          : payment.amount;
+
+      // Deduct forfeit from this payment before refunding the rest
+      const deduct = Math.min(remainingForfeit, payment.amount);
+      remainingForfeit -= deduct;
+      const paymentRefundAmount = payment.amount - deduct;
 
       if (paymentRefundAmount > 0) {
         await refundPayment({

@@ -40,11 +40,7 @@ export default async function AppointmentDetailPage({ params }: Props) {
   const canCancel = CANCELABLE_STATUSES.includes(appointment.status);
   const noShowFeeAmount = shop?.noShowFeeAmount ? Number(shop.noShowFeeAmount) : null;
 
-  // Check if no-show fee was already charged
-  const noShowFeeCharged = appointment.payments.some(
-    (p) => p.status === 'SUCCEEDED' && p.type === 'FULL' &&
-      appointment.status === 'NO_SHOW',
-  );
+  const noShowFeeCharged = appointment.noShowFeeCharged;
 
   return (
     <div className="p-6 lg:p-8 max-w-3xl">

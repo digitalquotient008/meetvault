@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { CreditCard, Smartphone } from 'lucide-react';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { CreditCard } from 'lucide-react';
 import {
-  checkoutAppointmentAction,
   createCheckoutPaymentIntentAction,
+  completeCheckoutAction,
+  completeWithoutPaymentAction,
 } from './actions';
 
 const stripePromise =
@@ -15,63 +16,74 @@ const stripePromise =
     ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
     : null;
 
-const TIP_OPTIONS = [
-  { label: '15%', value: 15 },
-  { label: '20%', value: 20 },
-  { label: '25%', value: 25 },
+const TIP_PRESETS = [
+  { label: '15%', pct: 15 },
+  { label: '20%', pct: 20 },
+  { label: '25%', pct: 25 },
 ];
 
-type CardOnFile = { brand: string; last4: string; id: string } | null;
+function fmt(cents: number) {
+  return `$${(cents / 100).toFixed(2)}`;
+}
 
-type AppointmentData = {
-  id: string;
-  subtotal: number | null;
-  totalAmount: number | null;
-  appointmentServices: { serviceNameSnapshot: string; priceSnapshot: number }[];
-  customer: { firstName: string; lastName: string };
-  barberProfile: { displayName: string };
-};
+type CardOnFile = {
+  paymentMethodId: string;
+  brand: string | null;
+  lastFour: string | null;
+} | null;
 
-function NewCardForm({
+// Inner form — uses Stripe hooks, must be inside <Elements>
+function PaymentForm({
   appointmentId,
-  totalCents,
+  totalChargeCents,
   tipCents,
+  cardOnFile,
   onSuccess,
 }: {
   appointmentId: string;
-  totalCents: number;
+  totalChargeCents: number;
   tipCents: number;
+  cardOnFile: CardOnFile;
   onSuccess: () => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
+  const [useNewCard, setUseNewCard] = useState(!cardOnFile);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stripe || !elements) return;
+  const handleCharge = async () => {
+    if (!stripe) return;
     setLoading(true);
     setError(null);
 
     try {
-      const { error: submitError, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        redirect: 'if_required',
+      const { clientSecret } = await createCheckoutPaymentIntentAction({
+        appointmentId,
+        tipCents,
       });
 
-      if (submitError) {
-        setError(submitError.message ?? 'Payment failed');
+      let result;
+      if (!useNewCard && cardOnFile) {
+        // Customer is present — confirm with stored payment method
+        result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: cardOnFile.paymentMethodId,
+        });
+      } else {
+        const cardElement = elements?.getElement(CardElement);
+        if (!cardElement) throw new Error('Card element not mounted');
+        result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: { card: cardElement },
+        });
+      }
+
+      if (result.error) {
+        setError(result.error.message ?? 'Payment failed');
         return;
       }
 
-      if (paymentIntent?.status === 'succeeded' || paymentIntent?.status === 'processing') {
-        // Tell server to complete the appointment
-        await checkoutAppointmentAction({
-          appointmentId,
-          tipCents,
-          paymentMethodId: paymentIntent.payment_method as string | undefined ?? undefined,
-        });
+      if (result.paymentIntent?.status === 'succeeded') {
+        await completeCheckoutAction({ appointmentId, tipCents });
         onSuccess();
       }
     } catch (err) {
@@ -82,125 +94,153 @@ function NewCardForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement />
+    <div className="space-y-4">
+      {/* Payment method selector */}
+      {cardOnFile && (
+        <div className="space-y-2">
+          <p className="text-slate-300 text-sm font-medium">Payment method</p>
+          <button
+            type="button"
+            onClick={() => setUseNewCard(false)}
+            className={`w-full flex items-center gap-3 p-3 rounded-xl border text-sm transition-colors ${
+              !useNewCard
+                ? 'border-amber-500 bg-amber-500/10'
+                : 'border-slate-700 bg-slate-800 hover:border-slate-600'
+            }`}
+          >
+            <div
+              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                !useNewCard ? 'border-amber-500' : 'border-slate-500'
+              }`}
+            >
+              {!useNewCard && <div className="w-2 h-2 rounded-full bg-amber-500" />}
+            </div>
+            <CreditCard className="w-4 h-4 text-slate-400 shrink-0" />
+            <span className="text-slate-300">
+              {cardOnFile.brand
+                ? cardOnFile.brand.charAt(0).toUpperCase() + cardOnFile.brand.slice(1)
+                : 'Card'}{' '}
+              ••••{cardOnFile.lastFour}
+            </span>
+            <span className="ml-auto text-emerald-400 text-xs font-medium">On file</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setUseNewCard(true)}
+            className={`w-full flex items-center gap-3 p-3 rounded-xl border text-sm transition-colors ${
+              useNewCard
+                ? 'border-amber-500 bg-amber-500/10'
+                : 'border-slate-700 bg-slate-800 hover:border-slate-600'
+            }`}
+          >
+            <div
+              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                useNewCard ? 'border-amber-500' : 'border-slate-500'
+              }`}
+            >
+              {useNewCard && <div className="w-2 h-2 rounded-full bg-amber-500" />}
+            </div>
+            <span className="text-slate-300">New card</span>
+          </button>
+        </div>
+      )}
+
+      {/* Card element — shown when entering new card */}
+      {useNewCard && (
+        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-4">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#f1f5f9',
+                  '::placeholder': { color: '#64748b' },
+                },
+                invalid: { color: '#f87171' },
+              },
+            }}
+          />
+        </div>
+      )}
+
       {error && <p className="text-red-400 text-sm">{error}</p>}
+
       <button
-        type="submit"
-        disabled={!stripe || loading}
-        className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-3 rounded-xl transition-colors text-lg"
+        type="button"
+        onClick={handleCharge}
+        disabled={loading || !stripe}
+        className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold py-3.5 rounded-xl transition-colors text-lg"
       >
-        {loading
-          ? 'Processing…'
-          : `Charge $${(totalCents / 100).toFixed(2)}`}
+        {loading ? 'Processing…' : `Charge ${fmt(totalChargeCents)}`}
       </button>
-    </form>
-  );
-}
-
-function NewCardWrapper({
-  appointmentId,
-  totalCents,
-  tipCents,
-  onSuccess,
-}: {
-  appointmentId: string;
-  totalCents: number;
-  tipCents: number;
-  onSuccess: () => void;
-}) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (totalCents < 50) return;
-    createCheckoutPaymentIntentAction(appointmentId, totalCents)
-      .then(({ clientSecret: cs }) => setClientSecret(cs))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load payment'));
-  }, [appointmentId, totalCents]);
-
-  if (error) return <p className="text-red-400 text-sm">{error}</p>;
-  if (!clientSecret || !stripePromise) {
-    return <p className="text-slate-400 text-sm">Loading payment form…</p>;
-  }
-
-  return (
-    <Elements
-      stripe={stripePromise}
-      options={{ clientSecret, appearance: { theme: 'night' } }}
-    >
-      <NewCardForm
-        appointmentId={appointmentId}
-        totalCents={totalCents}
-        tipCents={tipCents}
-        onSuccess={onSuccess}
-      />
-    </Elements>
+    </div>
   );
 }
 
 export default function CheckoutForm({
-  appointment,
-  cardOnFile,
+  appointmentId,
+  customerName,
+  serviceName,
+  barberName,
+  subtotalCents,
+  balanceDueCents,
   tippingEnabled,
+  cardOnFile,
 }: {
-  appointment: AppointmentData;
-  cardOnFile: CardOnFile;
+  appointmentId: string;
+  customerName: string;
+  serviceName: string;
+  barberName: string;
+  subtotalCents: number;
+  balanceDueCents: number;
   tippingEnabled: boolean;
+  cardOnFile: CardOnFile;
 }) {
   const router = useRouter();
-  const subtotalCents = Math.round(Number(appointment.subtotal ?? appointment.totalAmount ?? 0) * 100);
-
-  const [tipType, setTipType] = useState<number | 'custom' | 'skip'>('skip');
+  const [tipPct, setTipPct] = useState<number | 'custom' | null>(null);
   const [customTip, setCustomTip] = useState('');
-  const [paymentMode, setPaymentMode] = useState<'card-on-file' | 'new-card'>(
-    cardOnFile ? 'card-on-file' : 'new-card',
-  );
-  const [loading, setLoading] = useState(false);
+  const [completing, setCompleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [done, setDone] = useState(false);
 
-  const tipCents: number = (() => {
-    if (!tippingEnabled || tipType === 'skip') return 0;
-    if (tipType === 'custom') {
-      const val = parseFloat(customTip);
-      return isNaN(val) ? 0 : Math.round(val * 100);
-    }
-    return Math.round((subtotalCents * tipType) / 100);
-  })();
+  const tipCents =
+    tipPct === null
+      ? 0
+      : tipPct === 'custom'
+        ? Math.round((parseFloat(customTip) || 0) * 100)
+        : Math.round((subtotalCents * tipPct) / 100);
 
-  const totalCents = subtotalCents + tipCents;
-  const serviceName =
-    appointment.appointmentServices[0]?.serviceNameSnapshot ?? 'Service';
+  const totalChargeCents = balanceDueCents + tipCents;
 
-  const handleCardOnFileCharge = async () => {
-    setLoading(true);
+  const handleSuccess = () => {
+    setDone(true);
+    setTimeout(() => {
+      router.push(`/app/appointments/${appointmentId}`);
+      router.refresh();
+    }, 1200);
+  };
+
+  const handleCompleteNoCharge = async () => {
+    setCompleting(true);
     setError(null);
     try {
-      await checkoutAppointmentAction({ appointmentId: appointment.id, tipCents });
-      setSuccess(true);
-      setTimeout(() => router.push(`/app/appointments/${appointment.id}`), 1500);
+      await completeWithoutPaymentAction(appointmentId);
+      handleSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Charge failed');
-    } finally {
-      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Failed to complete');
+      setCompleting(false);
     }
   };
 
-  const handleNewCardSuccess = () => {
-    setSuccess(true);
-    setTimeout(() => router.push(`/app/appointments/${appointment.id}`), 1500);
-  };
-
-  if (success) {
+  if (done) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-12">
+      <div className="flex flex-col items-center justify-center gap-4 py-10">
         <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
           <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <p className="text-white text-lg font-semibold">Payment complete!</p>
+        <p className="text-white text-lg font-semibold">Done!</p>
         <p className="text-slate-400 text-sm">Redirecting…</p>
       </div>
     );
@@ -208,150 +248,123 @@ export default function CheckoutForm({
 
   return (
     <div className="space-y-6">
-      {/* Service Summary */}
-      <div className="bg-slate-800/60 rounded-xl p-4 space-y-1 border border-slate-700">
+      {/* Service summary */}
+      <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700 space-y-1">
         <p className="text-white font-semibold">{serviceName}</p>
-        <p className="text-slate-400 text-sm">
-          {appointment.barberProfile.displayName} ·{' '}
-          {appointment.customer.firstName} {appointment.customer.lastName}
-        </p>
-        <p className="text-slate-300 text-sm">
-          Subtotal:{' '}
-          <span className="text-white font-medium">${(subtotalCents / 100).toFixed(2)}</span>
-        </p>
+        <p className="text-slate-400 text-sm">{barberName} · {customerName}</p>
+        <div className="flex justify-between text-sm pt-1">
+          <span className="text-slate-400">Service total</span>
+          <span className="text-white">{fmt(subtotalCents)}</span>
+        </div>
+        {balanceDueCents < subtotalCents && (
+          <div className="flex justify-between text-sm">
+            <span className="text-slate-400">Deposit paid</span>
+            <span className="text-emerald-400">−{fmt(subtotalCents - balanceDueCents)}</span>
+          </div>
+        )}
+        {tipCents > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-slate-400">Tip</span>
+            <span className="text-white">{fmt(tipCents)}</span>
+          </div>
+        )}
+        <div className="flex justify-between font-semibold text-white pt-2 border-t border-slate-700">
+          <span>Balance due</span>
+          <span className="text-xl">{fmt(totalChargeCents)}</span>
+        </div>
       </div>
 
-      {/* Tip Selection */}
+      {/* Tip selection */}
       {tippingEnabled && (
         <div>
           <p className="text-slate-300 text-sm font-medium mb-3">Add a tip?</p>
-          <div className="grid grid-cols-5 gap-2">
-            {TIP_OPTIONS.map((opt) => (
+          <div className="grid grid-cols-3 gap-2">
+            {TIP_PRESETS.map((p) => (
               <button
-                key={opt.value}
+                key={p.pct}
                 type="button"
-                onClick={() => setTipType(opt.value)}
-                className={`py-2.5 rounded-lg text-sm font-semibold transition-colors border ${
-                  tipType === opt.value
-                    ? 'bg-amber-500 border-amber-500 text-slate-950'
-                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-amber-500/50'
+                onClick={() => { setTipPct(p.pct); setCustomTip(''); }}
+                className={`py-2.5 rounded-lg text-sm font-semibold border transition-colors ${
+                  tipPct === p.pct
+                    ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                    : 'border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600'
                 }`}
               >
-                {opt.label}
+                {p.label}
+                <span className="block text-xs font-normal text-slate-400 mt-0.5">
+                  {fmt(Math.round((subtotalCents * p.pct) / 100))}
+                </span>
               </button>
             ))}
+          </div>
+          <div className="mt-2 flex gap-2">
             <button
               type="button"
-              onClick={() => setTipType('custom')}
-              className={`py-2.5 rounded-lg text-sm font-semibold transition-colors border ${
-                tipType === 'custom'
-                  ? 'bg-amber-500 border-amber-500 text-slate-950'
-                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-amber-500/50'
+              onClick={() => setTipPct('custom')}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                tipPct === 'custom'
+                  ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600'
               }`}
             >
               Custom
             </button>
             <button
               type="button"
-              onClick={() => setTipType('skip')}
-              className={`py-2.5 rounded-lg text-sm font-semibold transition-colors border col-span-5 mt-1 ${
-                tipType === 'skip'
-                  ? 'bg-slate-700 border-slate-600 text-slate-300'
-                  : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+              onClick={() => { setTipPct(null); setCustomTip(''); }}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                tipPct === null
+                  ? 'border-slate-600 bg-slate-700 text-slate-300'
+                  : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
               }`}
             >
               No tip
             </button>
           </div>
-
-          {tipType === 'custom' && (
-            <div className="mt-3">
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={customTip}
-                  onChange={(e) => setCustomTip(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-7 pr-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
+          {tipPct === 'custom' && (
+            <div className="relative mt-2">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={customTip}
+                onChange={(e) => setCustomTip(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-7 pr-4 py-2.5 text-white focus:outline-none focus:border-amber-500"
+                autoFocus
+              />
             </div>
           )}
         </div>
       )}
 
-      {/* Total */}
-      <div className="flex items-center justify-between bg-slate-800/40 rounded-xl px-4 py-3 border border-slate-700">
-        <span className="text-slate-400">Total</span>
-        <div className="text-right">
-          <span className="text-white font-bold text-xl">${(totalCents / 100).toFixed(2)}</span>
-          {tipCents > 0 && (
-            <p className="text-slate-400 text-xs">
-              incl. ${(tipCents / 100).toFixed(2)} tip
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Payment Method Selection */}
-      {cardOnFile && (
-        <div className="space-y-2">
-          <p className="text-slate-300 text-sm font-medium">Payment method</p>
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => setPaymentMode('card-on-file')}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                paymentMode === 'card-on-file'
-                  ? 'border-amber-500 bg-amber-500/10'
-                  : 'border-slate-700 bg-slate-800 hover:border-slate-600'
-              }`}
-            >
-              <CreditCard className="w-5 h-5 text-slate-400 shrink-0" />
-              <span className="text-white text-sm">
-                {cardOnFile.brand.charAt(0).toUpperCase() + cardOnFile.brand.slice(1)} ending{' '}
-                {cardOnFile.last4}
-              </span>
-              <span className="ml-auto text-xs text-slate-500">Card on file</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentMode('new-card')}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                paymentMode === 'new-card'
-                  ? 'border-amber-500 bg-amber-500/10'
-                  : 'border-slate-700 bg-slate-800 hover:border-slate-600'
-              }`}
-            >
-              <Smartphone className="w-5 h-5 text-slate-400 shrink-0" />
-              <span className="text-white text-sm">New card</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Charge button or new card form */}
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
-      {paymentMode === 'card-on-file' && cardOnFile ? (
+      {/* Payment */}
+      {totalChargeCents >= 50 ? (
+        stripePromise ? (
+          <Elements stripe={stripePromise} options={{ appearance: { theme: 'night' } }}>
+            <PaymentForm
+              appointmentId={appointmentId}
+              totalChargeCents={totalChargeCents}
+              tipCents={tipCents}
+              cardOnFile={cardOnFile}
+              onSuccess={handleSuccess}
+            />
+          </Elements>
+        ) : (
+          <p className="text-red-400 text-sm">Stripe is not configured.</p>
+        )
+      ) : (
         <button
           type="button"
-          onClick={handleCardOnFileCharge}
-          disabled={loading || totalCents < 50}
-          className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-semibold py-3.5 rounded-xl transition-colors text-lg"
+          onClick={handleCompleteNoCharge}
+          disabled={completing}
+          className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-colors text-lg"
         >
-          {loading ? 'Charging…' : `Charge $${(totalCents / 100).toFixed(2)}`}
+          {completing ? 'Completing…' : 'Complete appointment'}
         </button>
-      ) : (
-        <NewCardWrapper
-          appointmentId={appointment.id}
-          totalCents={totalCents}
-          tipCents={tipCents}
-          onSuccess={handleNewCardSuccess}
-        />
       )}
     </div>
   );

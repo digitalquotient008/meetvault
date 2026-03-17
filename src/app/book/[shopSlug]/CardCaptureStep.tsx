@@ -15,12 +15,10 @@ function CardForm({
   appointmentId,
   clientSecret,
   onSaved,
-  onSkip,
 }: {
   appointmentId: string;
   clientSecret: string;
   onSaved: () => void;
-  onSkip: () => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -51,7 +49,7 @@ function CardForm({
         await saveCardAction({ appointmentId, setupIntentId: setupIntent.id });
         onSaved();
       } catch {
-        setError('Card saved with Stripe but failed to record. You can skip.');
+        setError('Card saved with Stripe but failed to record. Please try again.');
         setLoading(false);
       }
     }
@@ -88,12 +86,10 @@ function CardForm({
 export default function CardCaptureStep({
   appointmentId,
   noShowFeeAmount,
-  cardRequired,
   onDone,
 }: {
   appointmentId: string;
   noShowFeeAmount: number | null;
-  cardRequired: boolean;
   onDone: () => void;
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -164,7 +160,6 @@ export default function CardCaptureStep({
             appointmentId={appointmentId}
             clientSecret={clientSecret}
             onSaved={() => { setSaved(true); setTimeout(onDone, 1500); }}
-            onSkip={cardRequired ? undefined! : onDone}
           />
         </Elements>
       )}

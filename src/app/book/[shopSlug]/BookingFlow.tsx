@@ -118,13 +118,9 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
         },
       });
       if (appointment) {
-        if (shop.depositRequired) {
-          router.push(`/book/${shop.slug}/pay/${appointment.id}?type=deposit`);
-        } else {
-          // Always collect card before confirming
-          setBookedAppointmentId(appointment.id);
-          setStep('card');
-        }
+        // Always collect card first (for no-show protection), then route to deposit or confirm
+        setBookedAppointmentId(appointment.id);
+        setStep('card');
       } else {
         throw new Error('Booking failed');
       }
@@ -349,8 +345,13 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
       <CardCaptureStep
         appointmentId={bookedAppointmentId}
         noShowFeeAmount={shop.noShowFeeAmount}
-        cardRequired={shop.cardRequiredForBooking}
-        onDone={() => router.push(`/book/${shop.slug}/confirm/${bookedAppointmentId}`)}
+        onDone={() =>
+          router.push(
+            shop.depositRequired
+              ? `/book/${shop.slug}/pay/${bookedAppointmentId}?type=deposit`
+              : `/book/${shop.slug}/confirm/${bookedAppointmentId}`,
+          )
+        }
       />
     );
   }

@@ -66,7 +66,9 @@ export async function createPaymentIntent(params: CreatePaymentIntentParams) {
   };
 
   if (isConnect) {
-    piParams.application_fee_amount = applicationFeeAmount;
+    if (applicationFeeAmount > 0) {
+      piParams.application_fee_amount = applicationFeeAmount;
+    }
     piParams.transfer_data = { destination: stripeConnectAccountId! };
 
     if (stripePaymentMethodId && stripeCustomerId) {
@@ -292,7 +294,8 @@ export async function createPaymentIntentForAppointment(params: {
   }
   if (amountCents < 50) throw new Error('Amount too small for Stripe');
 
-  const idempotencyKey = `apt-${appointmentId}-${type}-${Date.now()}`;
+  // Stable key — no timestamp. Same appointment + type always returns same PI from Stripe.
+  const idempotencyKey = `apt-${appointmentId}-${type}`;
   const { paymentIntent, payment } = await createPaymentIntent({
     shopId,
     appointmentId,

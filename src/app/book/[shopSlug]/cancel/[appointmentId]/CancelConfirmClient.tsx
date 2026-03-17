@@ -89,12 +89,13 @@ export default function CancelConfirmClient({
       )}
 
       <div className="flex gap-3">
-        <a
-          href="javascript:history.back()"
-          className="flex-1 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-center text-sm font-medium transition-colors"
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="flex-1 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-medium transition-colors"
         >
           Keep appointment
-        </a>
+        </button>
         <button
           type="button"
           onClick={handleCancel}

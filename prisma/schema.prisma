@@ -327,9 +327,10 @@ model Appointment {
   balanceDue      Decimal?           @db.Decimal(10, 2)
   notes                String?
   confirmationCode     String?           @unique
-  canceledAt           DateTime?
-  canceledByRole       CancellationActor?
-  cancellationFeeCharged Boolean         @default(false)
+  canceledAt             DateTime?
+  canceledByRole         CancellationActor?
+  cancellationFeeCharged Boolean           @default(false)
+  noShowFeeCharged       Boolean           @default(false)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
 
