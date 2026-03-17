@@ -1,0 +1,29 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { sendDueReminders } from '@/lib/services/reminders';
+
+/**
+ * Cron endpoint — sends 24-hour and 1-hour appointment reminders.
+ *
+ * Vercel invokes this every 15 minutes (see vercel.json → crons).
+ * Protected with CRON_SECRET to prevent unauthorized invocation.
+ */
+export async function GET(request: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const auth = request.headers.get('authorization');
+    if (auth !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
+  try {
+    const result = await sendDueReminders();
+    console.log(
+      `[cron/send-reminders] Sent ${result.sent24h} 24h reminder(s) and ${result.sent1h} 1h reminder(s)`,
+    );
+    return NextResponse.json({ ok: true, ...result });
+  } catch (err) {
+    console.error('[cron/send-reminders] Error:', err);
+    return NextResponse.json({ error: 'Reminder send failed' }, { status: 500 });
+  }
+}

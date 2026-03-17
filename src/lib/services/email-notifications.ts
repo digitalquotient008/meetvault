@@ -162,6 +162,30 @@ export async function sendCompletionThankYou(data: AppointmentEmailData) {
   await sendEmail(data.customerEmail, `Thanks for visiting ${data.shopName}!`, html, data.shopId, data.appointmentId, 'booking_completed_client');
 }
 
+export async function sendAppointmentReminder(data: AppointmentEmailData, hoursUntil: number) {
+  if (!data.customerEmail) return;
+  const timeLabel = hoursUntil <= 1 ? 'in 1 hour' : `tomorrow`;
+  const html = baseLayout(data.shopName, `
+    <h1 style="margin:0 0 8px;font-size:22px;color:#fff;">Reminder: You're coming in ${timeLabel}</h1>
+    <p style="color:#94a3b8;font-size:14px;margin:0 0 4px;">Hey ${data.customerFirstName}, just a friendly reminder about your upcoming appointment at ${data.shopName}.</p>
+    ${detailsBlock(data)}
+    <a href="${APP_URL}/book/${data.shopSlug}/confirm/${data.appointmentId}" style="display:block;text-align:center;background:#f59e0b;color:#0f172a;padding:14px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;margin-top:16px;">
+      View booking details
+    </a>
+    <p style="text-align:center;color:#64748b;font-size:12px;margin-top:12px;">
+      Need to cancel or reschedule? Contact the shop directly.
+    </p>
+  `);
+  const templateKey = hoursUntil <= 1 ? 'reminder_1h_client' : 'reminder_24h_client';
+  await sendEmail(data.customerEmail, `Reminder: ${data.serviceName} at ${data.shopName} ${timeLabel}`, html, data.shopId, data.appointmentId, templateKey);
+}
+
+export function buildReminderSmsBody(data: AppointmentEmailData, hoursUntil: number): string {
+  const when = fmtDateTime(data.startDateTime, data.shopTimezone);
+  const timeLabel = hoursUntil <= 1 ? 'in 1 hour' : 'tomorrow';
+  return `Reminder: Your ${data.serviceName} at ${data.shopName} is ${timeLabel} (${when}). See you soon!`;
+}
+
 export function buildEmailData(appointment: {
   id: string;
   shopId: string;

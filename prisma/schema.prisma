@@ -331,6 +331,9 @@ model Appointment {
   canceledByRole         CancellationActor?
   cancellationFeeCharged Boolean           @default(false)
   noShowFeeCharged       Boolean           @default(false)
+  reminder24hSentAt      DateTime?
+  reminder1hSentAt       DateTime?
+  autoNoShowChargedAt    DateTime?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
 

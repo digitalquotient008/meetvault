@@ -147,3 +147,60 @@ If a database loss ever orphans a Stripe Express account:
 `/app/appointments` paginates at 50 rows per page via `?page=N` query param.
 
 The `total` count and `appointments` records are fetched in parallel (`Promise.all`). If you add filters (by status, date range, barber) in the future, pass the same `where` clause to both the `count` and `findMany` calls.
+
+---
+
+## Automated Appointment Reminders
+
+### How it works
+A Vercel cron job (`/api/cron/send-reminders`, every 15 minutes) sends two reminders per appointment:
+
+| Reminder | Window | Template keys |
+|----------|--------|---------------|
+| **24-hour** | 22–26 hours before `startDateTime` | `reminder_24h_client` (email), `reminder_24h_sms` (SMS) |
+| **1-hour** | 45–75 minutes before `startDateTime` | `reminder_1h_client` (email), `reminder_1h_sms` (SMS) |
+
+### Idempotency
+Each appointment has `reminder24hSentAt` and `reminder1hSentAt` timestamps. The cron only processes appointments where the relevant field is `null`, then sets it immediately after sending. This prevents duplicate reminders if the cron fires multiple times within the window.
+
+### Channels
+- **Email** — always sent via Resend (if `RESEND_API_KEY` is set and customer has email)
+- **SMS** — sent via Twilio (if `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` are set and customer has phone)
+- Both channels gracefully no-op if credentials are missing
+
+### Adding Twilio
+1. Sign up at https://console.twilio.com
+2. Get a phone number with SMS capability
+3. Set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` in Vercel env vars
+4. `npm install twilio`
+
+---
+
+## Auto No-Show Detection & Charging
+
+### How it works
+A Vercel cron job (`/api/cron/auto-noshow`, every 15 minutes) automatically detects no-shows:
+
+1. Finds `CONFIRMED` appointments whose `endDateTime` is > 30 minutes in the past
+2. Marks each as `NO_SHOW` + increments `customer.noShowCount`
+3. If the shop has `noShowFeeAmount` configured AND the customer has a card on file, auto-charges the fee via `chargeNoShowFee()`
+4. Sets `autoNoShowChargedAt` to prevent re-processing
+
+### Safety
+- Only touches `CONFIRMED` appointments (not `IN_PROGRESS`, `COMPLETED`, etc.)
+- 30-minute grace period after `endDateTime` before marking as no-show
+- `chargeNoShowFee()` checks `noShowFeeCharged` flag to prevent double charges
+- Each charge creates an audit log entry (`auto_no_show` + `auto_no_show_charged`)
+- If the Stripe charge fails, the appointment is still marked as NO_SHOW — the shop can retry manually from the appointment detail page
+
+---
+
+## Cron Jobs Summary
+
+All cron jobs run every 15 minutes and are protected by the same `CRON_SECRET` header.
+
+| Route | Purpose |
+|-------|---------|
+| `/api/cron/cleanup-pending` | Cancel PENDING appointments older than 15 min |
+| `/api/cron/send-reminders` | Send 24h + 1h email/SMS reminders |
+| `/api/cron/auto-noshow` | Detect no-shows, mark status, auto-charge fee |
