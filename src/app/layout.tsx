@@ -17,11 +17,11 @@ export const metadata: Metadata = {
     })()
   ),
   title: { default: 'Barber Booking & No-Show Protection Software | MeetVault — $25/mo', template: '%s | MeetVault' },
-  description: 'Online booking, deposits, and no-show protection for independent barbers. Clients book and pay upfront — you keep the deposit if they ghost. $25/mo.',
+  description: 'Stop losing money to no-shows. MeetVault lets barbers collect deposits at booking — clients pay upfront or lose their spot. 14-day free trial.',
   keywords: 'barbershop booking, barber scheduling, barber no-show protection, barber deposit software, salon booking, appointment booking, MeetVault',
   openGraph: {
     title: 'Barber Booking & No-Show Protection Software | MeetVault',
-    description: 'Online booking, deposits, and no-show protection for independent barbers. $25/mo — 14-day free trial.',
+    description: 'Stop losing money to no-shows. MeetVault lets barbers collect deposits at booking — clients pay upfront or lose their spot. 14-day free trial.',
     type: 'website',
   },
 };
