@@ -13,6 +13,8 @@ export default async function AppLayout({
   if (!userId) redirect('/sign-in');
 
   let dbError: string | null = null;
+  let subscriptionActive = true;
+  let isOnboardingRoute = false;
 
   try {
     const clerkUser = await currentUser();
@@ -22,26 +24,28 @@ export default async function AppLayout({
 
     const user = await getOrCreateUser(userId, { email, firstName, lastName });
 
-    // Check subscription status — skip for onboarding routes
+    // Detect onboarding routes to skip subscription gate
     const headersList = await headers();
-    const pathname = headersList.get('x-next-pathname') ?? '';
-    const isOnboardingRoute = pathname.startsWith('/app/onboarding');
+    const referer = headersList.get('referer') ?? '';
+    const url = headersList.get('x-url') ?? headersList.get('x-invoke-path') ?? '';
+    isOnboardingRoute = url.includes('/onboarding') || referer.includes('/onboarding');
 
-    if (!isOnboardingRoute) {
-      const membership = await getMembershipForUser(user.id);
-      if (membership) {
-        const subStatus = await checkSubscriptionStatus(membership.shopId);
-        if (subStatus !== null) {
-          // Subscription not active — redirect to subscribe page
-          redirect('/app/onboarding/subscribe');
-        }
+    // Also check if user has no membership yet (still in onboarding)
+    const membership = await getMembershipForUser(user.id);
+    if (!membership) {
+      isOnboardingRoute = true;
+    } else if (!isOnboardingRoute) {
+      const subStatus = await checkSubscriptionStatus(membership.shopId);
+      if (subStatus !== null) {
+        subscriptionActive = false;
       }
     }
   } catch (e) {
-    // redirect() throws a special error — re-throw it
-    if (e instanceof Error && e.message === 'NEXT_REDIRECT') throw e;
+    const msg = e instanceof Error ? e.message : '';
+    // redirect() throws NEXT_REDIRECT — re-throw it
+    if (msg === 'NEXT_REDIRECT' || msg.includes('NEXT_REDIRECT')) throw e;
     console.error('Failed to sync user to database:', e);
-    dbError = e instanceof Error ? e.message : 'Unknown database error';
+    dbError = msg || 'Unknown database error';
   }
 
   if (dbError) {
@@ -70,6 +74,20 @@ export default async function AppLayout({
         </div>
       </div>
     );
+  }
+
+  // Onboarding / subscribe pages render full-screen (no sidebar, no gate)
+  if (isOnboardingRoute) {
+    return (
+      <div className="min-h-screen bg-slate-950">
+        {children}
+      </div>
+    );
+  }
+
+  // Redirect to subscribe if subscription not active
+  if (!subscriptionActive) {
+    redirect('/app/onboarding/subscribe');
   }
 
   return (

@@ -127,7 +127,7 @@ model Shop {
   // Subscription
   stripeSubscriptionId      String?
   stripeCustomerId          String?     // Shop-level Stripe customer (for billing)
-  subscriptionStatus        String?     @default("trialing") // trialing, active, past_due, canceled, unpaid
+  subscriptionStatus        String?     // trialing, active, past_due, canceled, unpaid — null until Stripe Checkout
   trialEndsAt               DateTime?
   cancellationWindowHours   Int?
   cancellationFeeType       CancellationFeeType?

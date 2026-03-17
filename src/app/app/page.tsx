@@ -96,8 +96,30 @@ export default async function AppDashboardPage() {
 
   const bookingUrl = `${APP_URL}/book/${shop.slug}`;
 
+  // Trial banner
+  const isTrialing = shop.subscriptionStatus === 'trialing' && shop.trialEndsAt;
+  const trialDaysLeft = isTrialing
+    ? Math.max(0, Math.ceil((new Date(shop.trialEndsAt!).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
+
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+      {/* Trial banner */}
+      {isTrialing && trialDaysLeft !== null && (
+        <div className="mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl px-5 py-3 flex items-center justify-between">
+          <p className="text-amber-300 text-sm">
+            <span className="font-semibold">{trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''}</span> left in your free trial.
+            {trialDaysLeft <= 3 && ' Your card will be charged $25/mo when it ends.'}
+          </p>
+          <Link
+            href="/app/settings/billing"
+            className="text-amber-400 hover:text-amber-300 text-sm font-medium shrink-0 ml-4"
+          >
+            Manage →
+          </Link>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl lg:text-3xl font-bold text-white">

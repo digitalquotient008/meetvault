@@ -1,19 +1,19 @@
 import Link from 'next/link';
 
 const features = [
-  'Online booking page (white-labeled to your shop)',
+  '1 staff member (you)',
   'Unlimited appointments',
+  'Online booking page (white-labeled)',
   'Deposit & full payment collection via Stripe',
   'No-show protection with cancellation fees',
   'Client history & notes (built-in CRM)',
   'Walk-in queue management',
   'Waitlist with automatic notifications',
-  'Staff scheduling & availability',
-  'Appointment reminders (email)',
-  'Growth tools (rebooking prompts, dormant client outreach)',
+  'Appointment reminders (email + SMS)',
+  'Growth tools (rebooking, dormant client outreach)',
   'Revenue reports & CSV export',
   'Custom branding (logo, colors, booking slug)',
-  'One-click client import (Square, Vagaro, Booksy, any CSV)',
+  'One-click client import (CSV)',
 ];
 
 export default function PricingCards() {
@@ -35,7 +35,7 @@ export default function PricingCards() {
           {/* Price */}
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-white mb-1">Starter</h3>
-            <p className="text-sm text-slate-400 mb-6">For independent barbers and solo stylists</p>
+            <p className="text-sm text-slate-400 mb-6">For solo barbers and independent stylists</p>
             <div className="flex items-end justify-center gap-1">
               <span className="text-6xl font-extrabold text-white leading-none">$25</span>
               <span className="text-slate-400 text-lg mb-1">/mo</span>
