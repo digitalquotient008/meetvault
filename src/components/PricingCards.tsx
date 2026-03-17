@@ -67,7 +67,7 @@ export default function PricingCards() {
             Start 14-day free trial
           </Link>
           <p className="text-center text-xs text-slate-500 mb-7">
-            You won&apos;t be charged until the trial ends
+            Card required — no charge for 14 days
           </p>
 
           <ul className="space-y-3">

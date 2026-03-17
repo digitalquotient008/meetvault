@@ -31,8 +31,9 @@ export default function CTA({
         >
           {buttonText}
         </Link>
+        <p className="text-amber-200/60 text-sm mt-3">Card required — no charge for 14 days</p>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-amber-200/80">
+        <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-sm text-amber-200/80">
           <span className="flex items-center gap-1.5">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
             14-day free trial

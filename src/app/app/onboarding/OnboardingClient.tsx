@@ -562,6 +562,7 @@ export default function OnboardingClient({ userId }: { userId: string }) {
       >
         Start free trial →
       </button>
+      <p className="text-slate-500 text-xs text-center mt-2">Card required — no charge for 14 days</p>
     </div>
   );
 }

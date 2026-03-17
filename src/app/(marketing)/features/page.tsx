@@ -170,7 +170,7 @@ export default function FeaturesPage() {
             </Link>
           </div>
           <p className="text-slate-500 text-sm mt-4">
-            Cancel anytime — you won&apos;t be charged until the trial ends.
+            Card required — no charge for 14 days. Cancel anytime.
           </p>
         </div>
       </section>

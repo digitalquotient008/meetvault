@@ -30,7 +30,7 @@ export default function Hero() {
               className="group relative bg-amber-500 text-slate-950 px-8 py-4 rounded-xl text-lg font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-400/30 w-full sm:w-auto text-center"
             >
               Start your free trial
-              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500 whitespace-nowrap font-normal">Not charged until trial ends</span>
+              <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-slate-500 whitespace-nowrap font-normal">Card required — no charge for 14 days</span>
             </Link>
             <Link
               href="#how-it-works"

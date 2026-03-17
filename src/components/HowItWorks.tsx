@@ -57,7 +57,7 @@ export default function HowItWorks() {
           >
             Start your 14-day free trial
           </Link>
-          <p className="text-sm text-slate-500 mt-3">You won&apos;t be charged until the trial ends</p>
+          <p className="text-sm text-slate-500 mt-3">Card required — no charge for 14 days</p>
         </div>
       </div>
     </section>

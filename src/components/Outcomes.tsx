@@ -78,12 +78,15 @@ export default function Outcomes() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 lg:flex-shrink-0">
-              <Link
-                href="/sign-up"
-                className="bg-amber-500 text-slate-950 px-8 py-3.5 rounded-xl font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 text-center"
-              >
-                Start free trial
-              </Link>
+              <div className="text-center">
+                <Link
+                  href="/sign-up"
+                  className="block bg-amber-500 text-slate-950 px-8 py-3.5 rounded-xl font-bold hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 text-center"
+                >
+                  Start free trial
+                </Link>
+                <p className="text-xs text-slate-500 mt-2">Card required — no charge for 14 days</p>
+              </div>
               <Link
                 href="/pricing"
                 className="border border-slate-600 text-slate-200 px-8 py-3.5 rounded-xl font-semibold hover:border-slate-500 hover:text-white transition-colors text-center"
