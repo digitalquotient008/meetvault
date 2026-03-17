@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 import type { ShopForBooking } from '@/lib/services/shop';
-import { bookAppointmentAction, joinWaitlistAction } from './actions';
+import { bookAppointmentAction, joinWaitlistAction, cancelPendingAppointmentAction } from './actions';
 import CardCaptureStep from './CardCaptureStep';
 
 type Step = 'service' | 'barber' | 'datetime' | 'details' | 'confirm' | 'card';
@@ -341,17 +341,26 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
   }
 
   if (step === 'card' && bookedAppointmentId) {
+    const aptId = bookedAppointmentId;
     return (
       <CardCaptureStep
-        appointmentId={bookedAppointmentId}
+        appointmentId={aptId}
         noShowFeeAmount={shop.noShowFeeAmount}
         onDone={() =>
           router.push(
             shop.depositRequired
-              ? `/book/${shop.slug}/pay/${bookedAppointmentId}?type=deposit`
-              : `/book/${shop.slug}/confirm/${bookedAppointmentId}`,
+              ? `/book/${shop.slug}/pay/${aptId}?type=deposit`
+              : `/book/${shop.slug}/confirm/${aptId}`,
           )
         }
+        onBack={async () => {
+          // Cancel the PENDING appointment so the slot is freed
+          await cancelPendingAppointmentAction(aptId);
+          setBookedAppointmentId(null);
+          // Return to confirm step — all selections are preserved so they can
+          // re-confirm (creates a new appointment) or back up further to change slot/service
+          setStep('confirm');
+        }}
       />
     );
   }

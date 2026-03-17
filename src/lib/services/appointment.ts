@@ -58,7 +58,9 @@ export async function createAppointment(params: {
         barberProfileId,
         startDateTime: start,
         endDateTime: end,
-        status: 'CONFIRMED',
+        // ONLINE bookings start as PENDING until card is saved;
+        // staff/walk-in bookings are CONFIRMED immediately
+        status: channel === 'ONLINE' ? 'PENDING' : 'CONFIRMED',
         channel,
         confirmationCode,
         subtotal: service.price,
@@ -104,9 +106,13 @@ export async function createAppointment(params: {
       afterJson: JSON.stringify({ status: result.status, confirmationCode: result.confirmationCode }),
     });
 
-    const emailData = buildEmailData(result);
-    sendBookingConfirmationToClient(emailData).catch(() => {});
-    sendBookingNotificationToShop(emailData).catch(() => {});
+    // Only send confirmation emails once CONFIRMED.
+    // ONLINE bookings are PENDING until card is saved — emails sent there.
+    if (result.status === 'CONFIRMED') {
+      const emailData = buildEmailData(result);
+      sendBookingConfirmationToClient(emailData).catch(() => {});
+      sendBookingNotificationToShop(emailData).catch(() => {});
+    }
   }
   return result;
 }

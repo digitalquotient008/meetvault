@@ -5,6 +5,11 @@ import { createAppointment } from '@/lib/services/appointment';
 import { createPaymentIntentForAppointment } from '@/lib/services/payments';
 import { addWaitlistEntry } from '@/lib/services/waitlist';
 import { saveCardFromSetupIntent } from '@/lib/services/card-on-file';
+import {
+  sendBookingConfirmationToClient,
+  sendBookingNotificationToShop,
+  buildEmailData,
+} from '@/lib/services/email-notifications';
 import { prisma } from '@/lib/db';
 
 export async function createPaymentIntentForBookingAction(
@@ -76,13 +81,44 @@ export async function saveCardAction(params: {
 }) {
   const appointment = await prisma.appointment.findUnique({
     where: { id: params.appointmentId },
-    select: { customerId: true, shopId: true },
+    select: { customerId: true, shopId: true, status: true },
   });
   if (!appointment) throw new Error('Appointment not found');
 
+  // Save card details to customer record
   await saveCardFromSetupIntent({
     customerId: appointment.customerId,
     shopId: appointment.shopId,
     setupIntentId: params.setupIntentId,
+  });
+
+  // Promote PENDING → CONFIRMED now that card is saved
+  if (appointment.status === 'PENDING') {
+    await prisma.appointment.update({
+      where: { id: params.appointmentId },
+      data: { status: 'CONFIRMED' },
+    });
+
+    // Send confirmation emails (skipped at booking time for ONLINE/PENDING)
+    const full = await prisma.appointment.findUnique({
+      where: { id: params.appointmentId },
+      include: { customer: true, barberProfile: true, appointmentServices: true, shop: true },
+    });
+    if (full) {
+      const emailData = buildEmailData(full);
+      sendBookingConfirmationToClient(emailData).catch(() => {});
+      sendBookingNotificationToShop(emailData).catch(() => {});
+    }
+  }
+}
+
+/**
+ * Cancels a PENDING appointment when the customer goes back during card entry.
+ * Only works on PENDING — safe to call; won't touch already-confirmed appointments.
+ */
+export async function cancelPendingAppointmentAction(appointmentId: string) {
+  await prisma.appointment.updateMany({
+    where: { id: appointmentId, status: 'PENDING' },
+    data: { status: 'CANCELED', canceledAt: new Date() },
   });
 }

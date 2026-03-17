@@ -87,10 +87,12 @@ export default function CardCaptureStep({
   appointmentId,
   noShowFeeAmount,
   onDone,
+  onBack,
 }: {
   appointmentId: string;
   noShowFeeAmount: number | null;
   onDone: () => void;
+  onBack: () => void;
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -127,6 +129,13 @@ export default function CardCaptureStep({
   return (
     <div className="space-y-5">
       <div>
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm text-slate-400 hover:text-white mb-1 inline-block"
+        >
+          ← Back
+        </button>
         <h2 className="text-lg font-semibold text-white">Save a card on file</h2>
         <p className="text-slate-400 text-sm mt-1">
           A card on file is required to complete your booking.

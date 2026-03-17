@@ -22,6 +22,12 @@ export default async function PayPage({ params, searchParams }: Props) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col items-center justify-center p-4">
       <div className="max-w-md w-full">
+        <a
+          href={`/book/${shopSlug}/confirm/${appointmentId}`}
+          className="text-sm text-slate-400 hover:text-white mb-4 inline-block"
+        >
+          ← Back
+        </a>
         <h1 className="text-xl font-bold text-white mb-2">{shop.name}</h1>
         <p className="text-slate-400 text-sm mb-4">
           {payType === 'DEPOSIT' ? 'Pay deposit' : 'Pay in full'} · {appointment.appointmentServices[0]?.serviceNameSnapshot}
