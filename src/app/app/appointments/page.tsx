@@ -60,37 +60,37 @@ export default async function AppointmentsPage({ searchParams }: Props) {
       </div>
       <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-800 text-slate-400 text-left">
-            <tr>
-              <th className="p-3">Date / Time</th>
-              <th className="p-3">Customer</th>
-              <th className="p-3">Barber</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Payment</th>
-              <th className="p-3">Actions</th>
-              <th className="p-3"></th>
+          <thead>
+            <tr className="bg-slate-800/50 border-b border-slate-800">
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Date / Time</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Customer</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Barber</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Payment</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Actions</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-800/60">
             {appointments.map((apt) => {
               const badge = paymentBadge(apt);
               return (
-                <tr key={apt.id} className="border-t border-slate-800">
-                  <td className="p-3 text-white">{fmtDateTime(apt.startDateTime, tz)}</td>
-                  <td className="p-3 text-slate-300">{apt.customer.firstName} {apt.customer.lastName}</td>
-                  <td className="p-3 text-slate-300">{apt.barberProfile.displayName}</td>
-                  <td className="p-3">
+                <tr key={apt.id} className="hover:bg-slate-800/30 transition-colors">
+                  <td className="px-4 py-3.5 text-white font-medium">{fmtDateTime(apt.startDateTime, tz)}</td>
+                  <td className="px-4 py-3.5 text-slate-300">{apt.customer.firstName} {apt.customer.lastName}</td>
+                  <td className="px-4 py-3.5 text-slate-400">{apt.barberProfile.displayName}</td>
+                  <td className="px-4 py-3.5">
                     <span className={statusColor(apt.status)}>
                       {apt.status.replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="p-3"><span className={badge.className}>{badge.label}</span></td>
-                  <td className="p-3">
+                  <td className="px-4 py-3.5"><span className={badge.className}>{badge.label}</span></td>
+                  <td className="px-4 py-3.5">
                     <AppointmentActions appointmentId={apt.id} status={apt.status} />
                   </td>
-                  <td className="p-3">
-                    <Link href={`/app/appointments/${apt.id}`} className="text-amber-400 hover:text-amber-300 text-xs">
-                      View
+                  <td className="px-4 py-3.5">
+                    <Link href={`/app/appointments/${apt.id}`} className="text-amber-400 hover:text-amber-300 text-xs font-medium">
+                      View →
                     </Link>
                   </td>
                 </tr>
