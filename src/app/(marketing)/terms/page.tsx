@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Terms of Service — MeetVault',
-  description: 'MeetVault Terms of Service — the agreement between you and MeetVault.',
+  description: 'MeetVault Terms of Service — the agreement between you and DIGITALQUOTIENT SOLUTIONS LLC.',
 };
 
 export default function TermsPage() {
@@ -17,7 +17,7 @@ export default function TermsPage() {
           <section>
             <h2>1. Agreement to Terms</h2>
             <p>
-              By accessing or using MeetVault (&ldquo;the Service&rdquo;), operated by MeetVault (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service. We reserve the right to update these terms at any time. Continued use after changes constitutes acceptance.
+              MeetVault is a product operated by DIGITALQUOTIENT SOLUTIONS LLC, a Texas limited liability company (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;). By accessing or using MeetVault (&ldquo;the Service&rdquo;), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service. We reserve the right to update these terms at any time. Continued use after changes constitutes acceptance.
             </p>
           </section>
 
@@ -42,7 +42,7 @@ export default function TermsPage() {
           <section>
             <h2>4. Subscription &amp; Billing</h2>
             <ul>
-              <li>MeetVault offers a 14-day free trial. A valid payment method is required to start the trial.</li>
+              <li>The Company offers a 14-day free trial. A valid payment method is required to start the trial.</li>
               <li>After the trial period, your payment method will be automatically charged the applicable subscription fee ($25/month for Starter; custom pricing for Team).</li>
               <li>Subscriptions renew automatically each billing cycle unless canceled before the renewal date.</li>
               <li>You may cancel at any time from your dashboard. Cancellation takes effect at the end of the current billing period — no prorated refunds are issued for partial months.</li>
@@ -57,9 +57,10 @@ export default function TermsPage() {
               Payment processing for client deposits, service payments, and subscription fees is handled by Stripe, Inc. By using MeetVault, you also agree to Stripe&apos;s <a href="https://stripe.com/legal" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300">Terms of Service</a> and <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300">Privacy Policy</a>.
             </p>
             <ul>
-              <li>Client payments flow directly to the shop owner&apos;s Stripe Connect account. MeetVault does not hold or custody client funds.</li>
-              <li>MeetVault may collect a platform fee on transactions processed through Stripe Connect, as disclosed in your account settings.</li>
-              <li>Refunds, chargebacks, and payment disputes are the responsibility of the shop owner. MeetVault is not liable for disputed transactions.</li>
+              <li>Client payments flow directly to the shop owner&apos;s Stripe Connect account. The Company does not hold or custody client funds.</li>
+              <li>The Company may collect a platform fee on transactions processed through Stripe Connect, as disclosed in your account settings.</li>
+              <li>Refunds, chargebacks, and payment disputes are the responsibility of the shop owner. The Company is not liable for disputed transactions.</li>
+              <li>MeetVault is not a financial institution, money transmitter, or payment processor. All payment processing is performed by Stripe, Inc.</li>
             </ul>
           </section>
 
@@ -80,7 +81,7 @@ export default function TermsPage() {
           <section>
             <h2>7. Intellectual Property</h2>
             <p>
-              The Service, including all code, design, branding, and documentation, is owned by MeetVault and protected by copyright, trademark, and other intellectual property laws. You retain ownership of your data (customer records, appointment history, etc.). We claim no intellectual property rights over your content.
+              The Service, including all code, design, branding, and documentation, is owned by DIGITALQUOTIENT SOLUTIONS LLC and protected by copyright, trademark, and other intellectual property laws. You retain ownership of your data (customer records, appointment history, etc.). We claim no intellectual property rights over your content.
             </p>
           </section>
 
@@ -96,14 +97,14 @@ export default function TermsPage() {
           <section>
             <h2>9. No-Show &amp; Cancellation Fees</h2>
             <p>
-              Shop owners are responsible for setting and communicating their own no-show and cancellation policies to their clients. MeetVault provides the tools to enforce these policies (deposit collection, automatic charges) but is not a party to the agreement between the shop and its clients. MeetVault is not liable for disputes arising from no-show or cancellation fee charges.
+              Shop owners are responsible for setting and communicating their own no-show and cancellation policies to their clients. The Company provides the tools to enforce these policies (deposit collection, automatic charges) but is not a party to the agreement between the shop and its clients. The Company is not liable for disputes arising from no-show or cancellation fee charges.
             </p>
           </section>
 
           <section>
             <h2>10. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, MeetVault shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, revenue, data, or business opportunities, arising from your use of the Service. Our total liability for any claim arising from the Service shall not exceed the amount you paid to MeetVault in the 12 months preceding the claim.
+              To the maximum extent permitted by law, the Company shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, revenue, data, or business opportunities, arising from your use of the Service. Our total liability for any claim arising from the Service shall not exceed the amount you paid to the Company in the 12 months preceding the claim. In no event shall the Company be liable for any loss of data, business interruption, or unauthorized access to user data.
             </p>
           </section>
 
@@ -117,12 +118,47 @@ export default function TermsPage() {
           <section>
             <h2>12. Indemnification</h2>
             <p>
-              You agree to indemnify, defend, and hold harmless MeetVault and its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorney&apos;s fees) arising from your use of the Service, your violation of these Terms, or your violation of any rights of a third party.
+              You agree to indemnify, defend, and hold harmless DIGITALQUOTIENT SOLUTIONS LLC and its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorney&apos;s fees) arising from your use of the Service, your violation of these Terms, or your violation of any rights of a third party.
             </p>
           </section>
 
           <section>
-            <h2>13. Termination</h2>
+            <h2>13. No Guarantee of Results</h2>
+            <p>
+              The Company does not guarantee any specific business outcomes, revenue, customer growth, or performance results from using the Service. Results depend on many factors outside our control, including but not limited to your pricing, location, service quality, and market conditions.
+            </p>
+          </section>
+
+          <section>
+            <h2>14. Data Loss Disclaimer</h2>
+            <p>
+              You are responsible for maintaining backups of your data. The Company is not responsible for any data loss, corruption, or unauthorized access resulting from factors beyond our reasonable control, including but not limited to third-party service failures, cyberattacks, or user error.
+            </p>
+          </section>
+
+          <section>
+            <h2>15. Service Modifications</h2>
+            <p>
+              We reserve the right to modify, suspend, or discontinue any part of the Service at any time, with or without notice. The Company shall not be liable to you or any third party for any modification, suspension, or discontinuation of the Service.
+            </p>
+          </section>
+
+          <section>
+            <h2>16. Force Majeure</h2>
+            <p>
+              The Company shall not be liable for any failure or delay in performance due to events beyond our reasonable control, including but not limited to internet outages, third-party service failures (Stripe, Clerk, hosting providers), natural disasters, pandemics, government actions, or acts of God.
+            </p>
+          </section>
+
+          <section>
+            <h2>17. Dispute Resolution &amp; Arbitration</h2>
+            <p>
+              Any dispute arising out of or relating to these Terms or the Service shall be resolved through binding arbitration rather than in court, except where prohibited by applicable law. Arbitration shall be conducted in the State of Texas under the rules of the American Arbitration Association. You agree to waive any right to participate in class action lawsuits or class-wide arbitration. Each party shall bear its own costs of arbitration unless the arbitrator determines otherwise.
+            </p>
+          </section>
+
+          <section>
+            <h2>18. Termination</h2>
             <ul>
               <li>We may suspend or terminate your account at any time for violation of these Terms, with or without notice.</li>
               <li>You may terminate your account at any time by canceling your subscription and contacting support.</li>
@@ -131,24 +167,35 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2>14. Governing Law</h2>
+            <h2>19. Governing Law</h2>
             <p>
-              These Terms are governed by and construed in accordance with the laws of the United States. Any disputes arising from these Terms shall be resolved in the courts of the applicable jurisdiction.
+              These Terms shall be governed by and construed in accordance with the laws of the State of Texas, without regard to its conflict of law provisions. Any disputes not subject to arbitration shall be resolved in the state or federal courts located in Denton County, Texas, and you consent to the personal jurisdiction of such courts.
             </p>
           </section>
 
           <section>
-            <h2>15. Severability</h2>
+            <h2>20. Severability</h2>
             <p>
-              If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.
+              If any provision of these Terms is found to be unenforceable or invalid by a court of competent jurisdiction, the remaining provisions will continue in full force and effect.
             </p>
           </section>
 
           <section>
-            <h2>16. Contact</h2>
+            <h2>21. Entire Agreement</h2>
+            <p>
+              These Terms, together with our Privacy Policy, constitute the entire agreement between you and the Company regarding the Service and supersede all prior agreements, representations, and understandings.
+            </p>
+          </section>
+
+          <section>
+            <h2>22. Contact</h2>
             <p>
               For questions about these Terms, contact us at{' '}
               <a href="mailto:legal@meetvault.app" className="text-amber-400 hover:text-amber-300">legal@meetvault.app</a>.
+            </p>
+            <p className="mt-4">
+              DIGITALQUOTIENT SOLUTIONS LLC<br />
+              State of Texas
             </p>
           </section>
         </div>
