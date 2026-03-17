@@ -79,10 +79,6 @@ export default function PricingCards() {
               </li>
             ))}
           </ul>
-
-          <div className="mt-6 pt-5 border-t border-slate-800/60 flex justify-center">
-            <StripeBadge />
-          </div>
         </div>
       </div>
 
@@ -131,6 +127,11 @@ export default function PricingCards() {
             ))}
           </ul>
         </div>
+      </div>
+
+      {/* ─── Shared trust bar ─── */}
+      <div className="md:col-span-2 flex justify-center pt-4">
+        <StripeBadge />
       </div>
     </div>
   );
