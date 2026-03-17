@@ -176,12 +176,16 @@ export default function FeaturesPage() {
       </section>
 
       {/* ─── PAIN SECTION ─── */}
-      <section className="py-20 sm:py-24">
+      <section className="py-20 sm:py-24 bg-slate-900/40 border-y border-slate-800/60">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-4 text-center">
-            Sound familiar?
-          </p>
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8 md:p-12">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="h-px w-12 bg-slate-700" />
+            <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest">
+              Sound familiar?
+            </p>
+            <div className="h-px w-12 bg-slate-700" />
+          </div>
+          <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-8 md:p-12 shadow-xl shadow-slate-950/50">
             <p className="text-slate-300 text-lg leading-relaxed mb-6">
               It&apos;s 11am. You blocked out the slot, set up your station, and waited.
             </p>
