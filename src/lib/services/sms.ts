@@ -2,7 +2,8 @@ import { env } from '@/lib/env';
 import { prisma } from '@/lib/db';
 
 /**
- * Send an SMS via Twilio.
+ * Send an SMS via the Twilio REST API.
+ * Uses fetch directly — no `twilio` npm package required.
  * No-ops gracefully if Twilio credentials are not configured.
  * Logs every attempt to NotificationLog for audit.
  */
@@ -20,16 +21,32 @@ export async function sendSms(params: {
     return; // Twilio not configured — skip silently
   }
 
-  try {
-    // Lazy-import twilio to avoid crashing if not installed
-    const twilio = (await import('twilio')).default;
-    const client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
+  const accountSid = env.TWILIO_ACCOUNT_SID;
 
-    const message = await client.messages.create({
-      body,
-      from: env.TWILIO_PHONE_NUMBER,
-      to,
-    });
+  try {
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization:
+            'Basic ' +
+            Buffer.from(`${accountSid}:${env.TWILIO_AUTH_TOKEN}`).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          To: to,
+          From: env.TWILIO_PHONE_NUMBER,
+          Body: body,
+        }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message ?? `Twilio API error ${response.status}`);
+    }
 
     await prisma.notificationLog.create({
       data: {
@@ -39,7 +56,7 @@ export async function sendSms(params: {
         channel: 'SMS',
         templateKey,
         status: 'SENT',
-        providerMessageId: message.sid,
+        providerMessageId: data.sid ?? null,
         sentAt: new Date(),
       },
     }).catch(() => {});
