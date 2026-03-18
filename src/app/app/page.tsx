@@ -23,6 +23,12 @@ import CopyBookingLink from '@/components/dashboard/CopyBookingLink';
 export default async function AppDashboardPage() {
   const { shopId } = await requireShopAccess();
 
+  // Redirect to subscribe if no active subscription
+  const shop0 = await prisma.shop.findUnique({ where: { id: shopId }, select: { subscriptionStatus: true } });
+  if (shop0 && shop0.subscriptionStatus !== 'active' && shop0.subscriptionStatus !== 'trialing') {
+    redirect('/app/onboarding/subscribe');
+  }
+
   const [shop, user] = await Promise.all([
     prisma.shop.findUnique({
       where: { id: shopId },
