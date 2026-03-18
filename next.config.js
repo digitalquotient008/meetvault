@@ -2,10 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+      },
+    ],
   },
-  // Railway will set PORT automatically, Next.js will use it
-  // No need to explicitly set port in config
 }
 
 module.exports = nextConfig
