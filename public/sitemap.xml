@@ -26,6 +26,21 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://meetvault.app/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://meetvault.app/blog/how-to-stop-no-shows-barbershop</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://meetvault.app/blog/barber-deposit-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://meetvault.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

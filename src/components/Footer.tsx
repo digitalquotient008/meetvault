@@ -23,6 +23,7 @@ export default function Footer() {
               <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
               <li><a href="mailto:support@meetvault.app" className="hover:text-white transition-colors">support@meetvault.app</a></li>
             </ul>
           </div>

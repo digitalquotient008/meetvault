@@ -11,6 +11,7 @@ const isPublicRoute = createRouteMatcher([
   '/privacy',
   '/sign-in(.*)',
   '/sign-up(.*)',
+  '/blog(.*)',
   '/book(.*)',
   '/api(.*)',
 ]);

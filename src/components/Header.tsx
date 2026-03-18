@@ -28,6 +28,9 @@ export default function Header() {
               <Link href="/contact" className="text-slate-400 hover:text-white text-sm font-medium">
                 Contact
               </Link>
+              <Link href="/blog" className="text-slate-400 hover:text-white text-sm font-medium">
+                Blog
+              </Link>
             </div>
           </div>
           <div className="flex items-center space-x-3 sm:space-x-4">
@@ -71,6 +74,9 @@ export default function Header() {
             </Link>
             <Link href="/contact" className="block text-slate-400 hover:text-white py-2" onClick={() => setMobileMenuOpen(false)}>
               Contact
+            </Link>
+            <Link href="/blog" className="block text-slate-400 hover:text-white py-2" onClick={() => setMobileMenuOpen(false)}>
+              Blog
             </Link>
           </div>
         )}
