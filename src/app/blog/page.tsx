@@ -1,37 +1,30 @@
 import Link from 'next/link';
+import { getAllPosts } from '@/lib/blog';
 import { BookOpen } from 'lucide-react';
-import { getAllPosts } from '@/lib/sanity';
 
 export const metadata = {
   title: 'Blog',
-  description:
-    'Tips, guides, and strategies for independent barbers — no-show protection, deposit policies, booking software, and growing your clientele.',
+  description: 'Tips, guides, and strategies for independent barbers — no-show protection, deposit policies, booking software, and growing your clientele.',
   alternates: { canonical: '/blog' },
 };
 
-export default async function BlogIndexPage() {
-  const posts = await getAllPosts();
+export default function BlogIndexPage() {
+  const posts = getAllPosts();
 
   return (
     <div className="bg-slate-950 min-h-screen">
       <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm text-slate-400 hover:text-white mb-8 transition-colors"
-          >
+          <Link href="/" className="inline-flex items-center text-sm text-slate-400 hover:text-white mb-8 transition-colors">
             &larr; Back to home
           </Link>
           <div className="text-center mb-14">
-            <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-3">
-              Blog
-            </p>
+            <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-3">Blog</p>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Guides for independent barbers
             </h1>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Practical advice on reducing no-shows, collecting deposits, booking software, and
-              growing your shop.
+              Practical advice on reducing no-shows, collecting deposits, booking software, and growing your shop.
             </p>
           </div>
 
@@ -41,16 +34,14 @@ export default async function BlogIndexPage() {
                 <BookOpen className="w-6 h-6 text-slate-500" />
               </div>
               <p className="text-slate-400 font-medium mb-1">No posts yet</p>
-              <p className="text-slate-500 text-sm">
-                Check back soon — new content is on the way.
-              </p>
+              <p className="text-slate-500 text-sm">Check back soon — new content is on the way.</p>
             </div>
           ) : (
             <div className="space-y-5">
               {posts.map((post) => (
                 <Link
-                  key={post._id}
-                  href={`/blog/${post.slug.current}`}
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
                   className="block bg-slate-900/80 border border-slate-800 rounded-2xl p-7 hover:border-slate-700 transition-colors group"
                 >
                   <div className="flex items-start justify-between gap-4">

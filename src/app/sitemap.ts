@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { getAllPostSlugs } from '@/lib/sanity';
+import { getAllPostSlugs } from '@/lib/blog';
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://meetvault.app';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/features`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
@@ -16,19 +16,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  // Dynamic blog post pages from Sanity
-  let blogPages: MetadataRoute.Sitemap = [];
-  try {
-    const slugs = await getAllPostSlugs();
-    blogPages = slugs.map((slug) => ({
-      url: `${SITE_URL}/blog/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
-  } catch {
-    // Sanity unavailable — skip blog pages in sitemap
-  }
+  const blogPages: MetadataRoute.Sitemap = getAllPostSlugs().map((slug) => ({
+    url: `${SITE_URL}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
 
   return [...staticPages, ...blogPages];
 }
