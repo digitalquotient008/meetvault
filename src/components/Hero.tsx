@@ -16,13 +16,13 @@ export default function Hero() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-[1.08] tracking-tight">
-            Your clients book.
+            The $400/Month Problem
             <br />
-            <span className="bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent">You get paid.</span>
+            <span className="bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent">Has a $25 Fix.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Online booking, deposits, no-show protection, and client management — built for independent barbers. Set up in 5 minutes. $25/mo after trial.
+            No-shows drain independent barbers up to $400/month. MeetVault stops it with deposit-required booking — set up in 5 minutes, no contracts, no hidden fees.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

@@ -59,6 +59,9 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
+        <p className="text-center text-xs text-slate-600 mt-6">
+          Results may vary based on booking volume and no-show rates.
+        </p>
       </div>
     </footer>
   );
