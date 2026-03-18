@@ -7,11 +7,11 @@ import { Calendar, Clock, User, ChevronRight, CreditCard, Shield, Check } from '
 
 function PhoneFrame({ children, glow = false }: { children: React.ReactNode; glow?: boolean }) {
   return (
-    <div className="relative w-full max-w-[280px]">
+    <div className="relative w-full max-w-[280px] mx-auto">
       {glow && <div className="absolute -inset-4 bg-amber-500/5 rounded-[3rem] blur-2xl" />}
       <div className={`relative bg-slate-900 border ${glow ? 'border-amber-500/30' : 'border-slate-700/80'} rounded-[2.2rem] p-2.5 shadow-2xl shadow-slate-950/80`}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-slate-900 rounded-b-xl z-10" />
-        <div className="bg-slate-950 rounded-[1.8rem] overflow-hidden">
+        <div className="bg-slate-950 rounded-[1.8rem] overflow-hidden flex flex-col" style={{ minHeight: '480px' }}>
           {/* Status bar */}
           <div className="flex justify-between items-center px-5 pt-7 pb-1">
             <span className="text-white text-[10px] font-medium">9:41</span>
@@ -19,7 +19,7 @@ function PhoneFrame({ children, glow = false }: { children: React.ReactNode; glo
               <div className="absolute inset-0.5 bg-emerald-400 rounded-[1px]" style={{ width: '70%' }} />
             </div>
           </div>
-          {children}
+          <div className="flex-1">{children}</div>
           {/* Home indicator */}
           <div className="flex justify-center pb-2.5 pt-1">
             <div className="w-24 h-1 bg-slate-700 rounded-full" />
