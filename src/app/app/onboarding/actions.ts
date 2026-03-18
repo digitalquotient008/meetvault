@@ -5,10 +5,13 @@ import { createService } from '@/lib/services/service';
 import { createBarberProfile } from '@/lib/services/barber';
 import { setAvailabilityRules } from '@/lib/services/availability';
 import { createSubscriptionCheckout } from '@/lib/services/subscription';
+import { sendWelcomeEmail } from '@/lib/services/lifecycle-emails';
 import { prisma } from '@/lib/db';
 
 export async function createShopAction(userId: string, data: { name: string; slug: string; timezone?: string }) {
-  return createShop(userId, {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, firstName: true } });
+
+  const shop = await createShop(userId, {
     name: data.name,
     slug: data.slug,
     timezone: data.timezone ?? 'America/New_York',
@@ -16,6 +19,13 @@ export async function createShopAction(userId: string, data: { name: string; slu
     depositRequired: false,
     tippingEnabled: true,
   });
+
+  // Send welcome email (fire-and-forget)
+  if (user?.email) {
+    sendWelcomeEmail(shop.id, user.email, shop.name, user.firstName || 'there').catch(() => {});
+  }
+
+  return shop;
 }
 
 export async function addServiceAction(shopId: string, data: { name: string; durationMin: number; price: number }) {

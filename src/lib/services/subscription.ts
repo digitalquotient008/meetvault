@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { requireStripeSecretKey } from '@/lib/env';
 import { APP_URL } from '@/lib/constants';
+import { sendTrialStartedEmail, sendSubscriptionActiveEmail } from '@/lib/services/lifecycle-emails';
 
 const TRIAL_DAYS = 14;
 const PLAN_PRICE_MONTHLY_CENTS = 2500; // $25/mo
@@ -83,16 +84,27 @@ export async function syncSubscriptionFromCheckout(sessionId: string) {
   const shopId = session.metadata?.shopId ?? sub.metadata?.shopId;
   if (!shopId) return;
 
+  const trialEndsAt = sub.trial_end ? new Date(sub.trial_end * 1000) : null;
+
   await prisma.shop.update({
     where: { id: shopId },
     data: {
       stripeSubscriptionId: sub.id,
       subscriptionStatus: sub.status,
-      trialEndsAt: sub.trial_end
-        ? new Date(sub.trial_end * 1000)
-        : null,
+      trialEndsAt,
     },
   });
+
+  // Send trial started email
+  if (sub.status === 'trialing' && trialEndsAt) {
+    const owner = await prisma.membership.findFirst({
+      where: { shopId, role: 'OWNER', isActive: true },
+      include: { user: true },
+    });
+    if (owner?.user?.email) {
+      sendTrialStartedEmail(shopId, owner.user.email, owner.user.firstName || 'there', trialEndsAt).catch(() => {});
+    }
+  }
 }
 
 /**
@@ -102,6 +114,13 @@ export async function handleSubscriptionUpdated(sub: Stripe.Subscription) {
   const shopId = sub.metadata?.shopId;
   if (!shopId) return;
 
+  // Check previous status to detect trial → active conversion
+  const shop = await prisma.shop.findUnique({
+    where: { id: shopId },
+    select: { subscriptionStatus: true },
+  });
+  const previousStatus = shop?.subscriptionStatus;
+
   await prisma.shop.update({
     where: { id: shopId },
     data: {
@@ -112,6 +131,17 @@ export async function handleSubscriptionUpdated(sub: Stripe.Subscription) {
         : null,
     },
   });
+
+  // Send "subscription active" email when trial converts to paid
+  if (sub.status === 'active' && previousStatus === 'trialing') {
+    const owner = await prisma.membership.findFirst({
+      where: { shopId, role: 'OWNER', isActive: true },
+      include: { user: true },
+    });
+    if (owner?.user?.email) {
+      sendSubscriptionActiveEmail(shopId, owner.user.email, owner.user.firstName || 'there').catch(() => {});
+    }
+  }
 }
 
 export async function handleSubscriptionDeleted(sub: Stripe.Subscription) {

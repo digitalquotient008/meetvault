@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendDueReminders, sendTrialEndingReminders } from '@/lib/services/reminders';
+import { processTrialDripSequence } from '@/lib/services/lifecycle-emails';
 
 /**
  * Cron endpoint — sends 24-hour and 1-hour appointment reminders.
@@ -17,14 +18,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [result, trialReminders] = await Promise.all([
+    const [result, trialReminders, dripEmails] = await Promise.all([
       sendDueReminders(),
       sendTrialEndingReminders(),
+      processTrialDripSequence(),
     ]);
     console.log(
-      `[cron/send-reminders] Sent ${result.sent24h} 24h, ${result.sent1h} 1h, ${trialReminders} trial-ending reminder(s)`,
+      `[cron/send-reminders] Sent ${result.sent24h} 24h, ${result.sent1h} 1h, ${trialReminders} trial-ending, ${dripEmails} drip email(s)`,
     );
-    return NextResponse.json({ ok: true, ...result, trialReminders });
+    return NextResponse.json({ ok: true, ...result, trialReminders, dripEmails });
   } catch (err) {
     console.error('[cron/send-reminders] Error:', err);
     return NextResponse.json({ error: 'Reminder send failed' }, { status: 500 });

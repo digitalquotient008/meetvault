@@ -150,6 +150,39 @@ The `total` count and `appointments` records are fetched in parallel (`Promise.a
 
 ---
 
+## Lifecycle Email System
+
+`src/lib/services/lifecycle-emails.ts` — full user journey email sequence.
+
+### Immediate triggers (event-driven)
+
+| Email | Trigger | Template key |
+|-------|---------|-------------|
+| Welcome | Shop created in onboarding | `welcome` |
+| Trial started | Stripe Checkout completes | `trial_started` |
+| Subscription active | Trial → active (webhook) | `subscription_active` |
+
+### Drip sequence (cron-driven, every 15 min)
+
+| Email | When | Template key | Goal |
+|-------|------|-------------|------|
+| Feature highlight | Day 3 | `trial_day3` | Push deposit setup |
+| Mid-trial check-in | Day 7 | `trial_day7` | Engagement, support offer |
+| Urgency nudge | Day 10 | `trial_day10` | 4 days left, value recap |
+| Trial ending | Day 12 | `trial_ending` | Payment reminder |
+| Trial expired | After day 14 (if not converted) | `trial_expired` | Win-back with 30-day data retention |
+
+### Idempotency
+Every email checks `NotificationLog` for the `templateKey + shopId` combination before sending. Safe to run repeatedly — each email is sent exactly once per shop.
+
+### Existing transactional emails (in email-notifications.ts)
+- `booking_confirmed_client` / `booking_confirmed_shop`
+- `booking_canceled_client` / `booking_canceled_shop`
+- `booking_completed_client`
+- `reminder_24h_client` / `reminder_1h_client` (+ SMS variants)
+
+---
+
 ## Automated Appointment Reminders
 
 ### How it works
