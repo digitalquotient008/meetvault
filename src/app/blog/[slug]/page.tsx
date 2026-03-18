@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
 import { getPostBySlug, getAllPosts } from '@/lib/blog';
 import BlogCTA from '@/components/BlogCTA';
 
@@ -120,7 +121,10 @@ export default async function BlogPostPage({ params }: Props) {
             prose-tr:even:bg-slate-900/30
             prose-img:rounded-xl prose-img:border prose-img:border-slate-800
           ">
-            <MDXRemote source={post.content} />
+            <MDXRemote
+              source={post.content}
+              options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+            />
           </div>
 
           {/* CTA */}
