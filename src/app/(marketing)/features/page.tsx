@@ -152,24 +152,23 @@ export default function FeaturesPage() {
           <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-4">
             Built for independent barbers
           </p>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-            No-shows are costing you
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            Your clients book.
             <br />
-            <span className="bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent">
-              $400 a month.
-            </span>{' '}
-            <span className="text-white">Let&apos;s fix that.</span>
+            <span className="bg-gradient-to-r from-amber-400 to-amber-500 bg-clip-text text-transparent">You get paid.</span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto">
-            Every empty slot is money you&apos;ll never get back. MeetVault requires
-            deposits at booking — so if they ghost, you keep it. Set up in 5 minutes.
+          <p className="text-xl md:text-2xl text-slate-300 font-medium mb-6">
+            Every tool an independent barber needs — and nothing they don&apos;t.
+          </p>
+          <p className="text-base md:text-lg text-slate-400 leading-relaxed max-w-2xl mx-auto">
+            Online booking, automatic deposit collection, and no-show protection built specifically for solo operators. Set up in under five minutes. No contracts, no complexity — just a cleaner calendar and money that actually shows up.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
             <Link
               href="/sign-up"
               className="bg-amber-500 text-slate-950 px-8 py-4 rounded-xl font-bold text-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 text-center"
             >
-              Start My Free 14-Day Trial
+              Start Your Free 14-Day Trial
             </Link>
           </div>
           <p className="text-slate-500 text-sm mt-4">
