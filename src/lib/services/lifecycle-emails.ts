@@ -359,35 +359,39 @@ export async function processTrialDripSequence(): Promise<number> {
     const firstName = owner.firstName || 'there';
     const trialStart = shop.createdAt;
     const daysSinceStart = Math.floor((now.getTime() - trialStart.getTime()) / (1000 * 60 * 60 * 24));
+    const isActive = shop.subscriptionStatus === 'active';
 
-    // Day 3: Feature highlight
-    if (daysSinceStart >= 3 && daysSinceStart < 7) {
-      await sendDay3Email(shop.id, owner.email, firstName);
-      sent++;
-    }
+    // Skip trial drip emails for shops that already converted to paid.
+    // They get the 'subscription_active' email instead (sent by webhook).
+    if (!isActive) {
+      // Day 3: Feature highlight
+      if (daysSinceStart >= 3 && daysSinceStart < 7) {
+        await sendDay3Email(shop.id, owner.email, firstName);
+        sent++;
+      }
 
-    // Day 7: Mid-trial check-in
-    if (daysSinceStart >= 7 && daysSinceStart < 10) {
-      await sendDay7Email(shop.id, owner.email, firstName);
-      sent++;
-    }
+      // Day 7: Mid-trial check-in
+      if (daysSinceStart >= 7 && daysSinceStart < 10) {
+        await sendDay7Email(shop.id, owner.email, firstName);
+        sent++;
+      }
 
-    // Day 10: Urgency nudge
-    if (daysSinceStart >= 10 && daysSinceStart < 12) {
-      await sendDay10Email(shop.id, owner.email, firstName, shop.name);
-      sent++;
-    }
+      // Day 10: Urgency nudge
+      if (daysSinceStart >= 10 && daysSinceStart < 12) {
+        await sendDay10Email(shop.id, owner.email, firstName, shop.name);
+        sent++;
+      }
 
-    // Trial expired (status changed to canceled/past_due and past trial end)
-    if (
-      shop.trialEndsAt &&
-      now > shop.trialEndsAt &&
-      shop.subscriptionStatus !== 'active' &&
-      shop.subscriptionStatus !== 'trialing'
-    ) {
-      await sendTrialExpiredEmail(shop.id, owner.email, firstName, shop.name);
-      sent++;
-    }
+      // Trial expired (status changed to canceled/past_due and past trial end)
+      if (
+        shop.trialEndsAt &&
+        now > shop.trialEndsAt &&
+        shop.subscriptionStatus !== 'trialing'
+      ) {
+        await sendTrialExpiredEmail(shop.id, owner.email, firstName, shop.name);
+        sent++;
+      }
+    } // end !isActive
   }
 
   return sent;
