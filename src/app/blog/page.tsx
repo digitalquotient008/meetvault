@@ -15,6 +15,9 @@ export default function BlogIndexPage() {
     <div className="bg-slate-950 min-h-screen">
       <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="inline-flex items-center text-sm text-slate-400 hover:text-white mb-8 transition-colors">
+            &larr; Back to home
+          </Link>
           <div className="text-center mb-14">
             <p className="text-amber-400 font-semibold text-sm uppercase tracking-widest mb-3">Blog</p>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
