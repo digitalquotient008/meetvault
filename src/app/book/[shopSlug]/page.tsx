@@ -9,7 +9,15 @@ export async function generateMetadata({ params }: Props) {
   const { shopSlug } = await params;
   const shop = await getShopBySlug(shopSlug);
   if (!shop) return { title: 'Book' };
-  return { title: `Book at ${shop.name}` };
+  return {
+    title: `Book at ${shop.name}`,
+    description: `Book an appointment at ${shop.name}. Pick a service, choose a time, and confirm — takes less than a minute.`,
+    openGraph: {
+      title: `Book at ${shop.name}`,
+      description: `Book your next appointment at ${shop.name}. Online booking powered by MeetVault.`,
+    },
+    robots: { index: false }, // Don't index individual shop booking pages
+  };
 }
 
 export default async function BookPage({ params }: Props) {

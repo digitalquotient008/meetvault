@@ -2,8 +2,9 @@ import Link from 'next/link';
 import CTA from '@/components/CTA';
 
 export const metadata = {
-  title: 'Contact Us',
-  description: 'Get in touch about MeetVault — the operating system for modern barbershops.',
+  title: 'Contact Us — MeetVault',
+  description: 'Get in touch about MeetVault. Questions about pricing, Team plans for multi-barber shops, or need help getting started? We respond within one business day.',
+  alternates: { canonical: '/contact' },
 };
 
 type Props = { searchParams: Promise<{ plan?: string }> };

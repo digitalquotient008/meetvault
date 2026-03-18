@@ -3,13 +3,32 @@ import CTA from '@/components/CTA';
 import { FAQ_ITEMS } from '@/lib/faq';
 
 export const metadata = {
-  title: 'FAQ',
-  description: 'Frequently asked questions about MeetVault — barbershop booking and payments.',
+  title: 'Frequently Asked Questions',
+  description: 'Common questions about MeetVault — how pricing works, how deposits protect against no-shows, how payments are processed via Stripe, and more.',
+  alternates: { canonical: '/faq' },
+};
+
+// JSON-LD FAQPage schema for rich results in Google
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_ITEMS.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
 };
 
 export default function FAQPage() {
   return (
     <div className="bg-slate-950 min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <section className="py-20 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Frequently Asked Questions</h1>

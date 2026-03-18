@@ -4,6 +4,7 @@ import PricingCards from '@/components/PricingCards';
 export const metadata = {
   title: 'Pricing',
   description: 'Simple pricing for barbers. Starter at $25/month for solo barbers. Team plan for multi-barber shops — talk to sales.',
+  alternates: { canonical: '/pricing' },
 };
 
 export default function PricingPage() {

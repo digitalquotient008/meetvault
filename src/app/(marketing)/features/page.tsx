@@ -24,6 +24,7 @@ export const metadata = {
   title: 'Features — MeetVault',
   description:
     'No-shows are costing you $400 a month. MeetVault requires deposits at booking — so if they ghost, you keep it.',
+  alternates: { canonical: '/features' },
 };
 
 const steps = [

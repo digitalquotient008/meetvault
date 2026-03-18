@@ -6,6 +6,7 @@ export const metadata = {
   title: 'About — MeetVault',
   description:
     'MeetVault was built by someone who watched barbers lose money to no-shows, juggle DMs, and scribble notes on paper. This is the tool that should have existed.',
+  alternates: { canonical: '/about' },
 };
 
 const values = [
