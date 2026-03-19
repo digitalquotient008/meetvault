@@ -129,6 +129,9 @@ model Shop {
   stripeCustomerId          String?     // Shop-level Stripe customer (for billing)
   subscriptionStatus        String?     // trialing, active, past_due, canceled, unpaid — null until Stripe Checkout
   trialEndsAt               DateTime?
+  trialStartedAt            DateTime?
+  trialConvertedAt          DateTime?
+  trialExpiredAt            DateTime?
   cancellationWindowHours   Int?
   cancellationFeeType       CancellationFeeType?
   cancellationFeeValue      Decimal?  @db.Decimal(10, 2)
@@ -427,6 +430,7 @@ model NotificationLog {
 
   shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
+  @@unique([shopId, templateKey])
   @@index([shopId])
 }
 
