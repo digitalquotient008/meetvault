@@ -5,6 +5,7 @@ import { fmtDate, fmtDateTime } from '@/lib/format-date';
 import Link from 'next/link';
 import { listCustomerNotes } from '@/lib/services/customer-notes';
 import AddCustomerNoteForm from './AddCustomerNoteForm';
+import CustomerDataActions from './CustomerDataActions';
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -28,7 +29,10 @@ export default async function CustomerDetailPage({ params }: Props) {
   return (
     <div className="p-6 lg:p-8">
       <Link href="/app/customers" className="text-sm text-slate-400 hover:text-white mb-4 inline-block">← Customers</Link>
-      <h1 className="text-2xl font-bold text-white mb-6">{customer.firstName} {customer.lastName}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-white">{customer.firstName} {customer.lastName}</h1>
+        <CustomerDataActions customerId={id} customerName={`${customer.firstName} ${customer.lastName}`} />
+      </div>
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 mb-6">
         <p><span className="text-slate-400">Email:</span> {customer.email ?? '—'}</p>
         <p><span className="text-slate-400">Phone:</span> {customer.phone ?? '—'}</p>

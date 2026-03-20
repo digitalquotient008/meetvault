@@ -1,11 +1,25 @@
 import { env } from '@/lib/env';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+
+const SMS_SEGMENT_LENGTH = 160;
+const MAX_SMS_LENGTH = 320; // 2 segments max — keeps cost predictable
+
+/**
+ * Truncate SMS body to fit within segment limits.
+ * Adds "..." if truncated so the message is clearly cut.
+ */
+function truncateSmsBody(body: string): string {
+  if (body.length <= MAX_SMS_LENGTH) return body;
+  return body.slice(0, MAX_SMS_LENGTH - 3) + '...';
+}
 
 /**
  * Send an SMS via the Twilio REST API.
  * Uses fetch directly — no `twilio` npm package required.
  * No-ops gracefully if Twilio credentials are not configured.
  * Logs every attempt to NotificationLog for audit.
+ * Automatically truncates messages to 2 segments (320 chars) max.
  */
 export async function sendSms(params: {
   to: string;
@@ -15,7 +29,17 @@ export async function sendSms(params: {
   customerId?: string;
   templateKey: string;
 }) {
-  const { to, body, shopId, appointmentId, customerId, templateKey } = params;
+  const { to, shopId, appointmentId, customerId, templateKey } = params;
+  const body = truncateSmsBody(params.body);
+
+  if (body.length > SMS_SEGMENT_LENGTH) {
+    logger.warn('SMS exceeds single segment', {
+      shopId,
+      templateKey,
+      length: body.length,
+      segments: Math.ceil(body.length / SMS_SEGMENT_LENGTH),
+    });
+  }
 
   if (!env.TWILIO_ACCOUNT_SID || !env.TWILIO_AUTH_TOKEN || !env.TWILIO_PHONE_NUMBER) {
     return; // Twilio not configured — skip silently

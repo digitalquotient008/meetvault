@@ -52,7 +52,7 @@ export async function getAvailableSlots(params: {
   const now = new Date();
 
   // PENDING appointments older than this are treated as expired (customer navigated away)
-  const pendingExpiryTime = new Date(Date.now() - 15 * 60 * 1000);
+  const pendingExpiryTime = new Date(Date.now() - 30 * 60 * 1000);
 
   for (const barber of barbers) {
     // Batch-load everything needed for this barber in a single round-trip.

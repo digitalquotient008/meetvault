@@ -1,54 +1,67 @@
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
 /**
- * Lightweight in-process rate limiter — sliding fixed-window.
+ * Distributed rate limiter backed by Upstash Redis.
+ * Works correctly across all Vercel serverless instances.
  *
- * Works within a single serverless function instance. Good enough for burst
- * protection; does NOT coordinate across multiple Vercel instances. For
- * cross-instance rate limiting, swap the store for Upstash Redis.
+ * Falls back to a permissive in-memory limiter if Upstash is not configured
+ * (local dev without Redis). In production, UPSTASH_REDIS_REST_URL and
+ * UPSTASH_REDIS_REST_TOKEN must be set.
  */
 
-type Entry = { count: number; windowStart: number };
+let _slotsLimiter: Ratelimit | null = null;
+let _setupIntentLimiter: Ratelimit | null = null;
 
-// Module-level store survives across requests in the same warm instance
-const store = new Map<string, Entry>();
+function getRedis(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.UPSTASH_REDIS_REST_KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN;
+  if (!url || !token) return null;
+  return new Redis({ url, token });
+}
 
-// Periodically evict stale entries so the Map doesn't grow without bound
-const EVICTION_INTERVAL_MS = 5 * 60 * 1000;
-let lastEviction = Date.now();
+function getSlotsLimiter(): Ratelimit | null {
+  if (_slotsLimiter) return _slotsLimiter;
+  const redis = getRedis();
+  if (!redis) return null;
+  _slotsLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(60, '1 m'),
+    prefix: 'rl:slots',
+  });
+  return _slotsLimiter;
+}
 
-function evictStale(windowMs: number) {
-  const now = Date.now();
-  if (now - lastEviction < EVICTION_INTERVAL_MS) return;
-  lastEviction = now;
-  for (const [key, entry] of store) {
-    if (now - entry.windowStart >= windowMs) store.delete(key);
-  }
+function getSetupIntentLimiter(): Ratelimit | null {
+  if (_setupIntentLimiter) return _setupIntentLimiter;
+  const redis = getRedis();
+  if (!redis) return null;
+  _setupIntentLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, '1 m'),
+    prefix: 'rl:setup-intent',
+  });
+  return _setupIntentLimiter;
 }
 
 /**
- * Returns true if the request is allowed, false if rate-limited.
+ * Check if a request is within rate limits.
  *
- * @param key     Unique identifier — typically an IP address
- * @param limit   Max allowed requests per window
- * @param windowMs Window duration in milliseconds
+ * @param key      Unique identifier (typically IP address)
+ * @param endpoint 'slots' | 'setup-intent'
+ * @returns true if allowed, false if rate-limited
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
-  limit: number,
-  windowMs: number,
-): boolean {
-  evictStale(windowMs);
-  const now = Date.now();
-  const entry = store.get(key);
+  endpoint: 'slots' | 'setup-intent',
+): Promise<boolean> {
+  const limiter = endpoint === 'slots' ? getSlotsLimiter() : getSetupIntentLimiter();
 
-  if (!entry || now - entry.windowStart >= windowMs) {
-    store.set(key, { count: 1, windowStart: now });
-    return true;
-  }
+  // No Redis configured → allow (local dev only)
+  if (!limiter) return true;
 
-  if (entry.count >= limit) return false;
-
-  entry.count += 1;
-  return true;
+  const { success } = await limiter.limit(key);
+  return success;
 }
 
 /**

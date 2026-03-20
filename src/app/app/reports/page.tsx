@@ -1,7 +1,8 @@
 import { requireShopAccess } from '@/lib/auth';
 import { getBarberEarnings } from '@/lib/services/reports';
-import { startOfMonth, endOfDay, subDays } from 'date-fns';
+import { startOfMonth, endOfDay } from 'date-fns';
 import ReportsView from './ReportsView';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default async function ReportsPage() {
   const { shopId } = await requireShopAccess();
@@ -11,8 +12,8 @@ export default async function ReportsPage() {
   const earnings = await getBarberEarnings(shopId, from, to);
 
   return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-bold text-white mb-6">Reports</h1>
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+      <PageHeader title="Reports" description="Revenue and earnings breakdown" />
       <ReportsView
         initialEarnings={earnings}
         initialFrom={from.toISOString().slice(0, 10)}

@@ -122,6 +122,11 @@ export async function markPaymentAsSucceeded(
     return null;
   }
 
+  // Prevent double-processing: only transition from PENDING
+  if (payment.status !== PaymentStatus.PENDING) {
+    return payment;
+  }
+
   const stripe = getStripe();
   const retrieveOptions: Stripe.RequestOptions = stripeConnectAccountId
     ? { stripeAccount: stripeConnectAccountId }

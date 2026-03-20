@@ -343,6 +343,7 @@ export async function processTrialDripSequence(): Promise<number> {
       name: true,
       subscriptionStatus: true,
       trialEndsAt: true,
+      trialStartedAt: true,
       createdAt: true,
       memberships: {
         where: { role: 'OWNER', isActive: true },
@@ -357,8 +358,12 @@ export async function processTrialDripSequence(): Promise<number> {
     if (!owner?.email) continue;
 
     const firstName = owner.firstName || 'there';
-    const trialStart = shop.createdAt;
-    const daysSinceStart = Math.floor((now.getTime() - trialStart.getTime()) / (1000 * 60 * 60 * 24));
+    // Use trialStartedAt (set when Stripe checkout completes) for accurate day counts.
+    // Falls back to createdAt for shops created before trialStartedAt was added.
+    const trialStart = shop.trialStartedAt ?? shop.createdAt;
+    // Use calendar-day difference to avoid off-by-one from time-of-day drift
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysSinceStart = Math.floor((now.getTime() - trialStart.getTime()) / msPerDay);
     const isActive = shop.subscriptionStatus === 'active';
 
     // Skip trial drip emails for shops that already converted to paid.

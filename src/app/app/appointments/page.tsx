@@ -3,6 +3,12 @@ import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { AppointmentActions } from '@/components/dashboard/AppointmentActions';
 import { fmtDateTime } from '@/lib/format-date';
+import { Badge, statusVariant } from '@/components/ui/badge';
+import { PageHeader } from '@/components/ui/page-header';
+import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { CalendarDays } from 'lucide-react';
 
 const PAGE_SIZE = 50;
 
@@ -11,21 +17,9 @@ function paymentBadge(apt: { payments: { status: string; amount: unknown; type: 
   const paid = apt.payments
     .filter((p) => p.status === 'SUCCEEDED')
     .reduce((s, p) => s + Number(p.amount), 0);
-  if (paid >= total - 0.01) return { label: 'Paid', className: 'text-emerald-400' };
-  if (apt.payments.some((p) => p.status === 'SUCCEEDED' && p.type === 'DEPOSIT')) return { label: 'Deposit', className: 'text-amber-400' };
-  return { label: 'Unpaid', className: 'text-slate-400' };
-}
-
-function statusColor(status: string): string {
-  switch (status) {
-    case 'CONFIRMED':   return 'text-amber-400';
-    case 'PENDING':     return 'text-slate-400';
-    case 'IN_PROGRESS': return 'text-sky-400';
-    case 'COMPLETED':   return 'text-emerald-400';
-    case 'CANCELED':
-    case 'NO_SHOW':     return 'text-red-400';
-    default:            return 'text-slate-400';
-  }
+  if (paid >= total - 0.01) return { label: 'Paid', variant: 'success' as const };
+  if (apt.payments.some((p) => p.status === 'SUCCEEDED' && p.type === 'DEPOSIT')) return { label: 'Deposit', variant: 'warning' as const };
+  return { label: 'Unpaid', variant: 'neutral' as const };
 }
 
 type Props = { searchParams: Promise<{ page?: string }> };
@@ -53,76 +47,75 @@ export default async function AppointmentsPage({ searchParams }: Props) {
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Appointments</h1>
-        <p className="text-slate-400 text-sm">{total} total</p>
-      </div>
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-800/50 border-b border-slate-800">
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Date / Time</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Customer</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Barber</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Payment</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Actions</th>
-              <th className="px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800/60">
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+      <PageHeader
+        title="Appointments"
+        description={`${total} total`}
+      />
+
+      {appointments.length === 0 ? (
+        <EmptyState
+          icon={<CalendarDays className="w-6 h-6" />}
+          title="No appointments yet"
+          description="Appointments will appear here once clients start booking."
+        />
+      ) : (
+        <Table>
+          <TableHead>
+            <TableHeader>Date / Time</TableHeader>
+            <TableHeader>Customer</TableHeader>
+            <TableHeader className="hidden md:table-cell">Barber</TableHeader>
+            <TableHeader>Status</TableHeader>
+            <TableHeader className="hidden sm:table-cell">Payment</TableHeader>
+            <TableHeader>Actions</TableHeader>
+            <TableHeader className="w-16" />
+          </TableHead>
+          <TableBody>
             {appointments.map((apt) => {
               const badge = paymentBadge(apt);
               return (
-                <tr key={apt.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-4 py-3.5 text-white font-medium">{fmtDateTime(apt.startDateTime, tz)}</td>
-                  <td className="px-4 py-3.5 text-slate-300">{apt.customer.firstName} {apt.customer.lastName}</td>
-                  <td className="px-4 py-3.5 text-slate-400">{apt.barberProfile.displayName}</td>
-                  <td className="px-4 py-3.5">
-                    <span className={statusColor(apt.status)}>
+                <TableRow key={apt.id}>
+                  <TableCell className="text-white font-medium whitespace-nowrap">{fmtDateTime(apt.startDateTime, tz)}</TableCell>
+                  <TableCell className="text-white">{apt.customer.firstName} {apt.customer.lastName}</TableCell>
+                  <TableCell className="hidden md:table-cell">{apt.barberProfile.displayName}</TableCell>
+                  <TableCell>
+                    <Badge variant={statusVariant(apt.status)} dot>
                       {apt.status.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5"><span className={badge.className}>{badge.label}</span></td>
-                  <td className="px-4 py-3.5">
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <Badge variant={badge.variant}>{badge.label}</Badge>
+                  </TableCell>
+                  <TableCell>
                     <AppointmentActions appointmentId={apt.id} status={apt.status} />
-                  </td>
-                  <td className="px-4 py-3.5">
+                  </TableCell>
+                  <TableCell>
                     <Link href={`/app/appointments/${apt.id}`} className="text-amber-400 hover:text-amber-300 text-xs font-medium">
-                      View →
+                      View
                     </Link>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
-        {appointments.length === 0 && <p className="p-6 text-slate-500">No appointments yet.</p>}
-      </div>
+          </TableBody>
+        </Table>
+      )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-slate-400 text-sm">
+        <div className="flex items-center justify-between mt-5">
+          <p className="text-slate-500 text-sm">
             Page {page} of {totalPages}
           </p>
           <div className="flex gap-2">
             {page > 1 && (
-              <Link
-                href={`/app/appointments?page=${page - 1}`}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 text-sm"
-              >
-                ← Previous
-              </Link>
+              <Button variant="secondary" size="sm" href={`/app/appointments?page=${page - 1}`}>
+                Previous
+              </Button>
             )}
             {page < totalPages && (
-              <Link
-                href={`/app/appointments?page=${page + 1}`}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 text-sm"
-              >
-                Next →
-              </Link>
+              <Button variant="secondary" size="sm" href={`/app/appointments?page=${page + 1}`}>
+                Next
+              </Button>
             )}
           </div>
         </div>

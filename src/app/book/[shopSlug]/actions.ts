@@ -92,12 +92,17 @@ export async function saveCardAction(params: {
     setupIntentId: params.setupIntentId,
   });
 
-  // Promote PENDING → CONFIRMED now that card is saved
+  // Promote PENDING → CONFIRMED now that card is saved.
+  // Use updateMany with status filter to prevent double-confirmation race condition:
+  // if two requests arrive simultaneously, only the first one matches status=PENDING.
   if (appointment.status === 'PENDING') {
-    await prisma.appointment.update({
-      where: { id: params.appointmentId },
+    const updated = await prisma.appointment.updateMany({
+      where: { id: params.appointmentId, status: 'PENDING' },
       data: { status: 'CONFIRMED' },
     });
+
+    // If count is 0, another request already confirmed this appointment — skip
+    if (updated.count === 0) return;
 
     // Now that the booking is confirmed, record the visit on the customer record.
     // Both lastVisitAt and totalVisits were intentionally deferred from appointment

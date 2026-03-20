@@ -8,11 +8,15 @@ import {
   StripeDashboardButton,
   RequestPayoutButton,
 } from './PaymentsClient';
+import { PageHeader } from '@/components/ui/page-header';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '@/components/ui/table';
 
-function payoutStatusBadge(status: string) {
-  if (status === 'paid') return 'text-emerald-400 bg-emerald-500/10';
-  if (status === 'pending' || status === 'in_transit') return 'text-amber-400 bg-amber-500/10';
-  return 'text-red-400 bg-red-500/10';
+function payoutBadgeVariant(status: string) {
+  if (status === 'paid') return 'success' as const;
+  if (status === 'pending' || status === 'in_transit') return 'warning' as const;
+  return 'danger' as const;
 }
 
 function bankLabel(destination: Stripe.Payout['destination']): string {
@@ -35,8 +39,6 @@ export default async function PaymentsPage({
   }
   const { setup, connect_error } = await searchParams;
 
-  // Only read DB — no Stripe API calls in the page render.
-  // Stripe syncing happens in /app/connect/return and server actions.
   const shop = await prisma.shop.findUnique({
     where: { id: shopId },
     select: {
@@ -66,27 +68,22 @@ export default async function PaymentsPage({
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Payments</h1>
-        <p className="text-slate-400 mt-1 text-sm">Manage your Stripe account and payouts</p>
-      </div>
+    <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
+      <PageHeader
+        title="Payments"
+        description="Manage your Stripe account and payouts"
+      />
 
       {setup === 'required' && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-amber-300 text-sm">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-amber-300 text-sm">
           Connect your Stripe account to start accepting payments and enable checkout.
         </div>
       )}
 
       {connect_error === 'stripe-connect-not-enabled' && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-400 text-sm">
           Stripe Connect is not enabled on your account. Visit{' '}
-          <a
-            href="https://dashboard.stripe.com/connect/accounts/overview"
-            target="_blank"
-            rel="noreferrer"
-            className="underline"
-          >
+          <a href="https://dashboard.stripe.com/connect/accounts/overview" target="_blank" rel="noreferrer" className="underline">
             dashboard.stripe.com → Connect
           </a>{' '}
           to activate it, then try again.
@@ -94,113 +91,83 @@ export default async function PaymentsPage({
       )}
 
       {connect_error && connect_error !== 'stripe-connect-not-enabled' && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-400 text-sm">
           Failed to connect Stripe account: {decodeURIComponent(connect_error)}
         </div>
       )}
 
-      {/* Connect Status Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+      {/* Connect Status */}
+      <Card>
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-white font-semibold text-lg">Stripe Account</h2>
-            {notConnected && (
-              <p className="text-slate-400 text-sm mt-1">
-                Connect your bank account to accept card payments.
-              </p>
-            )}
-            {notOnboarded && (
-              <p className="text-slate-400 text-sm mt-1">
-                Your setup is incomplete. Click below to finish onboarding.
-              </p>
-            )}
+            {notConnected && <p className="text-slate-400 text-sm mt-1">Connect your bank account to accept card payments.</p>}
+            {notOnboarded && <p className="text-slate-400 text-sm mt-1">Your setup is incomplete. Click below to finish onboarding.</p>}
             {onboarded && (
-              <p className="text-emerald-400 text-sm mt-1 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-                Active — accepting payments
+              <p className="text-sm mt-1 flex items-center gap-2">
+                <Badge variant="success" dot>Active — accepting payments</Badge>
               </p>
             )}
           </div>
           {onboarded && <StripeDashboardButton />}
         </div>
-
-        {(notConnected || notOnboarded) && <ConnectButton />}
-      </div>
+        {(notConnected || notOnboarded) && <div className="mt-4"><ConnectButton /></div>}
+      </Card>
 
       {stripeError && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm">
-          {stripeError}
-        </div>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-400 text-sm">{stripeError}</div>
       )}
 
-      {/* Balance Cards */}
+      {/* Balance */}
       {onboarded && balance && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
-            <p className="text-slate-400 text-sm">Available balance</p>
-            <p className="text-3xl font-bold text-emerald-400">
-              ${(balance.available / 100).toFixed(2)}
-            </p>
-            <p className="text-slate-500 text-xs">Ready to withdraw</p>
+          <Card>
+            <p className="text-slate-500 text-xs uppercase tracking-wider font-medium">Available balance</p>
+            <p className="text-3xl font-bold text-emerald-400 mt-2">${(balance.available / 100).toFixed(2)}</p>
+            <p className="text-slate-500 text-xs mt-1 mb-4">Ready to withdraw</p>
             <RequestPayoutButton availableCents={balance.available} />
-          </div>
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
-            <p className="text-slate-400 text-sm">Pending balance</p>
-            <p className="text-3xl font-bold text-amber-400">
-              ${(balance.pending / 100).toFixed(2)}
-            </p>
-            <p className="text-slate-500 text-xs">Typically available in 2 business days</p>
-          </div>
+          </Card>
+          <Card>
+            <p className="text-slate-500 text-xs uppercase tracking-wider font-medium">Pending balance</p>
+            <p className="text-3xl font-bold text-amber-400 mt-2">${(balance.pending / 100).toFixed(2)}</p>
+            <p className="text-slate-500 text-xs mt-1">Typically available in 2 business days</p>
+          </Card>
         </div>
       )}
 
-      {/* Payouts Table */}
+      {/* Payouts */}
       {onboarded && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-800">
-            <h2 className="text-white font-semibold">Payout history</h2>
-          </div>
+        <>
+          <h2 className="text-white font-semibold text-lg">Payout history</h2>
           {payouts.length === 0 ? (
-            <p className="text-slate-500 text-sm p-6">No payouts yet.</p>
+            <Card><p className="text-slate-500 text-sm text-center py-4">No payouts yet.</p></Card>
           ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-slate-500 text-xs border-b border-slate-800">
-                  <th className="text-left px-6 py-3 font-medium">Date</th>
-                  <th className="text-left px-6 py-3 font-medium">Amount</th>
-                  <th className="text-left px-6 py-3 font-medium">Status</th>
-                  <th className="text-left px-6 py-3 font-medium">Bank</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHead>
+                <TableHeader>Date</TableHeader>
+                <TableHeader>Amount</TableHeader>
+                <TableHeader>Status</TableHeader>
+                <TableHeader className="hidden sm:table-cell">Bank</TableHeader>
+              </TableHead>
+              <TableBody>
                 {payouts.map((payout) => (
-                  <tr key={payout.id} className="border-b border-slate-800/50 last:border-0">
-                    <td className="px-6 py-3 text-slate-300">
-                      {new Date(payout.created * 1000).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </td>
-                    <td className="px-6 py-3 text-white font-medium">
-                      ${(payout.amount / 100).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${payoutStatusBadge(payout.status)}`}
-                      >
-                        {payout.status === 'in_transit'
-                          ? 'In transit'
-                          : payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3 text-slate-400">{bankLabel(payout.destination)}</td>
-                  </tr>
+                  <TableRow key={payout.id}>
+                    <TableCell>
+                      {new Date(payout.created * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </TableCell>
+                    <TableCell className="text-white font-medium">${(payout.amount / 100).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge variant={payoutBadgeVariant(payout.status)}>
+                        {payout.status === 'in_transit' ? 'In transit' : payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{bankLabel(payout.destination)}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
-        </div>
+        </>
       )}
     </div>
   );

@@ -1,8 +1,14 @@
+import Link from 'next/link';
 import { requireShopAccess } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { getAppointmentsForShop } from '@/lib/services/appointment';
 import { startOfDayInTz, endOfDayInTz, fmtTime } from '@/lib/format-date';
 import { AppointmentActions } from '@/components/dashboard/AppointmentActions';
+import { PageHeader } from '@/components/ui/page-header';
+import { Card } from '@/components/ui/card';
+import { Badge, statusVariant } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Calendar as CalendarIcon } from 'lucide-react';
 
 export default async function CalendarPage() {
   const { shopId } = await requireShopAccess();
@@ -14,23 +20,44 @@ export default async function CalendarPage() {
   const appointments = await getAppointmentsForShop(shopId, todayStart, todayEnd);
 
   return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-bold text-white mb-6">Calendar</h1>
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <p className="text-slate-400 text-sm mb-4">Today&apos;s appointments ({appointments.length})</p>
-        <ul className="space-y-2">
-          {appointments.map((apt) => (
-            <li key={apt.id} className="flex items-center justify-between py-2 border-b border-slate-800 last:border-0 gap-2">
-              <span className="text-white shrink-0 w-20">{fmtTime(apt.startDateTime, tz)}</span>
-              <span className="text-slate-400 truncate">{apt.customer.firstName} {apt.customer.lastName}</span>
-              <span className="text-amber-400 shrink-0">{apt.barberProfile.displayName}</span>
-              <span className="text-slate-500 text-xs shrink-0">{apt.status}</span>
-              <AppointmentActions appointmentId={apt.id} status={apt.status} />
-            </li>
-          ))}
-        </ul>
-        {appointments.length === 0 && <p className="text-slate-500 text-sm">No appointments today.</p>}
-      </div>
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+      <PageHeader
+        title="Calendar"
+        description={`Today's appointments (${appointments.length})`}
+      />
+
+      {appointments.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<CalendarIcon className="w-6 h-6" />}
+            title="No appointments today"
+            description="Your schedule is clear. Appointments will appear here as clients book."
+          />
+        </Card>
+      ) : (
+        <Card padding="none">
+          <div className="divide-y divide-slate-800/50">
+            {appointments.map((apt) => (
+              <div key={apt.id} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-slate-800/20 transition-colors">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <span className="text-white font-semibold text-sm w-16 shrink-0">{fmtTime(apt.startDateTime, tz)}</span>
+                  <div className="h-8 w-px bg-slate-800 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{apt.customer.firstName} {apt.customer.lastName}</p>
+                    <p className="text-slate-500 text-xs truncate">{apt.barberProfile.displayName}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <Badge variant={statusVariant(apt.status)} dot>
+                    {apt.status.replace('_', ' ')}
+                  </Badge>
+                  <AppointmentActions appointmentId={apt.id} status={apt.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

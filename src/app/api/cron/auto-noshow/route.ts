@@ -1,32 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processAutoNoShows } from '@/lib/services/auto-noshow';
+import { verifyCronAuth } from '@/lib/cron-auth';
+import { acquireCronLock, releaseCronLock } from '@/lib/cron-lock';
+import { logger } from '@/lib/logger';
 
-/**
- * Cron endpoint — auto-detects no-shows and charges the card on file.
- *
- * Finds CONFIRMED appointments whose endDateTime is > 30 min in the past,
- * marks them as NO_SHOW, and charges the no-show fee if configured.
- *
- * Vercel invokes this every 15 minutes (see vercel.json → crons).
- * Protected with CRON_SECRET to prevent unauthorized invocation.
- */
 export async function GET(request: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get('authorization');
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const authError = verifyCronAuth(request);
+  if (authError) return authError;
+
+  const lock = await acquireCronLock('auto-noshow', 120);
+  if (!lock) {
+    logger.warn('Cron skipped — already running', { cron: 'auto-noshow' });
+    return NextResponse.json({ ok: true, skipped: true });
   }
 
   try {
     const result = await processAutoNoShows();
-    console.log(
-      `[cron/auto-noshow] Detected ${result.detected} no-show(s), charged ${result.charged}, errors: ${result.chargeErrors}`,
-    );
+    logger.info('Auto no-show processed', { cron: 'auto-noshow', ...result });
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    console.error('[cron/auto-noshow] Error:', err);
+    logger.error('Auto no-show failed', { cron: 'auto-noshow', error: err instanceof Error ? err.message : String(err) });
     return NextResponse.json({ error: 'Auto no-show processing failed' }, { status: 500 });
+  } finally {
+    await releaseCronLock('auto-noshow', lock);
   }
 }

@@ -15,7 +15,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   STRIPE_CONNECT_WEBHOOK_SECRET: z.string().optional(),
-  PLATFORM_FEE_PERCENT: z.coerce.number().min(0).max(100).default(0),
+  PLATFORM_FEE_PERCENT: z.coerce.number().min(0).max(50).default(0),
 
   // Email
   RESEND_API_KEY: z.string().optional(),

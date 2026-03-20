@@ -3,6 +3,8 @@ import { getShopById } from '@/lib/services/shop';
 import { Globe, Clock, Link as LinkIcon } from 'lucide-react';
 import NoShowFeeForm from './NoShowFeeForm';
 import CancellationPolicyForm from './CancellationPolicyForm';
+import { PageHeader } from '@/components/ui/page-header';
+import { Card } from '@/components/ui/card';
 
 export default async function ShopSettingsPage() {
   const { shopId } = await requireShopAccess();
@@ -10,54 +12,42 @@ export default async function ShopSettingsPage() {
   if (!shop) return null;
 
   return (
-    <div className="p-6 lg:p-8 max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Shop settings</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Manage your shop info, fees, and cancellation policy</p>
-      </div>
+    <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-8">
+      <PageHeader
+        title="Shop settings"
+        description="Manage your shop info, fees, and cancellation policy"
+      />
 
       {/* Basic info */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800">
+      <Card padding="none">
+        <div className="px-6 py-4 border-b border-slate-800/50">
           <h2 className="text-white font-semibold">Shop info</h2>
         </div>
-        <div className="divide-y divide-slate-800/60">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
-                <Globe className="w-4 h-4 text-slate-400" />
+        <div className="divide-y divide-slate-800/50">
+          {[
+            { icon: Globe, label: 'Shop name', value: <span className="text-white">{shop.name}</span> },
+            { icon: LinkIcon, label: 'Booking URL', value: <span className="text-amber-400">/book/{shop.slug}</span> },
+            { icon: Clock, label: 'Timezone', value: <span className="text-white">{shop.timezone}</span> },
+          ].map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-center justify-between px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-slate-500" />
+                </div>
+                <span className="text-slate-400 text-sm">{label}</span>
               </div>
-              <span className="text-slate-400 text-sm">Shop name</span>
+              <span className="text-sm font-medium">{value}</span>
             </div>
-            <span className="text-white text-sm font-medium">{shop.name}</span>
-          </div>
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
-                <LinkIcon className="w-4 h-4 text-slate-400" />
-              </div>
-              <span className="text-slate-400 text-sm">Booking URL</span>
-            </div>
-            <span className="text-amber-400 text-sm font-medium">/book/{shop.slug}</span>
-          </div>
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
-                <Clock className="w-4 h-4 text-slate-400" />
-              </div>
-              <span className="text-slate-400 text-sm">Timezone</span>
-            </div>
-            <span className="text-white text-sm font-medium">{shop.timezone}</span>
-          </div>
+          ))}
         </div>
-      </div>
+      </Card>
 
       {/* No-show fee */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800">
+      <Card padding="none">
+        <div className="px-6 py-4 border-b border-slate-800/50">
           <h2 className="text-white font-semibold">No-show fee</h2>
           <p className="text-slate-500 text-sm mt-1">
-            Charge customers who miss their appointment without canceling. A card on file will be collected at booking time.
+            Charge customers who miss their appointment without canceling.
           </p>
         </div>
         <div className="px-6 py-5">
@@ -67,14 +57,14 @@ export default async function ShopSettingsPage() {
             currentRequired={shop.cardRequiredForBooking ?? false}
           />
         </div>
-      </div>
+      </Card>
 
       {/* Cancellation policy */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-800">
+      <Card padding="none">
+        <div className="px-6 py-4 border-b border-slate-800/50">
           <h2 className="text-white font-semibold">Cancellation policy</h2>
           <p className="text-slate-500 text-sm mt-1">
-            Set a free-cancellation window and choose what fee (if any) applies when customers cancel within it.
+            Set a free-cancellation window and choose what fee applies when customers cancel within it.
           </p>
         </div>
         <div className="px-6 py-5">
@@ -88,7 +78,7 @@ export default async function ShopSettingsPage() {
             }}
           />
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

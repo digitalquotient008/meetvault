@@ -22,7 +22,7 @@ export default function Hero() {
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            No-shows drain independent barbers up to $400/month. MeetVault stops it with deposit-required booking — set up in 5 minutes, no contracts, no hidden fees.
+            No-shows drain independent barbers up to $400/month<span className="text-amber-500">*</span>. MeetVault stops it with deposit-required booking — set up in 5 minutes, no contracts, no hidden fees.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

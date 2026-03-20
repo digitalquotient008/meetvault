@@ -39,7 +39,7 @@ function CheckIcon() {
 
 export default function PricingCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-start">
       {/* ─── Starter ─── */}
       <div className="relative bg-slate-900/90 rounded-3xl border border-amber-500/40 p-8 shadow-2xl shadow-amber-500/10 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
@@ -55,7 +55,7 @@ export default function PricingCards() {
           <div className="text-center mb-7">
             <h3 className="text-2xl font-bold text-white mb-1">Starter</h3>
             <p className="text-sm text-slate-400 mb-5">For solo barbers and independent stylists</p>
-            <div className="flex items-end justify-center gap-1">
+            <div className="flex items-end justify-center gap-1 h-14">
               <span className="text-5xl font-extrabold text-white leading-none">$25</span>
               <span className="text-slate-400 text-lg mb-1">/mo</span>
             </div>
@@ -94,20 +94,17 @@ export default function PricingCards() {
           <div className="text-center mb-7">
             <h3 className="text-2xl font-bold text-white mb-1">Team</h3>
             <p className="text-sm text-slate-400 mb-5">For shops with multiple barbers or salon suites</p>
-            <div className="flex items-end justify-center gap-1">
+            <div className="flex items-end justify-center gap-1 h-14">
               <span className="text-3xl font-bold text-white leading-none">Custom pricing</span>
             </div>
           </div>
 
           <Link
-            href="/book/meetingvault"
+            href="/contact?plan=team"
             className="block w-full text-center px-4 py-3.5 rounded-xl font-bold text-base transition-all bg-white/10 border border-slate-600 text-white hover:bg-white/15 hover:border-slate-500 mb-2"
           >
-            Schedule a Demo
+            Contact Sales
           </Link>
-          <p className="text-center text-xs text-slate-500 mb-1">
-            or <Link href="/contact?plan=team" className="text-blue-400 hover:text-blue-300">contact sales</Link> directly
-          </p>
           <p className="text-center text-xs text-slate-500 mb-7">
             We&apos;ll build a plan that fits your shop
           </p>
