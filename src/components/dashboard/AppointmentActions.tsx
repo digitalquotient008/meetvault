@@ -11,6 +11,8 @@ type Props = {
   status: AppointmentStatus;
 };
 
+const btnBase = 'text-xs px-2.5 py-1 rounded-lg font-medium transition-colors';
+
 export function AppointmentActions({ appointmentId, status }: Props) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -26,49 +28,32 @@ export function AppointmentActions({ appointmentId, status }: Props) {
   };
 
   if (status === 'CANCELED' || status === 'COMPLETED' || status === 'NO_SHOW') {
-    return <span className="text-slate-500 text-xs">{status.replace('_', ' ')}</span>;
+    return null;
   }
 
   if (status === 'PENDING') {
-    return <span className="text-slate-400 text-xs italic">Awaiting card</span>;
+    return <span className="text-slate-500 text-xs italic">Awaiting card</span>;
   }
 
   return (
-    <div className="flex flex-wrap gap-1">
-      {error && (
-        <span className="w-full text-xs text-red-400 mb-1">{error}</span>
-      )}
+    <div className="flex flex-wrap gap-1.5">
+      {error && <span className="w-full text-xs text-red-400 mb-1">{error}</span>}
       {status === 'CONFIRMED' && (
-        <button
-          type="button"
-          onClick={() => handle('start')}
-          className="text-xs px-2 py-1 rounded bg-amber-600 text-white hover:bg-amber-500"
-        >
+        <button type="button" onClick={() => handle('start')} className={`${btnBase} bg-amber-500/15 text-amber-400 hover:bg-amber-500/25`}>
           Start
         </button>
       )}
       {(status === 'CONFIRMED' || status === 'IN_PROGRESS') && (
-        <Link
-          href={`/app/appointments/${appointmentId}/checkout`}
-          className="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500"
-        >
+        <Link href={`/app/appointments/${appointmentId}/checkout`} className={`${btnBase} bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25`}>
           Checkout
         </Link>
       )}
       {(status === 'CONFIRMED' || status === 'IN_PROGRESS') && (
         <>
-          <button
-            type="button"
-            onClick={() => handle('no-show')}
-            className="text-xs px-2 py-1 rounded bg-slate-600 text-white hover:bg-slate-500"
-          >
+          <button type="button" onClick={() => handle('no-show')} className={`${btnBase} bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700`}>
             No-show
           </button>
-          <button
-            type="button"
-            onClick={() => handle('cancel')}
-            className="text-xs px-2 py-1 rounded border border-slate-600 text-slate-400 hover:bg-slate-800"
-          >
+          <button type="button" onClick={() => handle('cancel')} className={`${btnBase} text-slate-500 hover:text-red-400 hover:bg-red-500/10`}>
             Cancel
           </button>
         </>
