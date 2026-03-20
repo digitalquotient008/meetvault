@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processTrialDripSequence } from '@/lib/services/lifecycle-emails';
+import { verifyCronAuth } from '@/lib/cron-auth';
 
-/**
- * Cron endpoint — processes trial drip email sequence.
- *
- * Runs daily at 10am UTC (see vercel.json → crons).
- * Sends day 3, 7, 10 emails + trial expired / winback emails.
- * Protected with CRON_SECRET to prevent unauthorized invocation.
- */
 export async function GET(request: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get('authorization');
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-  }
+  const authError = verifyCronAuth(request);
+  if (authError) return authError;
 
   try {
     const dripEmails = await processTrialDripSequence();

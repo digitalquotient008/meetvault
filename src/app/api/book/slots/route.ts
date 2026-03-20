@@ -4,7 +4,7 @@ import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   // 60 requests / minute per IP — prevents slot-scraping abuse
-  if (!checkRateLimit(getClientIp(request), 60, 60_000)) {
+  if (!(await checkRateLimit(getClientIp(request), 'slots'))) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 

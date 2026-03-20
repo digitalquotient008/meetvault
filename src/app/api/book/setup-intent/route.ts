@@ -5,7 +5,7 @@ import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   // 10 requests / minute per IP — SetupIntents create Stripe customers on abuse
-  if (!checkRateLimit(getClientIp(req), 10, 60_000)) {
+  if (!(await checkRateLimit(getClientIp(req), 'setup-intent'))) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 

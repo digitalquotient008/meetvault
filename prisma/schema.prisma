@@ -299,8 +299,8 @@ model Customer {
 
   customerNotes        CustomerNote[]
 
+  @@unique([shopId, email])
   @@index([shopId])
-  @@index([shopId, email])
 }
 
 model CustomerNote {
