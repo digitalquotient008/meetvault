@@ -14,6 +14,7 @@ const isPublicRoute = createRouteMatcher([
   '/blog(.*)',
   '/book(.*)',
   '/api(.*)',
+  '/meetvault-vs-booksy',
   '/sitemap.xml',
   '/robots.txt',
 ]);

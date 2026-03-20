@@ -4,6 +4,15 @@ const nextConfig = {
   images: {
     domains: [],
   },
+  async redirects() {
+    return [
+      {
+        source: '/meetvault-vs-booksy',
+        destination: '/blog/meetvault-vs-booksy',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
