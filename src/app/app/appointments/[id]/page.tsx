@@ -7,6 +7,8 @@ import RefundButton from './RefundButton';
 import NoShowChargeButton from './NoShowChargeButton';
 import CancelAppointmentButton from './CancelAppointmentButton';
 import { CreditCard } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Badge, statusVariant } from '@/components/ui/badge';
 
 const CANCELABLE_STATUSES = ['PENDING', 'CONFIRMED', 'IN_PROGRESS'];
 
@@ -39,46 +41,54 @@ export default async function AppointmentDetailPage({ params }: Props) {
     .reduce((s, p) => s + Number(p.amount), 0);
   const canCancel = CANCELABLE_STATUSES.includes(appointment.status);
   const noShowFeeAmount = shop?.noShowFeeAmount ? Number(shop.noShowFeeAmount) : null;
-
   const noShowFeeCharged = appointment.noShowFeeCharged;
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl">
-      <Link href="/app/appointments" className="text-sm text-slate-400 hover:text-white mb-4 inline-block">
+    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
+      <Link href="/app/appointments" className="text-sm text-slate-400 hover:text-white mb-4 inline-block transition-colors">
         ← Appointments
       </Link>
-      <h1 className="text-2xl font-bold text-white mb-6">Appointment</h1>
+      <div className="flex items-center gap-3 mb-6">
+        <h1 className="text-2xl font-bold text-white">Appointment</h1>
+        <Badge variant={statusVariant(appointment.status)} dot>
+          {appointment.status.replace('_', ' ')}
+        </Badge>
+      </div>
 
       {/* Details */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4 mb-6">
-        <p><span className="text-slate-400">When:</span> <span className="text-white">{fmtDateTime(appointment.startDateTime, tz)}</span></p>
-        <p><span className="text-slate-400">Customer:</span> <span className="text-white">{customer.firstName} {customer.lastName}</span></p>
-        <p><span className="text-slate-400">Barber:</span> <span className="text-white">{appointment.barberProfile.displayName}</span></p>
-        <p>
-          <span className="text-slate-400">Status:</span>{' '}
-          <span className={appointment.status === 'NO_SHOW' ? 'text-red-400 font-semibold' : 'text-amber-400'}>
-            {appointment.status.replace('_', ' ')}
-          </span>
-        </p>
-        <p><span className="text-slate-400">Total:</span> <span className="text-white">${Number(appointment.totalAmount ?? 0).toFixed(2)}</span></p>
+      <Card className="mb-6">
+        <div className="space-y-3">
+          {[
+            { label: 'When', value: fmtDateTime(appointment.startDateTime, tz) },
+            { label: 'Customer', value: `${customer.firstName} ${customer.lastName}` },
+            { label: 'Barber', value: appointment.barberProfile.displayName },
+            { label: 'Service', value: appointment.appointmentServices[0]?.serviceNameSnapshot ?? '—' },
+            { label: 'Total', value: `$${Number(appointment.totalAmount ?? 0).toFixed(2)}` },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex items-center justify-between py-1">
+              <span className="text-slate-500 text-sm">{label}</span>
+              <span className="text-white text-sm font-medium">{value}</span>
+            </div>
+          ))}
+        </div>
         {canCancel && (
-          <div className="pt-2 border-t border-slate-800">
+          <div className="pt-4 mt-4 border-t border-slate-800/50">
             <CancelAppointmentButton appointmentId={appointment.id} totalPaid={totalPaid} />
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Card on file */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-          <CreditCard className="w-5 h-5 text-slate-400" />
+      <Card className="mb-6">
+        <h2 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+          <CreditCard className="w-4 h-4 text-slate-500" />
           Card on file
         </h2>
         {hasCardOnFile ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-6 bg-slate-700 rounded flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-slate-300" />
+              <div className="w-9 h-6 bg-slate-800 rounded flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-slate-400" />
               </div>
               <span className="text-white text-sm">
                 {customer.cardBrand
@@ -87,22 +97,18 @@ export default async function AppointmentDetailPage({ params }: Props) {
                 •••• {customer.cardLastFour}
               </span>
             </div>
-            <span className="text-emerald-400 text-xs font-medium">On file</span>
+            <Badge variant="success" dot>On file</Badge>
           </div>
         ) : (
           <p className="text-slate-500 text-sm">No card on file for this customer.</p>
         )}
 
-        {/* No-show fee charge section */}
         {appointment.status === 'NO_SHOW' && noShowFeeAmount && (
-          <div className="mt-4 pt-4 border-t border-slate-800">
+          <div className="mt-4 pt-4 border-t border-slate-800/50">
             {noShowFeeCharged ? (
-              <p className="text-emerald-400 text-sm font-medium">No-show fee already charged.</p>
+              <Badge variant="success" dot>No-show fee charged</Badge>
             ) : hasCardOnFile ? (
-              <NoShowChargeButton
-                appointmentId={appointment.id}
-                feeAmount={noShowFeeAmount}
-              />
+              <NoShowChargeButton appointmentId={appointment.id} feeAmount={noShowFeeAmount} />
             ) : (
               <p className="text-slate-500 text-sm">
                 No card on file — cannot charge no-show fee of ${noShowFeeAmount.toFixed(2)}.
@@ -110,34 +116,28 @@ export default async function AppointmentDetailPage({ params }: Props) {
             )}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Payments */}
-      <h2 className="text-lg font-semibold text-white mb-3">Payments</h2>
-      <div className="space-y-2 mb-6">
-        {appointment.payments.length === 0 ? (
-          <p className="text-slate-500 text-sm">No payments recorded.</p>
-        ) : (
-          appointment.payments.map((p: typeof appointment.payments[number]) => (
-            <div
-              key={p.id}
-              className="flex items-center justify-between bg-slate-800 rounded-lg px-4 py-3 border border-slate-700"
-            >
-              <div>
-                <span className="text-white">{p.type}</span>
-                <span className="text-slate-400 ml-2">${Number(p.amount).toFixed(2)}</span>
-                <span className={`ml-2 text-xs ${p.status === 'SUCCEEDED' ? 'text-emerald-400' : 'text-slate-500'}`}>
+      <h2 className="text-base font-semibold text-white mb-3">Payments</h2>
+      {appointment.payments.length === 0 ? (
+        <p className="text-slate-500 text-sm">No payments recorded.</p>
+      ) : (
+        <div className="space-y-2">
+          {appointment.payments.map((p) => (
+            <div key={p.id} className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl px-5 py-4">
+              <div className="flex items-center gap-3">
+                <Badge variant={p.status === 'SUCCEEDED' ? 'success' : p.status === 'FAILED' ? 'danger' : 'neutral'}>
+                  {p.type}
+                </Badge>
+                <span className="text-white font-medium text-sm">${Number(p.amount).toFixed(2)}</span>
+                <Badge variant={p.status === 'SUCCEEDED' ? 'success' : 'neutral'} dot>
                   {p.status}
-                </span>
+                </Badge>
               </div>
               <div className="flex items-center gap-2">
                 {p.receiptUrl && (
-                  <a
-                    href={p.receiptUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-400 hover:text-amber-300 text-sm"
-                  >
+                  <a href={p.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300 text-xs font-medium">
                     Receipt
                   </a>
                 )}
@@ -146,9 +146,9 @@ export default async function AppointmentDetailPage({ params }: Props) {
                 )}
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
