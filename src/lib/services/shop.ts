@@ -13,7 +13,7 @@ export type ShopForBooking = {
   depositValue?: number | null;
   noShowFeeAmount: number | null;
   cardRequiredForBooking: boolean;
-  services: { id: string; name: string; durationMin: number; price: number }[];
+  services: { id: string; name: string; description: string | null; durationMin: number; price: number }[];
   barberProfiles: { id: string; displayName: string }[];
 };
 
@@ -87,6 +87,7 @@ export async function getShopBySlug(slug: string): Promise<ShopForBooking | null
     services: row.services.map((s) => ({
       id: s.id,
       name: s.name,
+      description: s.description,
       durationMin: s.durationMin,
       price: Number(s.price),
     })),

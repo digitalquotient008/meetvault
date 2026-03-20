@@ -148,7 +148,8 @@ export default function BookingFlow({ shop }: { shop: ShopForBooking }) {
               className="w-full text-left bg-slate-800 border border-slate-700 rounded-lg p-4 hover:border-amber-500/50 transition-colors"
             >
               <span className="font-medium text-white">{s.name}</span>
-              <span className="block text-sm text-slate-400">{s.durationMin} min · ${Number(s.price)}</span>
+              {s.description && <span className="block text-xs text-slate-500 mt-0.5">{s.description}</span>}
+              <span className="block text-sm text-slate-400 mt-0.5">{s.durationMin} min · ${Number(s.price)}</span>
             </button>
           ))}
         </div>
