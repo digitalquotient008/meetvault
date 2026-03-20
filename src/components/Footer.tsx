@@ -61,7 +61,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="text-center text-xs text-slate-600 mt-6">
-          Results may vary based on booking volume and no-show rates.
+          <span className="text-amber-600">*</span> Based on 2–3 no-shows per week at $40–$60 per service. Actual savings depend on your booking volume, pricing, and no-show rate.
         </p>
       </div>
     </footer>
