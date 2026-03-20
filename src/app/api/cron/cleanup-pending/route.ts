@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   if (authError) return authError;
 
   try {
-    const result = await cleanupExpiredPendingAppointments(15);
+    const result = await cleanupExpiredPendingAppointments(30);
     console.log(`[cron/cleanup-pending] Canceled ${result.canceled} expired PENDING appointment(s)`);
     return NextResponse.json({ ok: true, canceled: result.canceled });
   } catch (err) {
