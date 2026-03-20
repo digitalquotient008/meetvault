@@ -321,16 +321,10 @@ export default function FeaturesPage() {
               </p>
               <div className="flex items-center gap-4">
                 <Link
-                  href="/book/meetingvault"
+                  href="/contact?plan=team"
                   className="inline-flex px-5 py-2.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/15 rounded-xl text-sm font-semibold transition-colors"
                 >
-                  Schedule a Demo
-                </Link>
-                <Link
-                  href="/contact?plan=team"
-                  className="text-slate-400 hover:text-slate-300 text-sm transition-colors"
-                >
-                  or contact sales
+                  Contact Sales
                 </Link>
               </div>
             </div>

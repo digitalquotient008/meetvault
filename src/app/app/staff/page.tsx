@@ -81,8 +81,8 @@ export default async function StaffPage() {
                 The Starter plan includes 1 staff member. Upgrade to Team for unlimited barbers, per-barber scheduling, commission tracking, and more.
               </p>
               <div className="flex items-center gap-3">
-                <Button variant="secondary" size="sm" href="/book/meetingvault">
-                  Schedule a Demo
+                <Button variant="secondary" size="sm" href="/contact?plan=team">
+                  Contact Sales
                 </Button>
                 <Link href="/contact?plan=team" className="text-slate-400 hover:text-slate-300 text-sm transition-colors">
                   or contact sales

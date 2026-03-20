@@ -100,14 +100,11 @@ export default function PricingCards() {
           </div>
 
           <Link
-            href="/book/meetingvault"
+            href="/contact?plan=team"
             className="block w-full text-center px-4 py-3.5 rounded-xl font-bold text-base transition-all bg-white/10 border border-slate-600 text-white hover:bg-white/15 hover:border-slate-500 mb-2"
           >
-            Schedule a Demo
+            Contact Sales
           </Link>
-          <p className="text-center text-xs text-slate-500 mb-1">
-            or <Link href="/contact?plan=team" className="text-blue-400 hover:text-blue-300">contact sales</Link> directly
-          </p>
           <p className="text-center text-xs text-slate-500 mb-7">
             We&apos;ll build a plan that fits your shop
           </p>
