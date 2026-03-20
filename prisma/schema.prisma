@@ -355,6 +355,7 @@ model Appointment {
   @@index([barberProfileId])
   @@index([customerId])
   @@index([shopId, startDateTime])
+  @@index([status, createdAt])
 }
 
 model AppointmentService {
@@ -397,6 +398,7 @@ model Payment {
 
   @@index([shopId])
   @@index([appointmentId])
+  @@index([stripePaymentIntentId])
 }
 
 model Refund {
@@ -487,4 +489,5 @@ model AuditLog {
 
   @@index([shopId])
   @@index([shopId, entityType, entityId])
+  @@index([createdAt])
 }
