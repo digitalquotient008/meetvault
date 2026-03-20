@@ -16,7 +16,7 @@ export function TableHead({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function TableHeader({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+export function TableHeader({ children, className = '' }: { children?: React.ReactNode; className?: string }) {
   return (
     <th className={`px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider ${className}`}>
       {children}
