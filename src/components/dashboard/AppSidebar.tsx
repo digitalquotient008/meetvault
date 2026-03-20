@@ -20,6 +20,7 @@ import {
   LogOut,
   ChevronUp,
   ListOrdered,
+  Code,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -49,6 +50,7 @@ const financeNav: NavItem[] = [
   { href: '/app/reports', label: 'Reports', icon: FileText },
   { href: '/app/payments', label: 'Payments', icon: CreditCard },
   { href: '/app/settings/billing', label: 'Billing', icon: Receipt },
+  { href: '/app/settings/api', label: 'API', icon: Code },
   { href: '/app/settings/shop', label: 'Settings', icon: Settings },
 ];
 

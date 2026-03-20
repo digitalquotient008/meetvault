@@ -152,6 +152,7 @@ model Shop {
   walkInQueueEntries   WalkInQueueEntry[]
   auditLogs            AuditLog[]
   customerNotes        CustomerNote[]
+  apiKeys              ApiKey[]
 }
 
 model User {
@@ -490,4 +491,19 @@ model AuditLog {
   @@index([shopId])
   @@index([shopId, entityType, entityId])
   @@index([createdAt])
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  shopId      String
+  name        String   @default("Default")
+  keyHash     String   @unique
+  keyPrefix   String   // First 8 chars of key for display (e.g. "mv_live_a1b2...")
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
 }
