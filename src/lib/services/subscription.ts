@@ -92,6 +92,7 @@ export async function syncSubscriptionFromCheckout(sessionId: string) {
       stripeSubscriptionId: sub.id,
       subscriptionStatus: sub.status,
       trialEndsAt,
+      trialStartedAt: sub.status === 'trialing' ? new Date() : undefined,
     },
   });
 
@@ -121,6 +122,8 @@ export async function handleSubscriptionUpdated(sub: Stripe.Subscription) {
   });
   const previousStatus = shop?.subscriptionStatus;
 
+  const isConversion = sub.status === 'active' && previousStatus === 'trialing';
+
   await prisma.shop.update({
     where: { id: shopId },
     data: {
@@ -129,11 +132,12 @@ export async function handleSubscriptionUpdated(sub: Stripe.Subscription) {
       trialEndsAt: sub.trial_end
         ? new Date(sub.trial_end * 1000)
         : null,
+      ...(isConversion ? { trialConvertedAt: new Date() } : {}),
     },
   });
 
   // Send "subscription active" email when trial converts to paid
-  if (sub.status === 'active' && previousStatus === 'trialing') {
+  if (isConversion) {
     const owner = await prisma.membership.findFirst({
       where: { shopId, role: 'OWNER', isActive: true },
       include: { user: true },
@@ -148,10 +152,18 @@ export async function handleSubscriptionDeleted(sub: Stripe.Subscription) {
   const shopId = sub.metadata?.shopId;
   if (!shopId) return;
 
+  // Check if this was a trial that never converted
+  const shop = await prisma.shop.findUnique({
+    where: { id: shopId },
+    select: { trialConvertedAt: true },
+  });
+
   await prisma.shop.update({
     where: { id: shopId },
     data: {
       subscriptionStatus: 'canceled',
+      // Only set trialExpiredAt if the trial never converted to paid
+      ...(!shop?.trialConvertedAt ? { trialExpiredAt: new Date() } : {}),
     },
   });
 }
